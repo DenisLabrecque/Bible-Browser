@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Classes", "Classes", "{0CB22B3C-E60A-4BA9-AC3F-E788136DF7F7}"
 	ProjectSection(SolutionItems) = preProject
 		BibleReference.cs = BibleReference.cs
+		LoadBible.cs = LoadBible.cs
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BibleBrowserUWP", "..\BibleBrowserUWP\BibleBrowserUWP.csproj", "{A417D63C-7E69-499C-8A7B-D4381A50CC3B}"
