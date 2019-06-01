@@ -3,12 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2041
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BibleBrowserUWP", "BibleBrowserUWP.csproj", "{E764FDBA-3A4F-40B9-8B3B-7905CCC39DB6}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Classes", "Classes", "{0CB22B3C-E60A-4BA9-AC3F-E788136DF7F7}"
 	ProjectSection(SolutionItems) = preProject
 		BibleReference.cs = BibleReference.cs
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BibleBrowserUWP", "..\BibleBrowserUWP\BibleBrowserUWP.csproj", "{A417D63C-7E69-499C-8A7B-D4381A50CC3B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,24 +20,24 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E764FDBA-3A4F-40B9-8B3B-7905CCC39DB6}.Debug|ARM.ActiveCfg = Debug|ARM
-		{E764FDBA-3A4F-40B9-8B3B-7905CCC39DB6}.Debug|ARM.Build.0 = Debug|ARM
-		{E764FDBA-3A4F-40B9-8B3B-7905CCC39DB6}.Debug|ARM.Deploy.0 = Debug|ARM
-		{E764FDBA-3A4F-40B9-8B3B-7905CCC39DB6}.Debug|x64.ActiveCfg = Debug|x64
-		{E764FDBA-3A4F-40B9-8B3B-7905CCC39DB6}.Debug|x64.Build.0 = Debug|x64
-		{E764FDBA-3A4F-40B9-8B3B-7905CCC39DB6}.Debug|x64.Deploy.0 = Debug|x64
-		{E764FDBA-3A4F-40B9-8B3B-7905CCC39DB6}.Debug|x86.ActiveCfg = Debug|x86
-		{E764FDBA-3A4F-40B9-8B3B-7905CCC39DB6}.Debug|x86.Build.0 = Debug|x86
-		{E764FDBA-3A4F-40B9-8B3B-7905CCC39DB6}.Debug|x86.Deploy.0 = Debug|x86
-		{E764FDBA-3A4F-40B9-8B3B-7905CCC39DB6}.Release|ARM.ActiveCfg = Release|ARM
-		{E764FDBA-3A4F-40B9-8B3B-7905CCC39DB6}.Release|ARM.Build.0 = Release|ARM
-		{E764FDBA-3A4F-40B9-8B3B-7905CCC39DB6}.Release|ARM.Deploy.0 = Release|ARM
-		{E764FDBA-3A4F-40B9-8B3B-7905CCC39DB6}.Release|x64.ActiveCfg = Release|x64
-		{E764FDBA-3A4F-40B9-8B3B-7905CCC39DB6}.Release|x64.Build.0 = Release|x64
-		{E764FDBA-3A4F-40B9-8B3B-7905CCC39DB6}.Release|x64.Deploy.0 = Release|x64
-		{E764FDBA-3A4F-40B9-8B3B-7905CCC39DB6}.Release|x86.ActiveCfg = Release|x86
-		{E764FDBA-3A4F-40B9-8B3B-7905CCC39DB6}.Release|x86.Build.0 = Release|x86
-		{E764FDBA-3A4F-40B9-8B3B-7905CCC39DB6}.Release|x86.Deploy.0 = Release|x86
+		{A417D63C-7E69-499C-8A7B-D4381A50CC3B}.Debug|ARM.ActiveCfg = Debug|ARM
+		{A417D63C-7E69-499C-8A7B-D4381A50CC3B}.Debug|ARM.Build.0 = Debug|ARM
+		{A417D63C-7E69-499C-8A7B-D4381A50CC3B}.Debug|ARM.Deploy.0 = Debug|ARM
+		{A417D63C-7E69-499C-8A7B-D4381A50CC3B}.Debug|x64.ActiveCfg = Debug|x64
+		{A417D63C-7E69-499C-8A7B-D4381A50CC3B}.Debug|x64.Build.0 = Debug|x64
+		{A417D63C-7E69-499C-8A7B-D4381A50CC3B}.Debug|x64.Deploy.0 = Debug|x64
+		{A417D63C-7E69-499C-8A7B-D4381A50CC3B}.Debug|x86.ActiveCfg = Debug|x86
+		{A417D63C-7E69-499C-8A7B-D4381A50CC3B}.Debug|x86.Build.0 = Debug|x86
+		{A417D63C-7E69-499C-8A7B-D4381A50CC3B}.Debug|x86.Deploy.0 = Debug|x86
+		{A417D63C-7E69-499C-8A7B-D4381A50CC3B}.Release|ARM.ActiveCfg = Release|ARM
+		{A417D63C-7E69-499C-8A7B-D4381A50CC3B}.Release|ARM.Build.0 = Release|ARM
+		{A417D63C-7E69-499C-8A7B-D4381A50CC3B}.Release|ARM.Deploy.0 = Release|ARM
+		{A417D63C-7E69-499C-8A7B-D4381A50CC3B}.Release|x64.ActiveCfg = Release|x64
+		{A417D63C-7E69-499C-8A7B-D4381A50CC3B}.Release|x64.Build.0 = Release|x64
+		{A417D63C-7E69-499C-8A7B-D4381A50CC3B}.Release|x64.Deploy.0 = Release|x64
+		{A417D63C-7E69-499C-8A7B-D4381A50CC3B}.Release|x86.ActiveCfg = Release|x86
+		{A417D63C-7E69-499C-8A7B-D4381A50CC3B}.Release|x86.Build.0 = Release|x86
+		{A417D63C-7E69-499C-8A7B-D4381A50CC3B}.Release|x86.Deploy.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -47,7 +47,7 @@ namespace BibleBrowser
       /// <summary>
       /// Change a reference once it has been set using a book index
       /// </summary>
-      public void ChangeReference(int bookNumeral, int book, ChapterVerse start, ChapterVerse end)
+      public void SetReference(int bookNumeral, int book, ChapterVerse start, ChapterVerse end)
       {
          Initialize(bookNumeral, start, end, book);
       }
@@ -55,7 +55,7 @@ namespace BibleBrowser
       /// <summary>
       /// Change a reference once it has been set using a book name
       /// </summary>
-      public void ChangeReference(int bookNumeral, string bookName, ChapterVerse start, ChapterVerse end)
+      public void SetReference(int bookNumeral, string bookName, ChapterVerse start, ChapterVerse end)
       {
          Initialize(bookNumeral, start, end, null, bookName);
       }
@@ -165,38 +165,24 @@ namespace BibleBrowser
       private void Initialize(int bookNumeral, ChapterVerse start, ChapterVerse end, int? book = null, string bookName = null)
       {
          if(bookNumeral >= 0)
-         {
             BookNumeral = bookNumeral;
-         }
          else
-         {
             throw new Exception("A book numeral must be greater than 1, or zero if nonexistent");
-         }
 
          if(book != null && book < (int)BookShortName.Gn || book > (int)BookShortName.Rev)
-         {
             throw new Exception("A reference must be from the book short name enumeration");
-         }
          else
-         {
             Book = book;
-         }
 
          if(bookName != null && bookName.Length <= 1)
-         {
             throw new Exception("A book name should be at least two characters long");
-         }
          else
-         {
             BookName = bookName;
-         }
 
          Start = start;
          End = end;
          if(End.Chapter > 0 && End < Start)
-         {
             throw new Exception("A start reference cannot begin at a point later than an end reference");
-         }
       }
 
       /// <summary>
@@ -268,13 +254,9 @@ namespace BibleBrowser
 
          // Add the book numeral and name
          if(BookNumeral > 0)
-         {
             reference = BookNumeral + " " + Enum.GetName(typeof(BookShortName), Book);
-         }
          else
-         {
             reference = Enum.GetName(typeof(BookShortName), Book);
-         }
 
          // Add the chapter
          if(Start.Chapter > 0)
