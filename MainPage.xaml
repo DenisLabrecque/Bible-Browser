@@ -1,0 +1,231 @@
+﻿<Page
+   x:Class="BibleBrowserUWP.MainPage"
+   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+   xmlns:local="using:BibleBrowserUWP"
+   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+   xmlns:local1="using:BibleBrowser"
+   mc:Ignorable="d"
+   Background="{ThemeResource SystemControlAltMediumLowAcrylicWindowMediumBrush }">
+
+   <Grid Background="Transparent">
+      <Grid.RowDefinitions>
+         <RowDefinition Height="Auto"/>
+         <RowDefinition />
+      </Grid.RowDefinitions>
+
+      
+      <!-- Official title bar (must be defined in code for the custom title bar) -->
+      <Grid x:Name="grdTitleBar"
+            Background="Transparent">
+         <!-- Width of the padding columns is set in LayoutMetricsChanged handler. -->
+         <!-- Using padding columns instead of Margin ensures that the background
+              paints the area under the caption control buttons (for transparent buttons). -->
+         <Grid.ColumnDefinitions>
+            <ColumnDefinition x:Name="LeftPaddingColumn" Width="0"/>
+            <ColumnDefinition/>
+            <ColumnDefinition x:Name="RightPaddingColumn" Width="0"/>
+         </Grid.ColumnDefinitions>
+      </Grid>
+
+
+      <!-- Actual tabbed interface -->
+      <Grid>
+         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="1*"/>
+         </Grid.ColumnDefinitions>
+         
+         <!-- Tabs -->
+         <StackPanel Orientation="Horizontal"
+                     Background="Transparent">
+
+            <!-- Home Button -->
+            <Button Background="Transparent">
+               <Button.Content>
+                  <SymbolIcon Symbol="Home"/>
+               </Button.Content>
+            </Button>
+
+            <!-- Tab List -->
+            <ListView x:Name="tabs"
+                   ItemsSource="{x:Bind Tabs}"
+                   Background="Transparent">
+               <ListView.ItemsPanel>
+                  <ItemsPanelTemplate>
+                     <StackPanel Orientation="Horizontal" />
+                  </ItemsPanelTemplate>
+               </ListView.ItemsPanel>
+               <ListView.ItemTemplate>
+                  <DataTemplate x:DataType="local1:BrowserTab">
+                     <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{x:Bind Reference}"/>
+                        <Button>
+                           <Button.Content>
+                              <SymbolIcon Symbol="Cancel"/>
+                           </Button.Content>
+                        </Button>
+                     </StackPanel>
+                  </DataTemplate>
+               </ListView.ItemTemplate>
+            </ListView>
+
+            <!-- New Tab Button -->
+            <Button>
+               <Button.Content>
+                  <SymbolIcon Symbol="Add"/>
+               </Button.Content>
+            </Button>
+         </StackPanel>
+      </Grid>
+
+
+      <!-- Main Content -->
+      <Grid Grid.Column="1"
+            Grid.Row="1"
+            Background="White">
+         <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+         </Grid.RowDefinitions>
+
+         <ScrollViewer Grid.Row="0"
+                       Grid.Column="0"
+                       Margin="0,40,0,0"
+                       HorizontalScrollMode="Disabled"
+                       HorizontalScrollBarVisibility="Hidden">
+            <Grid>
+               <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="1*"/>
+               </Grid.ColumnDefinitions>
+               <Grid.RowDefinitions>
+                  <RowDefinition Height="1*"/>
+               </Grid.RowDefinitions>
+               <TextBlock Name="tbMainText"
+                                TextWrapping="Wrap"
+                                Grid.Column="0"
+                                Grid.Row="0"
+                                Margin="0"
+                                Width="1000">Suspendisse porta rhoncus mauris ac faucibus. Cras finibus, diam sit amet facilisis vestibulum, augue quam faucibus tellus, vel commodo felis enim ultricies lorem. Nulla egestas ante vitae vulputate posuere. Suspendisse potenti. Praesent at nisi nunc. Aliquam erat volutpat. Nullam eget quam a risus congue elementum. Suspendisse nisi nulla, blandit at lorem sit amet, viverra consequat urna. Maecenas in egestas tellus. Nullam luctus et felis vel eleifend. Curabitur rhoncus, neque ut fermentum blandit, tellus turpis vulputate nisi, nec dignissim lacus tellus nec metus. Nam vel feugiat dolor. Mauris fringilla tellus consequat pharetra vestibulum. Donec ut eleifend magna, in semper tellus. Vestibulum sit amet efficitur dui. Phasellus fringilla tortor risus, sit amet suscipit sem laoreet nec. 
+Nullam dapibus, augue eget egestas tristique, massa purus cursus felis, at faucibus ex sem in justo. Vestibulum et elit ipsum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nunc malesuada quam non leo ullamcorper placerat sit amet sed lorem. Etiam eget consequat ante, sed euismod arcu. Nulla facilisi. Sed tortor ex, rhoncus quis efficitur vel, pharetra in ipsum. Aliquam eu neque sit amet nisi laoreet tristique. Nulla eget congue dolor, eu fringilla neque. Sed auctor placerat elementum. Quisque egestas dignissim mattis. Sed sodales, erat in ultricies suscipit, odio felis euismod erat, non dapibus magna orci in tortor. Suspendisse mattis finibus dolor eu ultrices. Vivamus non orci id dolor condimentum placerat. Ut volutpat turpis scelerisque nisi blandit facilisis. 
+Etiam ut quam at mauris pharetra imperdiet non sagittis ligula. Vivamus ut ante nec purus fringilla molestie. Suspendisse quis luctus mi. Aenean interdum iaculis sollicitudin. Duis hendrerit mauris lacus, ac laoreet ligula commodo sit amet. Ut laoreet ipsum ac consequat efficitur. Donec laoreet tristique lacus, ultricies aliquet metus sollicitudin sit amet. Ut sed aliquet elit. Phasellus pharetra, dui congue scelerisque tincidunt, urna ipsum tempus orci, luctus accumsan nibh ipsum id velit. Integer elit sapien, hendrerit vel convallis sed, auctor sit amet lorem. Aliquam convallis aliquam erat, vitae molestie justo. Morbi vehicula enim eget justo accumsan porttitor. Vivamus eget quam purus. Cras nec pulvinar tellus. 
+Nulla in nisl eget est scelerisque accumsan sed a justo. Morbi cursus mi malesuada ipsum egestas finibus. In mollis congue massa, eget semper lacus auctor sed. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Integer sit amet varius nisi, et vestibulum neque. Morbi non convallis lorem, congue imperdiet dui. Vivamus dignissim sapien id purus volutpat venenatis. Cras non lacus sapien. 
+Morbi ultrices lorem enim, in vehicula nunc aliquet cursus. Praesent iaculis, odio semper luctus malesuada, dui enim semper est, efficitur pretium justo dolor sit amet orci. Quisque ut placerat urna, non eleifend dui. Fusce mollis, dolor a euismod commodo, turpis lectus pellentesque felis, eget lobortis neque urna at eros. Pellentesque bibendum eros a porta viverra. Donec ultricies turpis quis sollicitudin lobortis. Ut tincidunt lorem sed elit iaculis iaculis eget mollis dolor. Aenean luctus dapibus metus id imperdiet. Quisque pharetra a elit id maximus. 
+Integer diam purus, scelerisque eget ligula a, malesuada bibendum erat. Curabitur rhoncus diam finibus sem porttitor sodales. Donec porta urna ac imperdiet interdum. Donec cursus, tellus sed sagittis pharetra, erat lorem vulputate nulla, ac semper massa nibh sed erat. Aenean efficitur turpis nunc, at sollicitudin ex auctor non. Aenean consequat leo eu lorem porttitor, ac cursus nulla dapibus. Nam ut tellus sit amet tellus sodales tincidunt. Suspendisse nec magna vehicula, commodo leo nec, tempus eros. Donec cursus ipsum ut mauris bibendum porta. 
+Curabitur tincidunt, eros ut euismod placerat, ex lacus porta odio, non lobortis tellus sapien eget ex. Integer ullamcorper nunc justo, at dictum lacus scelerisque eu. Cras suscipit aliquet tincidunt. Cras euismod urna elit, sed semper libero elementum quis. In sagittis diam et ante lacinia faucibus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Integer dictum faucibus turpis, ac interdum massa tincidunt a. In imperdiet aliquet quam. Mauris fermentum vitae tortor in mollis. Integer vestibulum tortor nibh, et interdum nisi tincidunt eu. Sed eu rhoncus enim. 
+Sed semper tellus id sodales pellentesque. Integer vel blandit diam, a rhoncus tortor. Aliquam facilisis imperdiet ligula, nec tincidunt tortor mollis at. Morbi euismod accumsan diam vel ultrices. Morbi hendrerit tortor arcu, et facilisis ex imperdiet eu. Nulla ac iaculis risus, et ornare sem. Nunc tempus orci vitae imperdiet ultrices. Cras odio enim, convallis a tellus ut, ullamcorper dignissim ante. 
+Donec vehicula malesuada egestas. Morbi iaculis convallis velit a pulvinar. Integer ultricies accumsan imperdiet. Nam et suscipit mauris. Pellentesque bibendum sollicitudin scelerisque. Vestibulum non ex ac velit bibendum scelerisque eu nec enim. Nulla facilisi. Praesent in ultricies magna. Nam eu risus est. Donec elementum, orci vitae varius posuere, purus lorem vehicula augue, ut semper est tortor sed magna. 
+Suspendisse in justo posuere, egestas diam eu, ullamcorper enim. Suspendisse scelerisque maximus lectus non aliquet. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Curabitur a placerat mauris. Pellentesque imperdiet elementum convallis. Sed id nulla justo. Pellentesque odio erat, egestas ut mi et, dictum gravida ligula. Curabitur mollis, purus et accumsan sodales, tellus arcu malesuada nisi, vel interdum augue massa congue nisl. Nam ac dolor efficitur, sodales libero pellentesque, pharetra nulla. Praesent a nibh arcu. 
+Nullam a mollis metus. Etiam vitae sodales orci, sit amet vehicula tortor. Etiam hendrerit, libero aliquam varius consectetur, dui sem ultrices purus, ut venenatis turpis nibh sit amet ante. Nunc sed tortor in orci molestie elementum. Donec malesuada metus sollicitudin feugiat vulputate. Vivamus in risus tincidunt, posuere risus in, ornare odio. Mauris condimentum neque quam, vel condimentum sapien egestas sed. Nam ornare laoreet est, non dignissim diam venenatis et. Praesent et diam dui. Nam quis commodo sapien, ac dapibus augue. Donec iaculis aliquam ultricies. Morbi eu cursus neque. Praesent elit erat, sodales in consectetur ut, sodales quis ligula. Nunc suscipit euismod felis, vitae hendrerit tellus placerat at. Quisque eget nisi non nulla interdum vestibulum. 
+Vestibulum sapien dolor, hendrerit in pulvinar nec, tempus sit amet libero. Ut accumsan lobortis tortor quis dapibus. Nunc blandit risus vel metus bibendum bibendum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nunc vitae pretium nunc. Sed eu auctor nibh, vel dictum lorem. Aenean fermentum tortor vel nibh mollis convallis. Vestibulum id lorem sodales, sodales nibh in, congue odio. Donec scelerisque velit nulla, eu vehicula eros dignissim vel. Vestibulum cursus nisl id magna aliquam dictum. Quisque fermentum elit at nunc dignissim facilisis. Suspendisse ante lacus, vehicula eu sapien eget, vulputate sagittis ex. In felis purus, consectetur a nisl at, lacinia dignissim enim. 
+Nullam tincidunt, massa quis bibendum scelerisque, odio lorem lacinia ex, id suscipit dolor tellus eget lectus. Duis purus lectus, sagittis ac nisi id, convallis dictum diam. Etiam pulvinar orci at justo tempus, nec interdum risus porttitor. Duis hendrerit quam nisl, ut rhoncus sem mattis ac. Maecenas maximus consequat euismod. Proin dui mi, ullamcorper sit amet ornare tincidunt, tristique eget quam. Donec a turpis blandit, suscipit dolor non, tempor ipsum. 
+Vivamus eleifend faucibus ligula, viverra luctus massa fermentum vulputate. Nam nulla sem, elementum a suscipit lobortis, placerat eget orci. Sed dictum semper erat et viverra. Phasellus congue varius metus ut volutpat. Mauris ac enim at neque finibus vestibulum. Fusce dictum malesuada lacinia. Phasellus pharetra arcu eget nisi cursus, eu tristique justo scelerisque. Nulla facilisi. Aenean in pulvinar ipsum. 
+Proin vulputate sed magna at vulputate. Integer in quam suscipit, efficitur quam nec, efficitur tortor. Phasellus vulputate magna sed lacus vulputate, et dictum arcu pellentesque. Phasellus ornare cursus metus vel auctor. Curabitur non leo a lorem congue gravida. Vivamus lectus lectus, convallis vitae rhoncus at, tincidunt ornare odio. Nunc ut gravida turpis. Aliquam ante lacus, tristique sed lobortis non, eleifend eget leo. Aenean semper vel elit et eleifend. 
+Curabitur tincidunt cursus sapien. Nulla finibus quis leo a cursus. Integer bibendum erat nibh. Nulla malesuada posuere enim, congue feugiat ligula lobortis non. In sed pharetra diam. Quisque in purus id lorem pharetra tristique non a sapien. Sed dictum pharetra velit, at finibus tellus cursus malesuada. Duis ultricies maximus elit, vel aliquam dui tristique in. 
+Sed sed maximus odio, ac tristique quam. Suspendisse potenti. Praesent vel consectetur felis, at tristique magna. Nullam consequat ligula eget iaculis iaculis. Morbi efficitur dapibus velit, eget congue ligula imperdiet sed. Donec vulputate elit sed elit vestibulum auctor. Ut varius, nulla a imperdiet dapibus, dui nunc scelerisque dolor, vitae rutrum sapien lorem at diam. Suspendisse fermentum nisi eget sapien imperdiet, a luctus lacus laoreet. Morbi vel diam hendrerit, dapibus turpis sit amet, gravida augue. Curabitur lobortis magna eget placerat tempor. Nulla facilisi. Nullam tempor vitae libero nec porttitor. Ut placerat lacus purus, eget ultrices dui cursus tempor. 
+Cras gravida lorem a luctus bibendum. Morbi dapibus tristique nibh et bibendum. Nulla ut finibus elit. Nulla pulvinar lacus ligula, congue malesuada massa pellentesque rhoncus. Integer eget diam sed nibh efficitur porttitor nec sit amet nibh. Integer id luctus sapien, vel feugiat velit. Mauris faucibus enim vel tempus laoreet. Quisque posuere et sapien ac fringilla. Praesent pellentesque dui commodo turpis pretium suscipit. Cras eleifend massa in eros consectetur fermentum. Sed a diam dui. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Etiam purus dolor, egestas at interdum non, finibus at nibh. Integer sit amet tincidunt nulla, non cursus magna. 
+Aliquam fringilla iaculis ante, a feugiat odio. Interdum et malesuada fames ac ante ipsum primis in faucibus. Pellentesque volutpat urna a ipsum sodales pulvinar. Morbi non sapien justo. Cras dignissim massa quis purus suscipit placerat. Sed in diam quam. Integer magna lorem, luctus quis bibendum sit amet, porta eget metus. Aenean elementum feugiat tincidunt. 
+Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Fusce non neque vel urna iaculis vulputate tristique non urna. Fusce sed neque tristique, iaculis odio vel, euismod risus. Sed vestibulum, est in varius accumsan, ante nisi dapibus libero, sed auctor leo ligula a lacus. Vivamus auctor non orci at convallis. Etiam elementum tortor a lectus imperdiet, ac porta ante volutpat. Duis nec ligula vel ligula accumsan auctor ut sed ante. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Morbi tincidunt lacus sit amet tincidunt feugiat. Etiam tempor posuere massa, id tincidunt arcu dapibus ut. Mauris eget imperdiet nibh. Quisque convallis quis justo ac rhoncus. In hac habitasse platea dictumst. Mauris aliquam ornare massa. Etiam consectetur sem risus.</TextBlock>
+            </Grid>
+         </ScrollViewer>
+
+
+         <!-- Command Bar -->
+         <Grid Height="40"
+               VerticalAlignment="Top"
+               Background="{ThemeResource SystemControlAltMediumLowAcrylicElementMediumBrush}"
+               Opacity=".5">
+            <Grid.ColumnDefinitions>
+               <ColumnDefinition Width="90"/>
+               <ColumnDefinition Width="1*"/>
+               <ColumnDefinition Width="90"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Previous and Next buttons -->
+            <StackPanel Grid.Column="0"
+                        Orientation="Horizontal">
+               <Button
+                       Width="35"
+                       Height="35"
+                       Margin="2.5, 2.5, 2.5, 2.5">
+                  <Button.Content>
+                     <SymbolIcon Symbol="Back"/>
+                  </Button.Content>
+               </Button>
+               <Button
+                       Width="34"
+                       Height="34"
+                       Margin="0, 2.5, 2.5, 2.5">
+                  <Button.Content>
+                     <SymbolIcon Symbol="Forward"/>
+                  </Button.Content>
+               </Button>
+            </StackPanel>
+
+            <!-- Search -->
+            <Grid Grid.Column="1"
+                        Margin="0,5"
+                        BorderBrush="Gray"
+                        BorderThickness="1"
+                        Background="Transparent">
+               <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto"/>
+                  <ColumnDefinition Width="1*"/>
+               </Grid.ColumnDefinitions>
+               <Button Grid.Column="0" Content="KJV"
+                       BorderThickness="0"
+                       Background="Transparent"
+                       />
+               <TextBox Grid.Column="1"
+                        PlaceholderText="Search"
+                        BorderThickness="0"
+                        Background="Transparent"
+                        Margin="0"
+                        />
+            </Grid>
+            
+            <!-- Options -->
+            <StackPanel Grid.Column="2"
+                        Orientation="Horizontal"
+                        FlowDirection="RightToLeft">
+               <Button
+                       Width="35"
+                       Height="35"
+                       Margin="2.5, 2.5, 2.5, 2.5">
+                  <Button.Content>
+                     <SymbolIcon Symbol="More"/>
+                  </Button.Content>
+               </Button>
+               <Button
+                       Width="35"
+                       Height="35"
+                       Margin="0,2.5">
+                  <Button.Content>
+                     <SymbolIcon Symbol="More"/>
+                  </Button.Content>
+               </Button>
+            </StackPanel>
+         </Grid>
+
+
+         <!--<CommandBar>
+            <CommandBar.Content>
+               <StackPanel Orientation="Horizontal">
+                  <AppBarButton Icon="Back"/>
+                  <AppBarButton Icon="Forward"/>
+                  <AutoSuggestBox PlaceholderText="Search a phrase or reference"
+                                 VerticalAlignment="Center"></AutoSuggestBox>
+               </StackPanel>
+            </CommandBar.Content>
+            <CommandBar.PrimaryCommands>
+               <AppBarButton Icon="Library" Tag="Bibles"/>
+            </CommandBar.PrimaryCommands>
+            <CommandBar.SecondaryCommands>
+               <AppBarButton Icon="Library" Label="Bibles"/>
+               <AppBarButton Icon="Setting" Label="Settings"/>
+            </CommandBar.SecondaryCommands>
+         </CommandBar>-->
+      </Grid>
+
+   </Grid>
+</Page>
