@@ -9,99 +9,121 @@
    mc:Ignorable="d"
    Background="{ThemeResource SystemControlAltMediumLowAcrylicWindowMediumBrush }">
 
-   <Grid Background="Transparent">
-      <Grid.RowDefinitions>
-         <RowDefinition Height="Auto"/>
-         <RowDefinition />
-      </Grid.RowDefinitions>
+    <Page.Resources>
+        <Style x:Key="CommandButton" TargetType="Button" BasedOn="{StaticResource ButtonRevealStyle}">
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Margin" Value="1"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="Width" Value="40"/>
+        </Style>
 
-      
-      <!-- Official title bar (must be defined in code for the custom title bar) -->
-      <Grid x:Name="grdTitleBar"
+        <Style x:Key="TabBarButton" TargetType="Button" BasedOn="{StaticResource CommandButton}">
+            <Setter Property="Height" Value="33"/>
+            <Setter Property="Width" Value="35"/>
+        </Style>
+
+        <Style x:Key="TabCloseButton" TargetType="Button">
+            <Setter Property="Height" Value="33"/>
+            <Setter Property="Width" Value="33"/>
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+    </Page.Resources>
+
+    <Grid Background="Transparent">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+
+        <!-- Official title bar (must be defined in code for the custom title bar) -->
+        <Grid x:Name="grdTitleBar"
             Background="Transparent">
-         <!-- Width of the padding columns is set in LayoutMetricsChanged handler. -->
-         <!-- Using padding columns instead of Margin ensures that the background
+            <!-- Width of the padding columns is set in LayoutMetricsChanged handler. -->
+            <!-- Using padding columns instead of Margin ensures that the background
               paints the area under the caption control buttons (for transparent buttons). -->
-         <Grid.ColumnDefinitions>
-            <ColumnDefinition x:Name="LeftPaddingColumn" Width="0"/>
-            <ColumnDefinition/>
-            <ColumnDefinition x:Name="RightPaddingColumn" Width="0"/>
-         </Grid.ColumnDefinitions>
-      </Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition x:Name="LeftPaddingColumn" Width="0"/>
+                <ColumnDefinition/>
+                <ColumnDefinition x:Name="RightPaddingColumn" Width="0"/>
+            </Grid.ColumnDefinitions>
+        </Grid>
 
 
-      <!-- Actual tabbed interface -->
-      <Grid>
-         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="1*"/>
-         </Grid.ColumnDefinitions>
-         
-         <!-- Tabs -->
-         <StackPanel Orientation="Horizontal"
-                     Background="Transparent">
+        <!-- Actual tabbed interface -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
 
-            <!-- Home Button -->
-            <Button Background="Transparent">
-               <Button.Content>
-                  <SymbolIcon Symbol="Home"/>
-               </Button.Content>
-            </Button>
+            <!-- Tabs -->
+            <StackPanel Orientation="Horizontal"
+                        Background="Transparent">
 
-            <!-- Tab List -->
-            <ListView x:Name="tabs"
-                   ItemsSource="{x:Bind Tabs}"
-                   Background="Transparent">
-               <ListView.ItemsPanel>
-                  <ItemsPanelTemplate>
-                     <StackPanel Orientation="Horizontal" />
-                  </ItemsPanelTemplate>
-               </ListView.ItemsPanel>
-               <ListView.ItemTemplate>
-                  <DataTemplate x:DataType="local1:BrowserTab">
-                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{x:Bind Reference}"/>
-                        <Button>
-                           <Button.Content>
-                              <SymbolIcon Symbol="Cancel"/>
-                           </Button.Content>
-                        </Button>
-                     </StackPanel>
-                  </DataTemplate>
-               </ListView.ItemTemplate>
-            </ListView>
+                <!-- Home Button -->
+                <Button Style="{StaticResource TabBarButton}">
+                    <FontIcon FontSize="15" Glyph="&#xE80F;"/>
+                </Button>
 
-            <!-- New Tab Button -->
-            <Button>
-               <Button.Content>
-                  <SymbolIcon Symbol="Add"/>
-               </Button.Content>
-            </Button>
-         </StackPanel>
-      </Grid>
+                <!-- Tab List -->
+                <ListView x:Name="lvTabs"
+                          ItemsSource="{x:Bind Tabs}"
+                          Background="Transparent">
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="local1:BrowserTab">
+                            <StackPanel Orientation="Horizontal">
+                                <StackPanel Orientation="Vertical">
+                                    <TextBlock Text="{x:Bind Reference}" FontWeight="Bold" FontSize="12"/>
+                                    <TextBlock Text="{x:Bind Reference.Version}" FontSize="9"/>
+                                </StackPanel>
+                                <Button Style="{StaticResource TabCloseButton}">
+                                    <FontIcon FontSize="15" Glyph="&#xE711;"/>
+                                </Button>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
+                <!-- New Tab Button -->
+                <Button Style="{StaticResource TabBarButton}">
+                    <FontIcon FontSize="15" Glyph="&#xE710;"/>
+                </Button>
+            </StackPanel>
+        </Grid>
 
 
-      <!-- Main Content -->
-      <Grid Grid.Column="1"
+        <!-- Main Content -->
+        <Grid Grid.Column="1"
             Grid.Row="1"
             Background="White">
-         <Grid.RowDefinitions>
-            <RowDefinition Height="1*"/>
-         </Grid.RowDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
 
-         <ScrollViewer Grid.Row="0"
+            <ScrollViewer Grid.Row="0"
                        Grid.Column="0"
-                       Margin="0,40,0,0"
+                       Margin="0,0,0,0"
                        HorizontalScrollMode="Disabled"
-                       HorizontalScrollBarVisibility="Hidden">
-            <Grid>
-               <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="1*"/>
-               </Grid.ColumnDefinitions>
-               <Grid.RowDefinitions>
-                  <RowDefinition Height="1*"/>
-               </Grid.RowDefinitions>
-               <TextBlock Name="tbMainText"
+                       HorizontalScrollBarVisibility="Hidden"
+                       VerticalScrollBarVisibility="Hidden">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Name="tbMainText"
                                 TextWrapping="Wrap"
                                 Grid.Column="0"
                                 Grid.Row="0"
@@ -126,89 +148,89 @@ Sed sed maximus odio, ac tristique quam. Suspendisse potenti. Praesent vel conse
 Cras gravida lorem a luctus bibendum. Morbi dapibus tristique nibh et bibendum. Nulla ut finibus elit. Nulla pulvinar lacus ligula, congue malesuada massa pellentesque rhoncus. Integer eget diam sed nibh efficitur porttitor nec sit amet nibh. Integer id luctus sapien, vel feugiat velit. Mauris faucibus enim vel tempus laoreet. Quisque posuere et sapien ac fringilla. Praesent pellentesque dui commodo turpis pretium suscipit. Cras eleifend massa in eros consectetur fermentum. Sed a diam dui. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Etiam purus dolor, egestas at interdum non, finibus at nibh. Integer sit amet tincidunt nulla, non cursus magna. 
 Aliquam fringilla iaculis ante, a feugiat odio. Interdum et malesuada fames ac ante ipsum primis in faucibus. Pellentesque volutpat urna a ipsum sodales pulvinar. Morbi non sapien justo. Cras dignissim massa quis purus suscipit placerat. Sed in diam quam. Integer magna lorem, luctus quis bibendum sit amet, porta eget metus. Aenean elementum feugiat tincidunt. 
 Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Fusce non neque vel urna iaculis vulputate tristique non urna. Fusce sed neque tristique, iaculis odio vel, euismod risus. Sed vestibulum, est in varius accumsan, ante nisi dapibus libero, sed auctor leo ligula a lacus. Vivamus auctor non orci at convallis. Etiam elementum tortor a lectus imperdiet, ac porta ante volutpat. Duis nec ligula vel ligula accumsan auctor ut sed ante. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Morbi tincidunt lacus sit amet tincidunt feugiat. Etiam tempor posuere massa, id tincidunt arcu dapibus ut. Mauris eget imperdiet nibh. Quisque convallis quis justo ac rhoncus. In hac habitasse platea dictumst. Mauris aliquam ornare massa. Etiam consectetur sem risus.</TextBlock>
-            </Grid>
-         </ScrollViewer>
+                </Grid>
+            </ScrollViewer>
 
 
-         <!-- Command Bar -->
-         <Grid Height="40"
+            <!-- Command Bar -->
+            <Grid Height="40"
                VerticalAlignment="Top"
-               Background="{ThemeResource SystemControlAltMediumLowAcrylicElementMediumBrush}"
-               Opacity=".5">
-            <Grid.ColumnDefinitions>
-               <ColumnDefinition Width="90"/>
-               <ColumnDefinition Width="1*"/>
-               <ColumnDefinition Width="90"/>
-            </Grid.ColumnDefinitions>
+               Background="Transparent">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="90"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="90"/>
+                </Grid.ColumnDefinitions>
 
-            <!-- Previous and Next buttons -->
-            <StackPanel Grid.Column="0"
-                        Orientation="Horizontal">
-               <Button
-                       Width="35"
-                       Height="35"
-                       Margin="2.5, 2.5, 2.5, 2.5">
-                  <Button.Content>
-                     <SymbolIcon Symbol="Back"/>
-                  </Button.Content>
-               </Button>
-               <Button
-                       Width="34"
-                       Height="34"
-                       Margin="0, 2.5, 2.5, 2.5">
-                  <Button.Content>
-                     <SymbolIcon Symbol="Forward"/>
-                  </Button.Content>
-               </Button>
-            </StackPanel>
-
-            <!-- Search -->
-            <Grid Grid.Column="1"
-                        Margin="0,5"
-                        BorderBrush="Gray"
-                        BorderThickness="1"
-                        Background="Transparent">
-               <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="Auto"/>
-                  <ColumnDefinition Width="1*"/>
-               </Grid.ColumnDefinitions>
-               <Button Grid.Column="0" Content="KJV"
-                       BorderThickness="0"
-                       Background="Transparent"
-                       />
-               <TextBox Grid.Column="1"
-                        PlaceholderText="Search"
-                        BorderThickness="0"
-                        Background="Transparent"
-                        Margin="0"
-                        />
-            </Grid>
-            
-            <!-- Options -->
-            <StackPanel Grid.Column="2"
+                <!-- Previous and Next buttons -->
+                <StackPanel Grid.Column="0"
                         Orientation="Horizontal"
-                        FlowDirection="RightToLeft">
-               <Button
-                       Width="35"
-                       Height="35"
-                       Margin="2.5, 2.5, 2.5, 2.5">
-                  <Button.Content>
-                     <SymbolIcon Symbol="More"/>
-                  </Button.Content>
-               </Button>
-               <Button
-                       Width="35"
-                       Height="35"
-                       Margin="0,2.5">
-                  <Button.Content>
-                     <SymbolIcon Symbol="More"/>
-                  </Button.Content>
-               </Button>
-            </StackPanel>
-         </Grid>
+                        Background="{StaticResource AppBarBackgroundThemeBrush}">
+                    
+                    <!-- Back -->
+                    <Button Style="{StaticResource CommandButton}"
+                            Name="btnPrevious">
+                        <FontIcon FontSize="15" Glyph="&#xE72B;"/>
+                    </Button>
+                    
+                    <!-- Next -->
+                    <Button Style="{StaticResource CommandButton}"
+                            Name="btnNext"
+                            AccessKey="LeftArrow">
+                        <FontIcon FontSize="15" Glyph="&#xE72A;"/>
+                    </Button>
+                </StackPanel>
+
+                <!-- Search -->
+                <StackPanel Grid.Column="1"
+                            BorderThickness="5"
+                            BorderBrush="{StaticResource AppBarBackgroundThemeBrush}">
+                    <Grid BorderBrush="Gray"
+                          BorderThickness="1"
+                          Background="{StaticResource SystemControlBaseMediumLowAcrylicElementMediumBrush}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button Grid.Column="0"
+                            Content="KJV"
+                            BorderThickness="0"
+                            Background="Transparent"/>
+
+                        <TextBox Grid.Column="1"
+                             PlaceholderText="Search"
+                             BorderThickness="0"
+                             Background="Transparent"
+                             Margin="0"
+                             VerticalAlignment="Center"
+                             Height="26"/>
+                    </Grid>
+                </StackPanel>
 
 
-         <!--<CommandBar>
+                <!-- Options -->
+                <StackPanel Grid.Column="2"
+                        Orientation="Horizontal"
+                        FlowDirection="RightToLeft"
+                        Background="{StaticResource AppBarBackgroundThemeBrush}">
+                    <Button Style="{StaticResource ButtonRevealStyle}"
+                       Margin="1">
+                        <Button.Content>
+                            <SymbolIcon Symbol="More"/>
+                        </Button.Content>
+                    </Button>
+                    <Button Style="{StaticResource ButtonRevealStyle}"
+                       Margin="1">
+                        <Button.Content>
+                            <SymbolIcon Symbol="More"/>
+                        </Button.Content>
+                    </Button>
+                </StackPanel>
+            </Grid>
+
+
+            <!--<CommandBar>
             <CommandBar.Content>
                <StackPanel Orientation="Horizontal">
                   <AppBarButton Icon="Back"/>
@@ -225,7 +247,7 @@ Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculu
                <AppBarButton Icon="Setting" Label="Settings"/>
             </CommandBar.SecondaryCommands>
          </CommandBar>-->
-      </Grid>
+        </Grid>
 
-   </Grid>
+    </Grid>
 </Page>
