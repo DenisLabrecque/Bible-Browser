@@ -45,7 +45,7 @@ namespace BibleBrowser
 
       public BibleVersion(string fileName)
       {
-         m_filePath = Path.Combine(Package.Current.InstalledLocation.Path, BiblesLoaded.BIBLE_PATH + "/" + fileName);
+         m_filePath = Path.Combine(Package.Current.InstalledLocation.Path, BibleLoader.BIBLE_PATH + "/" + fileName);
 
          // Create the XML document object
          XDocument loadedData = XDocument.Load(m_filePath);

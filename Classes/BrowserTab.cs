@@ -41,33 +41,34 @@ namespace BibleBrowser
       #endregion
 
 
-      #region Initialize
+        #region Initialize
 
-      /// <summary>
-      /// List browser tabs that were open in the past.
-      /// TODO
-      /// </summary>
-      public static void Initialize()
-      {
-         Tabs.Add(
-            new BrowserTab(
-               new BibleReference(
-                  BiblesLoaded.Version(BiblesLoaded.m_BibleFileNames[0]), BibleBook.Gn, 1, 1)));
-         Tabs.Add(
-            new BrowserTab(
-               new BibleReference(
-                  BiblesLoaded.Version(BiblesLoaded.m_BibleFileNames[0]), BibleBook.Rm, 2)));
-         Tabs.Add(
-            new BrowserTab(
-               new BibleReference(
-                  BiblesLoaded.Version(BiblesLoaded.m_BibleFileNames[0]), BibleBook.Lc)));
-         Tabs.Add(
-            new BrowserTab(
-               new BibleReference(
-                  BiblesLoaded.Version(BiblesLoaded.m_BibleFileNames[0]), BibleBook.Sng)));
-      }
+        /// <summary>
+        /// Static constructor.
+        /// List browser tabs that were open in the past.
+        /// TODO
+        /// </summary>
+        static BrowserTab()
+        {
+            Tabs.Add(
+               new BrowserTab(
+                  new BibleReference(
+                     BibleLoader.Version(BibleLoader.m_BibleFileNames[0]), BibleBook.Gn, 1, 1)));
+            Tabs.Add(
+               new BrowserTab(
+                  new BibleReference(
+                     BibleLoader.Version(BibleLoader.m_BibleFileNames[0]), BibleBook.Rm, 2)));
+            Tabs.Add(
+               new BrowserTab(
+                  new BibleReference(
+                     BibleLoader.Version(BibleLoader.m_BibleFileNames[0]), BibleBook.Lc)));
+            Tabs.Add(
+               new BrowserTab(
+                  new BibleReference(
+                     BibleLoader.Version(BibleLoader.m_BibleFileNames[0]), BibleBook.Sng)));
+        }
 
-      #endregion
+        #endregion
 
 
       #region Constructor
