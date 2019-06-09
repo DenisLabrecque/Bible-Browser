@@ -4,13 +4,14 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using System.Xml.Linq;
 using Windows.ApplicationModel;
 
 namespace BibleBrowser
 {
    /// <summary>
-   /// A summary of metadata representing an XML Bible document.
+   /// A summary of metadata and the document representing an XML Bible document.
    /// A list of these is created on load.
    /// </summary>
    class BibleVersion
@@ -21,6 +22,8 @@ namespace BibleBrowser
       string m_filePath;
       string m_versionName;
       string m_versionAbbreviation;
+
+      XDocument m_xDocument = null;
 
       List<string> m_bookNames = new List<string>();
       List<string> m_bookAbbreviations = new List<string>();
@@ -38,6 +41,14 @@ namespace BibleBrowser
       public List<string> BookAbbreviations { get => m_bookAbbreviations; }
       public List<int> BookNumbers { get => m_bookNumbers; }
 
+      public XDocument XDocument {
+         get {
+            if(m_xDocument == null)
+               m_xDocument = XDocument.Load(m_filePath);
+            return m_xDocument;
+         }
+      }
+
       #endregion
 
 
@@ -47,24 +58,21 @@ namespace BibleBrowser
       {
          m_filePath = Path.Combine(Package.Current.InstalledLocation.Path, BibleLoader.BIBLE_PATH + "/" + fileName);
 
-         // Create the XML document object
-         XDocument loadedData = XDocument.Load(m_filePath);
-
          // Set information from XML
-         m_language = loadedData.Root.Element(Zefania.NDE_INFO).Element(Zefania.NDE_LANG).Value;
-         m_versionName = loadedData.Root.Attribute(Zefania.ATTR_BIBLENAME).Value;
-         m_versionAbbreviation = loadedData.Root.Element(Zefania.NDE_INFO).Element(Zefania.VERSION_ABBR).Value;
+         m_language = XDocument.Root.Element(Zefania.NDE_INFO).Element(Zefania.NDE_LANG).Value;
+         m_versionName = XDocument.Root.Attribute(Zefania.ATTR_BIBLENAME).Value;
+         m_versionAbbreviation = XDocument.Root.Element(Zefania.NDE_INFO).Element(Zefania.VERSION_ABBR).Value;
 
          // Find the book names in XML
-         foreach(XElement element in loadedData.Descendants(Zefania.NDE_BIBLEBOOK))
+         foreach(XElement element in XDocument.Descendants(Zefania.NDE_BIBLEBOOK))
             m_bookNames.Add(element.Attribute(Zefania.ATTR_BOOKNAME).Value);
 
          // Find the book short names in XML
-         foreach(XElement element in loadedData.Descendants(Zefania.NDE_BIBLEBOOK))
+         foreach(XElement element in XDocument.Descendants(Zefania.NDE_BIBLEBOOK))
             m_bookAbbreviations.Add(element.Attribute(Zefania.ATTR_BOOKSHORTNAME).Value);
 
          // Find the book numbers in XML
-         foreach(XElement element in loadedData.Descendants(Zefania.NDE_BIBLEBOOK))
+         foreach(XElement element in XDocument.Descendants(Zefania.NDE_BIBLEBOOK))
             m_bookNumbers.Add(Int32.Parse(element.Attribute(Zefania.ATTR_BOOKNUM).Value));
       }
 
@@ -72,6 +80,26 @@ namespace BibleBrowser
 
 
       #region Methods
+
+      /// <summary>
+      /// Get every verse in a chapter by <c>BibleReference</c>.
+      /// </summary>
+      /// <param name="reference">The chapter to look up</param>
+      /// <returns>A list of strings that are the contents of each verse in the Bible's chapter.</returns>
+      public List<string> GetChapterVerses(BibleReference reference)
+      {
+         List<string> verseContents = new List<string>();
+         XElement book = XDocument.Descendants("BIBLEBOOK").ElementAt((int)reference.Book);
+         XElement chapter = book.Descendants("CHAPTER").ElementAt(reference.Chapter - 1);
+         
+         foreach(XElement element in chapter.Elements())
+         {
+            verseContents.Add(element.Value);
+         }
+
+         return verseContents;
+      }
+
 
       /// <summary>
       /// Overridden string method.

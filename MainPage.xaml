@@ -172,7 +172,7 @@
                 <ListView ItemContainerStyle="{StaticResource TabListViewItemContainer}" x:Name="lvTabs"
                           ItemsSource="{x:Bind Tabs}"
                           Height="Auto"
-                          Background="Transparent">
+                          Background="Transparent" SelectionChanged="LvTabs_SelectionChanged">
                     <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
                             <StackPanel Orientation="Horizontal" MinWidth="100" />
@@ -232,7 +232,7 @@
                                 TextWrapping="Wrap"
                                 Grid.Column="0"
                                 Grid.Row="0"
-                                Margin="0"
+                                Margin="0, 80"
                                 Width="1000">Suspendisse porta rhoncus mauris ac faucibus. Cras finibus, diam sit amet facilisis vestibulum, augue quam faucibus tellus, vel commodo felis enim ultricies lorem. Nulla egestas ante vitae vulputate posuere. Suspendisse potenti. Praesent at nisi nunc. Aliquam erat volutpat. Nullam eget quam a risus congue elementum. Suspendisse nisi nulla, blandit at lorem sit amet, viverra consequat urna. Maecenas in egestas tellus. Nullam luctus et felis vel eleifend. Curabitur rhoncus, neque ut fermentum blandit, tellus turpis vulputate nisi, nec dignissim lacus tellus nec metus. Nam vel feugiat dolor. Mauris fringilla tellus consequat pharetra vestibulum. Donec ut eleifend magna, in semper tellus. Vestibulum sit amet efficitur dui. Phasellus fringilla tortor risus, sit amet suscipit sem laoreet nec. 
 Nullam dapibus, augue eget egestas tristique, massa purus cursus felis, at faucibus ex sem in justo. Vestibulum et elit ipsum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nunc malesuada quam non leo ullamcorper placerat sit amet sed lorem. Etiam eget consequat ante, sed euismod arcu. Nulla facilisi. Sed tortor ex, rhoncus quis efficitur vel, pharetra in ipsum. Aliquam eu neque sit amet nisi laoreet tristique. Nulla eget congue dolor, eu fringilla neque. Sed auctor placerat elementum. Quisque egestas dignissim mattis. Sed sodales, erat in ultricies suscipit, odio felis euismod erat, non dapibus magna orci in tortor. Suspendisse mattis finibus dolor eu ultrices. Vivamus non orci id dolor condimentum placerat. Ut volutpat turpis scelerisque nisi blandit facilisis. 
 Etiam ut quam at mauris pharetra imperdiet non sagittis ligula. Vivamus ut ante nec purus fringilla molestie. Suspendisse quis luctus mi. Aenean interdum iaculis sollicitudin. Duis hendrerit mauris lacus, ac laoreet ligula commodo sit amet. Ut laoreet ipsum ac consequat efficitur. Donec laoreet tristique lacus, ultricies aliquet metus sollicitudin sit amet. Ut sed aliquet elit. Phasellus pharetra, dui congue scelerisque tincidunt, urna ipsum tempus orci, luctus accumsan nibh ipsum id velit. Integer elit sapien, hendrerit vel convallis sed, auctor sit amet lorem. Aliquam convallis aliquam erat, vitae molestie justo. Morbi vehicula enim eget justo accumsan porttitor. Vivamus eget quam purus. Cras nec pulvinar tellus. 

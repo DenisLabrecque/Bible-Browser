@@ -98,9 +98,9 @@
     <Compile Include="Classes\BibleReference.cs" />
     <Compile Include="Classes\BibleVersion.cs" />
     <Compile Include="Classes\BrowserTab.cs" />
-    <Compile Include="Classes\ChapterAndVerse.cs" />
+    <Compile Include="OldClasses\ChapterAndVerse.cs" />
     <Compile Include="Classes\Constants.cs" />
-    <Compile Include="Classes\BiblesLoaded.cs" />
+    <Compile Include="Classes\BibleLoader.cs" />
     <Compile Include="Classes\BibleSearch.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
@@ -114,7 +114,9 @@
     <None Include="BibleBrowserUWP_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Bibles\ylt.xml" />
+    <Content Include="Bibles\ylt.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\SplashScreen.scale-200.png" />
