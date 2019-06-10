@@ -24,6 +24,11 @@ namespace BibleBrowser
       public static ObservableCollection<BrowserTab> Tabs = new ObservableCollection<BrowserTab>();
 
       /// <summary>
+      /// The currently selected browser tab.
+      /// </summary>
+      public static BrowserTab Selected { get => Tabs[TabIndex]; }
+
+      /// <summary>
       /// The index of the currently open tab.
       /// Stored in application memory.
       /// </summary>

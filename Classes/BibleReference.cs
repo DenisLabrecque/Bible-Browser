@@ -27,6 +27,11 @@ namespace BibleBrowser
       public BookNumeral Numeral { get; private set; }
       public BibleBook Book { get; private set; }
       public string SimplifiedReference { get => BookName + " " + Chapter; } // Book name and chapter
+
+      /// <summary>
+      /// The book name indexed in this Bible version.
+      /// Set dynamically by retrieval using the <code>BibleBook</code> enumeration as index for the <code>BookNames</code> loaded list.
+      /// </summary>
       public string BookName { get => Version.BookNames[(int)Book]; }
       public int Chapter { get; private set; }
       public int Verse { get; private set; }
@@ -128,6 +133,50 @@ namespace BibleBrowser
 
          return containsLetter && containsNumber;
       }
+
+
+      /// <summary>
+      /// Set this reference to the wanted book.
+      /// Throw an <code>ArgumentException</code> if the book name does not exist.
+      /// This method is fluent and can be chained.
+      /// </summary>
+      /// <param name="bookName">The exact book name to set the reference to.</param>
+      public BibleReference SetBook(string bookName)
+      {
+         if (Version.BookNames.Contains(bookName))
+         {
+            Book = (BibleBook)Version.BookNames.IndexOf(bookName);
+         }
+         else
+            throw new ArgumentException("The book name sent was not a valid book name in this version");
+
+         return this;
+      }
+
+
+      /// <summary>
+      /// Set this reference to the current book's first chapter and verse.
+      /// This method is fluent and can be chained.
+      /// </summary>
+      public BibleReference SetToFirstChapter()
+      {
+         Chapter = 1;
+         Verse = 1;
+         return this;
+      }
+
+
+      /// <summary>
+      /// Set the chapter wanted for this book.
+      /// So that the chapter does not overflow, this usually requires setting the correct book first.
+      /// Will throw an
+      /// </summary>
+      /// <param name="chapter">The chapter to set this reference to.</param>
+      //public void SetChapter(int chapter)
+      //{
+
+      //}
+
 
       /// <summary>
       /// Cast a string to a Bible reference.

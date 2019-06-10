@@ -31,7 +31,7 @@ namespace BibleBrowser
       /// <summary>
       /// Maintains a list of the XML Bible names and book names in the versions' languages.
       /// </summary>
-      static Dictionary<string, BibleVersion> m_loadedBibles = new Dictionary<string, BibleVersion>();
+      public static Dictionary<string, BibleVersion> LoadedBibles { get; private set; } = new Dictionary<string, BibleVersion>();
 
       /// <summary>
       /// A list of all the local files that contain Bibles we want to read from.
@@ -44,6 +44,14 @@ namespace BibleBrowser
       /// The app folder in which Bible versions are stored.
       /// </summary>
       public const string BIBLE_PATH = "Bibles";
+
+      /// <summary>
+      /// Return the default Bible version.
+      /// TODO return it from app memory that changes according to settings.
+      /// </summary>
+      public static BibleVersion DefaultVersion {
+         get { return LoadedBibles.ElementAt(0).Value; }
+      }
 
       #endregion
 
@@ -62,7 +70,7 @@ namespace BibleBrowser
       static BibleLoader()
       {
          foreach (string fileName in m_BibleFileNames)
-               m_loadedBibles.Add(fileName, new BibleVersion(fileName)); // Create a new meta object for each Bible for fast retrieval.
+               LoadedBibles.Add(fileName, new BibleVersion(fileName)); // Create a new meta object for each Bible for fast retrieval.
       }
 
 
@@ -73,7 +81,7 @@ namespace BibleBrowser
       /// <returns>A <c>BibleVersion</c></returns>
       public static BibleVersion Version(string fileName)
       {
-         return m_loadedBibles[fileName];
+         return LoadedBibles[fileName];
       }
 
 
@@ -108,7 +116,7 @@ namespace BibleBrowser
       {
          string info = null;
 
-         foreach(KeyValuePair<string, BibleVersion> bible in m_loadedBibles)
+         foreach(KeyValuePair<string, BibleVersion> bible in LoadedBibles)
          {
             info = bible.Value.Language + ", " + bible.Value.VersionAbbreviation + ", " + bible.Value.VersionName;
          }
@@ -124,7 +132,7 @@ namespace BibleBrowser
       {
          string bookNames = string.Empty;
 
-         foreach(KeyValuePair<string, BibleVersion> bible in m_loadedBibles)
+         foreach(KeyValuePair<string, BibleVersion> bible in LoadedBibles)
          {
             List<String> bknames = bible.Value.BookNames;
 

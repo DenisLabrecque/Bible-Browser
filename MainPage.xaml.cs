@@ -172,6 +172,7 @@ namespace BibleBrowserUWP
          UpdateTitleBarLayout(sender);
       }
 
+
       /// <summary>
       /// A new tab was selected; track this in app memory.
       /// Load the new page contents according to the reference of the newly selected tab.
@@ -197,15 +198,21 @@ namespace BibleBrowserUWP
             // Load the tab's reference contents to the page's main area
             else
             {
-               contents = reference.Version.GetChapterVerses(reference);
-               tbMainText.Text = string.Empty;
-               foreach (string value in contents)
-               {
-                  tbMainText.Text += value;
-               }
+               ShowBibleTextTemp(reference);
             }
          }
       }
+
+      private void ShowBibleTextTemp(BibleReference reference)
+      {
+         contents = reference.Version.GetChapterVerses(reference);
+         tbMainText.Text = string.Empty;
+         foreach (string value in contents)
+         {
+            tbMainText.Text += value;
+         }
+      }
+
 
       /// <summary>
       /// Close a tab.
@@ -248,6 +255,31 @@ namespace BibleBrowserUWP
       {
          Tabs.Add(new BrowserTab());
          lvTabs.SelectedIndex = Tabs.Count - 1;
+      }
+
+
+      /// <summary>
+      /// Search or find a reference.
+      /// </summary>
+      /// <param name="sender"></param>
+      /// <param name="args"></param>
+      private void AsbSearch_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+      {
+         BibleReference reference = BrowserTab.Selected.Reference;
+         if (reference == null)
+            reference = new BibleReference(BibleLoader.DefaultVersion, BibleBook.Gn);
+
+         // Find which Bible book the string is closest to by the number of same letters
+         float similarity = BibleSearch.LevenshteinSimilarity(reference.BookName.ToLower(), args.QueryText.ToLower());
+
+         tbMainText.Text = "Similarity between " + reference.BookName.ToLower() + " and " + args.QueryText.ToLower() + " is " + similarity;
+
+         string closestBook = BibleSearch.ClosestBookName(reference.Version, args.QueryText);
+
+         tbMainText.Text += "The closest book in " + reference.Version + " is " + closestBook;
+
+         reference.SetBook(closestBook).SetToFirstChapter();
+         ShowBibleTextTemp(reference);
       }
       #endregion
    }

@@ -308,13 +308,14 @@ Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculu
                             BorderThickness="0"
                             Background="Transparent"/>
 
-                        <TextBox Grid.Column="1"
-                             PlaceholderText="Search"
-                             BorderThickness="0"
-                             Background="Transparent"
-                             Margin="0"
-                             VerticalAlignment="Center"
-                             Height="26"/>
+                        <AutoSuggestBox Name="asbSearch"
+                                        Grid.Column="1"
+                                        PlaceholderText="Reference or word search"
+                                        BorderThickness="0"
+                                        Background="Transparent"
+                                        Margin="0"
+                                        VerticalAlignment="Center"
+                                        Height="26" QuerySubmitted="AsbSearch_QuerySubmitted"/>
                     </Grid>
                 </StackPanel>
 
