@@ -5,11 +5,14 @@ This Windows universal app is an attempt to make a speedy browser that can load 
 
 Target features are:
 
-## Tabbed Interface
+**Tabbed Interface**
 Like a browser, this Bible app is able to load many pages at once, allowing quick skipping between passages and versions.
 
-## Search or Go to Reference
+**Search or Go to Reference**
 Like a browser, this app will automatically search for text if not given a reference to go to.
 
-## Bilingual
+**Reading Out Loud**
+Capability for the computer to read the present chapter.
+
+**Bilingual**
 Cette application sera aussi disponible en français.
