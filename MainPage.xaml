@@ -191,7 +191,10 @@
                                            FontWeight="Bold"
                                            FontSize="12"
                                            VerticalAlignment="Center"/>
-                                <Button Style="{StaticResource TabCloseButton}">
+                                <Button Style="{StaticResource TabCloseButton}"
+                                        Name="btnCloseTab"
+                                        Tag="{x:Bind Guid}"
+                                        Click="BtnCloseTab_Click">
                                     <FontIcon FontSize="10" Glyph="&#xE711;"/>
                                 </Button>
                             </StackPanel>
@@ -200,7 +203,9 @@
                 </ListView>
 
                 <!-- New Tab Button -->
-                <Button Style="{StaticResource TabBarButton}">
+                <Button Name="btnNewTab"
+                        Style="{StaticResource TabBarButton}"
+                        Click="BtnNewTab_Click">
                     <FontIcon FontSize="15" Glyph="&#xE710;"/>
                 </Button>
             </StackPanel>

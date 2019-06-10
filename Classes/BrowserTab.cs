@@ -57,51 +57,72 @@ namespace BibleBrowser
       /// </summary>
       public List<BibleReference> History { get; private set; } = new List<BibleReference>();
 
-      public BibleReference Reference { get => History[m_CurrentReferenceIndex]; }
+      /// <summary>
+      /// Get the currently active <c>BibleReference</c> from history.
+      /// If there is none, return <c>null</c>.
+      /// </summary>
+      public BibleReference Reference { get {
+            if (History.Count > 0)
+               return History[m_CurrentReferenceIndex];
+            else
+               return null;
+         }
+      }
+
+      /// <summary>
+      /// Uniquely identify each tab.
+      /// </summary>
+      public Guid Guid { get; private set; }
 
       #endregion
-
-
-        #region Initialize
-
-        /// <summary>
-        /// Static constructor.
-        /// List browser tabs that were open in the past. /// TODO
-        /// </summary>
-        static BrowserTab()
-        {
-            Tabs.Add(
-               new BrowserTab(
-                  new BibleReference(
-                     BibleLoader.Version(BibleLoader.m_BibleFileNames[0]), BibleBook.Gn, 1, 1)));
-            Tabs.Add(
-               new BrowserTab(
-                  new BibleReference(
-                     BibleLoader.Version(BibleLoader.m_BibleFileNames[0]), BibleBook.Rm, 1)));
-            Tabs.Add(
-               new BrowserTab(
-                  new BibleReference(
-                     BibleLoader.Version(BibleLoader.m_BibleFileNames[0]), BibleBook.Lc, 1)));
-            Tabs.Add(
-               new BrowserTab(
-                  new BibleReference(
-                     BibleLoader.Version(BibleLoader.m_BibleFileNames[0]), BibleBook.Rev, 22)));
-        }
-
-        #endregion
 
 
       #region Constructor
 
       /// <summary>
-      /// Create a new browser tab with the default BibleReference.
+      /// Static constructor.
+      /// List browser tabs that were open in the past. /// TODO
+      /// </summary>
+      static BrowserTab()
+      {
+         Tabs.Add(
+            new BrowserTab(
+               new BibleReference(
+                  BibleLoader.Version(BibleLoader.m_BibleFileNames[0]), BibleBook.Gn, 1, 1)));
+         Tabs.Add(
+            new BrowserTab(
+               new BibleReference(
+                  BibleLoader.Version(BibleLoader.m_BibleFileNames[0]), BibleBook.Rm, 1)));
+         Tabs.Add(
+            new BrowserTab(
+               new BibleReference(
+                  BibleLoader.Version(BibleLoader.m_BibleFileNames[0]), BibleBook.Lc, 1)));
+         Tabs.Add(
+            new BrowserTab(
+               new BibleReference(
+                  BibleLoader.Version(BibleLoader.m_BibleFileNames[0]), BibleBook.Rev, 22)));
+      }
+
+      /// <summary>
+      /// Create a new browser tab with the default <c>BibleReference</c>.
       /// </summary>
       public BrowserTab(BibleReference reference)
       {
          if(reference == null)
-            throw new ArgumentNullException("A new browser tab cannot be created using a null BibleReference");
+            throw new ArgumentNullException("A new browser tab without a reference should be created with the overloaded constructor.");
          else
             History.Add(reference);
+         Guid = Guid.NewGuid();
+      }
+
+      /// <summary>
+      /// Create a new blank browser tab.
+      /// TODO if this tab had history in the past, re-import the history from app memory
+      /// </summary>
+      public BrowserTab()
+      {
+         // Do not add anything to history yet.
+         Guid = Guid.NewGuid();
       }
 
       #endregion

@@ -73,6 +73,10 @@ namespace BibleBrowserUWP
          //tbMainText.Text = new BibleReference(0, (int)BookShortName.Jb, new ChapterVerse(1, 2, "a"), new ChapterVerse(0)).ToString();
       }
 
+
+      /// <summary>
+      /// Get the main text and begin reading it asynchroniously.
+      /// </summary>
       async private void ReadMainTextAloud()
       {
          if(m_isPlaybackStarted)
@@ -175,15 +179,75 @@ namespace BibleBrowserUWP
       private void LvTabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
       {
          BrowserTab.SetTabIndex(lvTabs.SelectedIndex);
-         BibleReference reference = ((BrowserTab)lvTabs.SelectedItem).Reference;
 
-         // Load the tab's reference contents to the page's main area
-         contents = reference.Version.GetChapterVerses(reference);
-         tbMainText.Text = string.Empty;
-         foreach (string value in contents)
+         // Stop audio playback when changing tabs
+         m_isPlaybackStarted = false;
+         m_mediaElement.Stop();
+         btnPause.Visibility = Visibility.Collapsed;
+         btnPlay.Visibility = Visibility.Visible;
+
+         // Only display the reference when there is still a tab to show; if not, we are closing the app anyway
+         if (lvTabs.Items.Count > 1)
          {
-            tbMainText.Text += value;
+            BibleReference reference = ((BrowserTab)lvTabs.SelectedItem).Reference;
+
+            // This was a new tab which does not have a reference yet
+            if (reference == null)
+               tbMainText.Text = string.Empty;
+            // Load the tab's reference contents to the page's main area
+            else
+            {
+               contents = reference.Version.GetChapterVerses(reference);
+               tbMainText.Text = string.Empty;
+               foreach (string value in contents)
+               {
+                  tbMainText.Text += value;
+               }
+            }
          }
+      }
+
+      /// <summary>
+      /// Close a tab.
+      /// </summary>
+      private void BtnCloseTab_Click(object sender, RoutedEventArgs e)
+      {
+         // There is still another tab to show when one is removed
+         if (lvTabs.Items.Count >= 2)
+         {
+            Guid tabGuid = ((Guid)((Button)sender).Tag);
+            BrowserTab removeTab = Tabs.Single(p => p.Guid == tabGuid);
+            int removeIndex = Tabs.IndexOf(removeTab);
+
+            // The selected tab is being removed
+            if (removeIndex == lvTabs.SelectedIndex)
+            {
+               if (removeIndex == Tabs.Count - 1)
+                  lvTabs.SelectedIndex = Tabs.Count - 2;
+               else if (removeIndex == 0)
+                  lvTabs.SelectedIndex = 1;
+               else
+                  lvTabs.SelectedIndex = removeIndex + 1;
+            }
+
+            Tabs.RemoveAt(removeIndex);
+         }
+         // There is no new tab to show; close the app
+         else
+         {
+            Tabs.RemoveAt(0);
+            CoreApplication.Exit();
+         }
+      }
+
+
+      /// <summary>
+      /// Open a new tab.
+      /// </summary>
+      private void BtnNewTab_Click(object sender, RoutedEventArgs e)
+      {
+         Tabs.Add(new BrowserTab());
+         lvTabs.SelectedIndex = Tabs.Count - 1;
       }
       #endregion
    }

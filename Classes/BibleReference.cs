@@ -306,7 +306,10 @@ namespace BibleBrowser
       /// <param name="reference">The reference to convert to a string.</param>
       public static implicit operator string(BibleReference reference)
       {
-         return reference.ToString();
+         if (reference == null)
+            return "New tab";
+         else
+            return reference.ToString();
       }
 
       #endregion
