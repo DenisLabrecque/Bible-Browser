@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -43,7 +42,12 @@ namespace BibleBrowserUWP
 
       List<string> contents = new List<string>();
 
-      BindingList<BrowserTab> TabList = BrowserTab.Tabs;
+      #endregion
+
+
+      #region Properties
+
+      ObservableCollection<BrowserTab> Tabs { get => BrowserTab.Tabs; }
 
       #endregion
 
@@ -54,7 +58,7 @@ namespace BibleBrowserUWP
 
          // Open the tab that was active before the app was last closed
          // Also activates a trigger to load page content
-         lvTabs.SelectedItem = BrowserTab.Selected;
+         lvTabs.SelectedIndex = BrowserTab.TabIndex;
 
 
 
@@ -102,8 +106,6 @@ namespace BibleBrowserUWP
          ApplicationViewTitleBar appBar = ApplicationView.GetForCurrentView().TitleBar;
          titleBar.ExtendViewIntoTitleBar = true;
          appBar.ButtonBackgroundColor = Colors.Transparent;
-         UISettings uISettings = new UISettings();
-         appBar.ButtonForegroundColor = uISettings.GetColorValue(UIColorType.AccentLight3);
          //appBar.ButtonHoverBackgroundColor = Colors.Transparent;
          //appBar.ButtonPressedBackgroundColor = Colors.Transparent;
          appBar.ButtonInactiveBackgroundColor = Colors.Transparent;
@@ -140,21 +142,17 @@ namespace BibleBrowserUWP
       {
          if(sender.IsVisible)
          {
-            grdTitleBar.Visibility = Visibility.Visible;
+               grdTitleBar.Visibility = Visibility.Visible;
          }
          else
          {
-            grdTitleBar.Visibility = Visibility.Collapsed;
+               grdTitleBar.Visibility = Visibility.Collapsed;
          }
       }
 
 
       #region Events
 
-
-      /// <summary>
-      /// Read the present chapter aloud.
-      /// </summary>
       private void BtnPlay_Click(object sender, RoutedEventArgs e)
       {
          ReadMainTextAloud();
@@ -162,10 +160,6 @@ namespace BibleBrowserUWP
          btnPause.Visibility = Visibility.Visible;
       }
 
-
-      /// <summary>
-      /// Pause the reading of the chapter.
-      /// </summary>
       private void BtnPause_Click(object sender, RoutedEventArgs e)
       {
          m_mediaElement.Pause();
@@ -173,10 +167,6 @@ namespace BibleBrowserUWP
          btnPlay.Visibility = Visibility.Visible;
       }
 
-
-      /// <summary>
-      /// React to window resizing.
-      /// </summary>
       private void CoreTitleBar_LayoutMetricsChanged(CoreApplicationViewTitleBar sender, object args)
       {
          UpdateTitleBarLayout(sender);
@@ -189,7 +179,7 @@ namespace BibleBrowserUWP
       /// </summary>
       private void LvTabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
       {
-         BrowserTab.Selected = ((BrowserTab)lvTabs.SelectedItem).Guid;
+         BrowserTab.SetTabIndex(lvTabs.SelectedIndex);
 
          // Stop audio playback when changing tabs
          m_isPlaybackStarted = false;
@@ -200,7 +190,7 @@ namespace BibleBrowserUWP
          // Only display the reference when there is still a tab to show; if not, we are closing the app anyway
          if (lvTabs.Items.Count > 1)
          {
-            BibleReference reference = ((BrowserTab)lvTabs.SelectedItem).Reference; // Error here
+            BibleReference reference = ((BrowserTab)lvTabs.SelectedItem).Reference;
 
             // This was a new tab which does not have a reference yet
             if (reference == null)
@@ -213,11 +203,6 @@ namespace BibleBrowserUWP
          }
       }
 
-
-      /// <summary>
-      /// Print a Bible chapter in the main window.
-      /// </summary>
-      /// <param name="reference">The chapter to print.</param>
       private void ShowBibleTextTemp(BibleReference reference)
       {
          contents = reference.Version.GetChapterVerses(reference);
@@ -238,27 +223,27 @@ namespace BibleBrowserUWP
          if (lvTabs.Items.Count >= 2)
          {
             Guid tabGuid = ((Guid)((Button)sender).Tag);
-            BrowserTab removeTab = BrowserTab.Tabs.Single(p => p.Guid == tabGuid);
-            int removeIndex = BrowserTab.Tabs.IndexOf(removeTab);
+            BrowserTab removeTab = Tabs.Single(p => p.Guid == tabGuid);
+            int removeIndex = Tabs.IndexOf(removeTab);
 
             // The selected tab is being removed
             if (removeIndex == lvTabs.SelectedIndex)
             {
-               if (removeIndex == BrowserTab.Tabs.Count - 1)
-                  lvTabs.SelectedIndex = BrowserTab.Tabs.Count - 2;
+               if (removeIndex == Tabs.Count - 1)
+                  lvTabs.SelectedIndex = Tabs.Count - 2;
                else if (removeIndex == 0)
                   lvTabs.SelectedIndex = 1;
                else
                   lvTabs.SelectedIndex = removeIndex + 1;
             }
 
-            BrowserTab.Tabs.RemoveAt(removeIndex);
+            Tabs.RemoveAt(removeIndex);
          }
          // There is no new tab to show; close the app
          else
          {
-            BrowserTab.Tabs.RemoveAt(0);
-            // CoreApplication.Exit(); TODO
+            Tabs.RemoveAt(0);
+            CoreApplication.Exit();
          }
       }
 
@@ -268,27 +253,33 @@ namespace BibleBrowserUWP
       /// </summary>
       private void BtnNewTab_Click(object sender, RoutedEventArgs e)
       {
-         BrowserTab.Tabs.Add(new BrowserTab());
-         lvTabs.SelectedIndex = BrowserTab.Tabs.Count - 1; // Fires the selection changed event and updates the tab index
+         Tabs.Add(new BrowserTab());
+         lvTabs.SelectedIndex = Tabs.Count - 1;
       }
 
 
       /// <summary>
       /// Search or find a reference.
       /// </summary>
+      /// <param name="sender"></param>
+      /// <param name="args"></param>
       private void AsbSearch_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
       {
          BibleReference reference = BrowserTab.Selected.Reference;
+         if (reference == null)
+            reference = new BibleReference(BibleLoader.DefaultVersion, BibleBook.Gn);
 
-
-         
          // Find which Bible book the string is closest to by the number of same letters
+         float similarity = BibleSearch.LevenshteinSimilarity(reference.BookName.ToLower(), args.QueryText.ToLower());
+
+         tbMainText.Text = "Similarity between " + reference.BookName.ToLower() + " and " + args.QueryText.ToLower() + " is " + similarity;
+
          string closestBook = BibleSearch.ClosestBookName(reference.Version, args.QueryText);
 
-         reference.SetBook(closestBook).SetToFirstChapter();
-         //BrowserTab.Selected = new BrowserTab(reference);
+         tbMainText.Text += "The closest book in " + reference.Version + " is " + closestBook;
 
-         tbMainText.Text = BrowserTab.Selected.Reference;
+         reference.SetBook(closestBook).SetToFirstChapter();
+         ShowBibleTextTemp(reference);
       }
       #endregion
    }

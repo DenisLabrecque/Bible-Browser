@@ -2,7 +2,7 @@
 
 namespace BibleBrowser
 {
-   enum BibleBook { Unset = -1, Gn, Ex, Lv, Nb, Dt, Jos, Jg, Rt, iS, iiS, iK, iiK, iCh, iiCh, Esr, Ne, Est, Jb, Ps, Pr, Ecc, Sng, Is, Jr, Lm, Ez, Dn, Hos, Jl, Am, Ob, Jon, Mi, Na, Ha, Zep, Hag, Za, Mal, Mt, Mc, Lc, Jn, Ac, Rm, iCo, iiCo, Ga, Ep, Ph, Col, iTh, iiTh, iTm, iiTm, Tt, Phm, He, Jc, iP, iiP, iJn, iiJn, iiiJn, Jude, Rev }
+   enum BibleBook { Gn, Ex, Lv, Nb, Dt, Jos, Jg, Rt, iS, iiS, iK, iiK, iCh, iiCh, Esr, Ne, Est, Jb, Ps, Pr, Ecc, Sng, Is, Jr, Lm, Ez, Dn, Hos, Jl, Am, Ob, Jon, Mi, Na, Ha, Zep, Hag, Za, Mal, Mt, Mc, Lc, Jn, Ac, Rm, iCo, iiCo, Ga, Ep, Ph, Col, iTh, iiTh, iTm, iiTm, Tt, Phm, He, Jc, iP, iiP, iJn, iiJn, iiiJn, Jude, Rev }
 
    enum BookNumeral { none, i, ii, iii }
 
@@ -22,7 +22,7 @@ namespace BibleBrowser
 
 
       #region Properties
-      
+
       public BibleVersion Version { get; private set; }
       public BookNumeral Numeral { get; private set; }
       public BibleBook Book { get; private set; }
@@ -30,16 +30,9 @@ namespace BibleBrowser
 
       /// <summary>
       /// The book name indexed in this Bible version.
-      /// Will return "Unset" if the reference isn't defined.
+      /// Set dynamically by retrieval using the <code>BibleBook</code> enumeration as index for the <code>BookNames</code> loaded list.
       /// </summary>
-      public string BookName {
-         get {
-            if ((int)Book == -1)
-               return "Unset";
-            else
-               return Version.BookNames[(int)Book];
-         }
-      }
+      public string BookName { get => Version.BookNames[(int)Book]; }
       public int Chapter { get; private set; }
       public int Verse { get; private set; }
 
@@ -50,15 +43,10 @@ namespace BibleBrowser
 
       /// <summary>
       /// Default constructor.
-      /// Passing null to the <c>BibleVersion</c> parameter sets the version as the app default version.
-      /// Not passing a <c>BibleBook</c> parameter will mark the reference as unset.
       /// </summary>
-      public BibleReference(BibleVersion version, BibleBook book = BibleBook.Unset, int chapter = 1, int verse = 1)
+      public BibleReference(BibleVersion version, BibleBook book, int chapter = 1, int verse = 1)
       {
-         if (version == null)
-            Version = BibleLoader.DefaultVersion;
-         else
-            Version = version;
+         Version = version ?? throw new ArgumentNullException("A BibleReference cannot be created with a null BibleVersion");
          Book = book;
          Chapter = chapter;
          Verse = verse;
@@ -367,7 +355,10 @@ namespace BibleBrowser
       /// <param name="reference">The reference to convert to a string.</param>
       public static implicit operator string(BibleReference reference)
       {
-         return reference.ToString();
+         if (reference == null)
+            return "New tab";
+         else
+            return reference.ToString();
       }
 
       #endregion
