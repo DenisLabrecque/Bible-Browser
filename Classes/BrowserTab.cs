@@ -34,10 +34,16 @@ namespace BibleBrowser
       /// </summary>
       public static int TabIndex {
          get {
-            if (m_localSettings.Values[KEYHISTINDX] == null)
+            int? index = (int)m_localSettings.Values[KEYHISTINDX];
+            if (index == null)
                return 0;
             else
-               return (int)m_localSettings.Values[KEYHISTINDX];
+            {
+               if (index > Tabs.Count - 1)
+                  return Tabs.Count - 1;
+               else
+                  return (int)index;
+            }
          }
          private set {
             m_localSettings.Values[KEYHISTINDX] = value;
