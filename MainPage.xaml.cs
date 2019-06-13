@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -47,7 +48,7 @@ namespace BibleBrowserUWP
 
       #region Properties
 
-      ObservableCollection<BrowserTab> Tabs { get => BrowserTab.Tabs; }
+      TrulyObservableCollection<BrowserTab> Tabs { get => BrowserTab.Tabs; }
 
       #endregion
 
@@ -58,7 +59,7 @@ namespace BibleBrowserUWP
 
          // Open the tab that was active before the app was last closed
          // Also activates a trigger to load page content
-         lvTabs.SelectedIndex = BrowserTab.TabIndex;
+         lvTabs.SelectedItem = BrowserTab.Selected;
 
 
 
@@ -179,7 +180,7 @@ namespace BibleBrowserUWP
       /// </summary>
       private void LvTabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
       {
-         BrowserTab.SetTabIndex(lvTabs.SelectedIndex);
+         BrowserTab.Selected = (BrowserTab)lvTabs.SelectedItem;
 
          // Stop audio playback when changing tabs
          m_isPlaybackStarted = false;
@@ -190,7 +191,7 @@ namespace BibleBrowserUWP
          // Only display the reference when there is still a tab to show; if not, we are closing the app anyway
          if (lvTabs.Items.Count > 1)
          {
-            BibleReference reference = ((BrowserTab)lvTabs.SelectedItem).Reference;
+            BibleReference reference = BrowserTab.Selected.Reference;
 
             // This was a new tab which does not have a reference yet
             if (reference == null)
@@ -278,7 +279,8 @@ namespace BibleBrowserUWP
 
          tbMainText.Text += "The closest book in " + reference.Version + " is " + closestBook;
 
-         reference.SetBook(closestBook).SetToFirstChapter();
+         
+         BrowserTab.Selected.Reference = reference.SetBook(closestBook).SetToFirstChapter();
          ShowBibleTextTemp(reference);
       }
       #endregion

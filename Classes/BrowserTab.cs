@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
@@ -11,8 +13,23 @@ namespace BibleBrowser
    /// <summary>
    /// A tab that has a Bible and reference open.
    /// </summary>
-   class BrowserTab
+   class BrowserTab : INotifyPropertyChanged
    {
+      #region Property Changed Implementation
+
+      public event PropertyChangedEventHandler PropertyChanged;
+
+      // This method is called by the Set accessor of each property.  
+      // The CallerMemberName attribute that is applied to the optional propertyName  
+      // parameter causes the property name of the caller to be substituted as an argument.  
+      private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+      {
+         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+      }
+
+      #endregion
+
+
       #region Constants and Static Elements
 
       private const string KEYHISTINDX = "current_history_index";
@@ -21,41 +38,83 @@ namespace BibleBrowser
       /// <summary>
       /// A list of open tabs. TODO initialize at startup.
       /// </summary>
-      public static ObservableCollection<BrowserTab> Tabs = new ObservableCollection<BrowserTab>();
+      public static TrulyObservableCollection<BrowserTab> Tabs = new TrulyObservableCollection<BrowserTab>();
 
       /// <summary>
       /// The currently selected browser tab.
       /// </summary>
-      public static BrowserTab Selected { get => Tabs[TabIndex]; }
+      public static BrowserTab Selected {
+         get {
+            if(Tabs.Count == 0)
+            {
+               throw new Exception("No selected tab because there are no tabs");
+            }
+            else if (Tabs.Count == 1)
+            {
+               return Tabs.LastOrDefault();
+            }
+            else
+            {
+               BrowserTab tab = Tabs.Where(i => i.Guid == SelectedIndex).LastOrDefault();
+               Guid guid = SelectedIndex;
+               if (tab == null)
+                  return Tabs.LastOrDefault();
+               else
+                  return Tabs.LastOrDefault();
+            }
+         }
+         set {
+            if (value == null)
+               throw new Exception("Cannot assign a selected tab as null");
+            else
+               SelectedIndex = value.Guid;
+         }
+      }
 
       /// <summary>
       /// The index of the currently open tab.
       /// Stored in application memory.
       /// </summary>
-      public static int TabIndex {
+      private static Guid SelectedIndex {
          get {
-            int? index = (int)m_localSettings.Values[KEYHISTINDX];
-            if (index == null)
-               return 0;
+            //Guid index =  (int)m_localSettings.Values[KEYHISTINDX];
+            //if (index == null)
+            //{
+            //Guid index;
+            //   index = Tabs.LastOrDefault().Guid;
+            //   m_localSettings.Values[KEYHISTINDX] = index;
+            //   return index;
+            //}
+            //else
+            //   return index;
+            Guid index;
+            if(Guid.TryParse(m_localSettings.Values[KEYHISTINDX].ToString(), out index))
+            {
+               return index;
+            }
             else
             {
-               if (index > Tabs.Count - 1)
-                  return Tabs.Count - 1;
-               else
-                  return (int)index;
+               index = Tabs.LastOrDefault().Guid;
+               m_localSettings.Values[KEYHISTINDX] = index;
+               return index;
             }
          }
-         private set {
-            m_localSettings.Values[KEYHISTINDX] = value;
+         set {
+            if (value == null)
+               throw new Exception("Do not pass a null Guid to the selected index property");
+            else
+               m_localSettings.Values[KEYHISTINDX] = value.ToString();
          }
       }
+
+
 
       #endregion
 
 
       #region Member Variables
 
-      private int m_CurrentReferenceIndex = 0;
+      private int m_HistoryIndex = 0;
 
       #endregion
 
@@ -74,9 +133,19 @@ namespace BibleBrowser
       /// </summary>
       public BibleReference Reference { get {
             if (History.Count > 0)
-               return History[m_CurrentReferenceIndex];
+               return History[m_HistoryIndex];
             else
-               return null;
+               throw new Exception("Reference is null");
+         }
+         set {
+            if (value == null)
+               throw new Exception("Do not assign null to a Bible reference");
+            else
+            {
+               History.Add(value);
+               m_HistoryIndex = History.Count - 1;
+               NotifyPropertyChanged();
+            }
          }
       }
 
@@ -128,7 +197,6 @@ namespace BibleBrowser
 
       /// <summary>
       /// Create a new blank browser tab.
-      /// TODO if this tab had history in the past, re-import the history from app memory
       /// </summary>
       public BrowserTab()
       {
@@ -142,22 +210,12 @@ namespace BibleBrowser
       #region Methods
 
       /// <summary>
-      /// Set the index of the currently open tab property.
-      /// This index is stored in app memory.
-      /// </summary>
-      /// <param name="index"></param>
-      public static void SetTabIndex(int index)
-      {
-         TabIndex = index;
-      }
-
-      /// <summary>
       /// Overridden string method.
       /// </summary>
       /// <returns>A bible reference</returns>
       public override string ToString()
       {
-         BibleReference reference = History[TabIndex];
+         BibleReference reference = History.LastOrDefault();
          return "[" + reference.Version + "] " + reference.SimplifiedReference;
       }
 
