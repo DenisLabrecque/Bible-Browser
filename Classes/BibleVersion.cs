@@ -16,7 +16,6 @@ namespace BibleBrowser
    /// </summary>
    class BibleVersion
    {
-
       #region Members
 
       string m_filePath;
@@ -86,7 +85,7 @@ namespace BibleBrowser
       public List<string> GetChapterVerses(BibleReference reference)
       {
          List<string> verseContents = new List<string>();
-         XElement book = XDocument.Descendants("BIBLEBOOK").ElementAt((int)reference.Book);
+         XElement book = XDocument.Descendants("BIBLEBOOK").ElementAt(Math.Clamp((int)reference.Book, 0, (int)BibleBook.Rev));
          XElement chapter = book.Descendants("CHAPTER").ElementAt(reference.Chapter - 1);
          
          foreach(XElement element in chapter.Elements())
