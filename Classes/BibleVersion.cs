@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -83,15 +84,18 @@ namespace BibleBrowser
       /// </summary>
       /// <param name="reference">The chapter to look up</param>
       /// <returns>A list of strings that are the contents of each verse in the Bible's chapter.</returns>
-      public List<string> GetChapterVerses(BibleReference reference)
+      public TrulyObservableCollection<Verse> GetChapterVerses(BibleReference reference)
       {
-         List<string> verseContents = new List<string>();
+         TrulyObservableCollection<Verse> verseContents = new TrulyObservableCollection<Verse>();
+         if (reference == null)
+            return verseContents; // Blank page
+         
          XElement book = XDocument.Descendants("BIBLEBOOK").ElementAt((int)reference.Book);
          XElement chapter = book.Descendants("CHAPTER").ElementAt(reference.Chapter - 1);
          
          foreach(XElement element in chapter.Elements())
          {
-            verseContents.Add(element.Value);
+            verseContents.Add(new Verse(element.Value));
          }
 
          return verseContents;

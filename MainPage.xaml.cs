@@ -40,8 +40,8 @@ namespace BibleBrowserUWP
       // The object for controlling the speech synthesis engine (voice).
       SpeechSynthesizer m_synth = new SpeechSynthesizer();
       bool m_isPlaybackStarted = false;
-
-      List<string> contents = new List<string>();
+      
+      static string VerseText = "Testing."; // TODO for text reader
 
       #endregion
 
@@ -49,6 +49,7 @@ namespace BibleBrowserUWP
       #region Properties
 
       TrulyObservableCollection<BrowserTab> Tabs { get => BrowserTab.Tabs; }
+      TrulyObservableCollection<Verse> Verses { get => BrowserTab.Verses; }
 
       #endregion
 
@@ -58,7 +59,6 @@ namespace BibleBrowserUWP
          StyleTitleBar();
 
          // Open the tab that was active before the app was last closed
-         // Also activates a trigger to load page content
          lvTabs.SelectedItem = BrowserTab.Selected;
 
 
@@ -86,13 +86,13 @@ namespace BibleBrowserUWP
          }
          else
          {
-               // Generate the audio stream from plain text.
-               SpeechSynthesisStream stream = await m_synth.SynthesizeTextToStreamAsync(tbMainText.Text);
+            // Generate the audio stream from plain text.
+            SpeechSynthesisStream stream = await m_synth.SynthesizeTextToStreamAsync(VerseText);
 
-               // Send the stream to the media object.
-               m_mediaElement.SetSource(stream, stream.ContentType);
-               m_mediaElement.Play();
-               m_isPlaybackStarted = true;
+            // Send the stream to the media object.
+            m_mediaElement.SetSource(stream, stream.ContentType);
+            m_mediaElement.Play();
+            m_isPlaybackStarted = true;
          }
       }
 
@@ -180,7 +180,20 @@ namespace BibleBrowserUWP
       /// </summary>
       private void LvTabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
       {
-         BrowserTab.Selected = (BrowserTab)lvTabs.SelectedItem;
+         // Some event caused no tab to be selected; we always want a tab selected, so override that
+         if(lvTabs.SelectedIndex == -1)
+         {
+            lvTabs.SelectedIndex = BrowserTab.SelectedIndex; // HACK prevent -1 selection
+            return;
+         }
+
+         BrowserTab.SelectedIndex = lvTabs.SelectedIndex;
+         BrowserTab selected = (BrowserTab)lvTabs.SelectedItem;
+         if (selected == null)
+         {
+            // Keep the previous selection
+            throw new Exception("No selected tab found");
+         }
 
          // Stop audio playback when changing tabs
          m_isPlaybackStarted = false;
@@ -191,27 +204,19 @@ namespace BibleBrowserUWP
          // Only display the reference when there is still a tab to show; if not, we are closing the app anyway
          if (lvTabs.Items.Count > 1)
          {
-            BibleReference reference = BrowserTab.Selected.Reference;
-
-            // This was a new tab which does not have a reference yet
-            if (reference == null)
-               tbMainText.Text = string.Empty;
-            // Load the tab's reference contents to the page's main area
-            else
-            {
-               ShowBibleTextTemp(reference);
-            }
+            ShowBibleTextTemp(BrowserTab.Selected.Reference);
          }
       }
 
       private void ShowBibleTextTemp(BibleReference reference)
       {
-         contents = reference.Version.GetChapterVerses(reference);
-         tbMainText.Text = string.Empty;
-         foreach (string value in contents)
-         {
-            tbMainText.Text += value;
-         }
+         ///Verses = reference.Version.GetChapterVerses(reference);
+
+         //tbMainText.Text = string.Empty;
+         //foreach (string value in contents)
+         //{
+         //   tbMainText.Text += value;
+         //}
       }
 
 
@@ -267,19 +272,14 @@ namespace BibleBrowserUWP
       private void AsbSearch_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
       {
          BibleReference reference = BrowserTab.Selected.Reference;
+         //tbMainText.Text = BrowserTab.Selected.Reference + ";//";
          if (reference == null)
             reference = new BibleReference(BibleLoader.DefaultVersion, BibleBook.Gn);
 
-         // Find which Bible book the string is closest to by the number of same letters
-         float similarity = BibleSearch.LevenshteinSimilarity(reference.BookName.ToLower(), args.QueryText.ToLower());
-
-         tbMainText.Text = "Similarity between " + reference.BookName.ToLower() + " and " + args.QueryText.ToLower() + " is " + similarity;
-
+         // Find which Bible book the search query is closest to
          string closestBook = BibleSearch.ClosestBookName(reference.Version, args.QueryText);
-
-         tbMainText.Text += "The closest book in " + reference.Version + " is " + closestBook;
-
          
+         // Display the reference and contents
          BrowserTab.Selected.Reference = reference.SetBook(closestBook).SetToFirstChapter();
          ShowBibleTextTemp(reference);
       }

@@ -32,7 +32,7 @@ namespace BibleBrowser
 
       #region Constants and Static Elements
 
-      private const string KEYHISTINDX = "current_history_index";
+      private const string KEYHISTINDX = "tab_selected_index";
       private static ApplicationDataContainer m_localSettings = ApplicationData.Current.LocalSettings;
 
       /// <summary>
@@ -41,33 +41,33 @@ namespace BibleBrowser
       public static TrulyObservableCollection<BrowserTab> Tabs = new TrulyObservableCollection<BrowserTab>();
 
       /// <summary>
+      /// The verses in the currently open tab's chapter.
+      /// </summary>
+      public static TrulyObservableCollection<Verse> Verses {
+         get {
+            TrulyObservableCollection<Verse> verses = new TrulyObservableCollection<Verse>();
+            if (Selected == null || Selected.Reference == null)
+               return verses; // Blank page
+            else
+               return Selected.Reference.Version.GetChapterVerses(Selected.Reference);
+         }
+      }
+
+      /// <summary>
       /// The currently selected browser tab.
       /// </summary>
       public static BrowserTab Selected {
          get {
-            if(Tabs.Count == 0)
+            if (Tabs.Count == 0)
             {
                throw new Exception("No selected tab because there are no tabs");
             }
-            else if (Tabs.Count == 1)
+            else if (Tabs.Count - 1 < SelectedIndex)
             {
-               return Tabs.LastOrDefault();
+               throw new Exception("The selected index was greater than the current number of tabs");
             }
             else
-            {
-               BrowserTab tab = Tabs.Where(i => i.Guid == SelectedIndex).LastOrDefault();
-               Guid guid = SelectedIndex;
-               if (tab == null)
-                  return Tabs.LastOrDefault();
-               else
-                  return Tabs.LastOrDefault();
-            }
-         }
-         set {
-            if (value == null)
-               throw new Exception("Cannot assign a selected tab as null");
-            else
-               SelectedIndex = value.Guid;
+               return Tabs[SelectedIndex];
          }
       }
 
@@ -75,35 +75,26 @@ namespace BibleBrowser
       /// The index of the currently open tab.
       /// Stored in application memory.
       /// </summary>
-      private static Guid SelectedIndex {
+      public static int SelectedIndex {
          get {
-            //Guid index =  (int)m_localSettings.Values[KEYHISTINDX];
-            //if (index == null)
-            //{
-            //Guid index;
-            //   index = Tabs.LastOrDefault().Guid;
-            //   m_localSettings.Values[KEYHISTINDX] = index;
-            //   return index;
-            //}
-            //else
-            //   return index;
-            Guid index;
-            if(Guid.TryParse(m_localSettings.Values[KEYHISTINDX].ToString(), out index))
+            // First time the app is opened
+            if (m_localSettings.Values[KEYHISTINDX] == null)
             {
-               return index;
+               m_localSettings.Values[KEYHISTINDX] = Tabs.Count - 1;
+               return Tabs.Count - 1;
             }
             else
-            {
-               index = Tabs.LastOrDefault().Guid;
-               m_localSettings.Values[KEYHISTINDX] = index;
-               return index;
-            }
+               return (int)m_localSettings.Values[KEYHISTINDX];
          }
          set {
-            if (value == null)
-               throw new Exception("Do not pass a null Guid to the selected index property");
+            if (value < 0)
+            {
+               throw new Exception("Cannot set the selected index to less than zero");
+            }
+            else if (value > Tabs.Count - 1)
+               throw new Exception("Cannot set the selected index to more than the number of tabs");
             else
-               m_localSettings.Values[KEYHISTINDX] = value.ToString();
+               m_localSettings.Values[KEYHISTINDX] = value;
          }
       }
 
@@ -135,7 +126,8 @@ namespace BibleBrowser
             if (History.Count > 0)
                return History[m_HistoryIndex];
             else
-               throw new Exception("Reference is null");
+               //throw new Exception("Reference is null");
+               return null;
          }
          set {
             if (value == null)
@@ -215,8 +207,11 @@ namespace BibleBrowser
       /// <returns>A bible reference</returns>
       public override string ToString()
       {
-         BibleReference reference = History.LastOrDefault();
-         return "[" + reference.Version + "] " + reference.SimplifiedReference;
+         BibleReference reference = History.LastOrDefault(); // TODO
+         if (reference == null)
+            return Guid.ToString();
+         else
+            return "[" + reference.Version + "] " + reference.SimplifiedReference;
       }
 
       #endregion

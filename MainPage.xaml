@@ -172,7 +172,9 @@
                 <ListView ItemContainerStyle="{StaticResource TabListViewItemContainer}" x:Name="lvTabs"
                           ItemsSource="{x:Bind Tabs}"
                           Height="Auto"
-                          Background="Transparent" SelectionChanged="LvTabs_SelectionChanged">
+                          Background="Transparent"
+                          SelectionChanged="LvTabs_SelectionChanged"
+                          >
                     <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
                             <StackPanel Orientation="Horizontal" MinWidth="100" />
@@ -233,7 +235,11 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="1*"/>
                     </Grid.RowDefinitions>
-                    <TextBlock Name="tbMainText"
+                     <ListView Name="lvVerses"
+                               ItemsSource="{x:Bind Verses}">
+                  
+                     </ListView>
+                    <!--<TextBlock Name="tbMainText"
                                 TextWrapping="Wrap"
                                 Grid.Column="0"
                                 Grid.Row="0"
@@ -257,7 +263,7 @@ Curabitur tincidunt cursus sapien. Nulla finibus quis leo a cursus. Integer bibe
 Sed sed maximus odio, ac tristique quam. Suspendisse potenti. Praesent vel consectetur felis, at tristique magna. Nullam consequat ligula eget iaculis iaculis. Morbi efficitur dapibus velit, eget congue ligula imperdiet sed. Donec vulputate elit sed elit vestibulum auctor. Ut varius, nulla a imperdiet dapibus, dui nunc scelerisque dolor, vitae rutrum sapien lorem at diam. Suspendisse fermentum nisi eget sapien imperdiet, a luctus lacus laoreet. Morbi vel diam hendrerit, dapibus turpis sit amet, gravida augue. Curabitur lobortis magna eget placerat tempor. Nulla facilisi. Nullam tempor vitae libero nec porttitor. Ut placerat lacus purus, eget ultrices dui cursus tempor. 
 Cras gravida lorem a luctus bibendum. Morbi dapibus tristique nibh et bibendum. Nulla ut finibus elit. Nulla pulvinar lacus ligula, congue malesuada massa pellentesque rhoncus. Integer eget diam sed nibh efficitur porttitor nec sit amet nibh. Integer id luctus sapien, vel feugiat velit. Mauris faucibus enim vel tempus laoreet. Quisque posuere et sapien ac fringilla. Praesent pellentesque dui commodo turpis pretium suscipit. Cras eleifend massa in eros consectetur fermentum. Sed a diam dui. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Etiam purus dolor, egestas at interdum non, finibus at nibh. Integer sit amet tincidunt nulla, non cursus magna. 
 Aliquam fringilla iaculis ante, a feugiat odio. Interdum et malesuada fames ac ante ipsum primis in faucibus. Pellentesque volutpat urna a ipsum sodales pulvinar. Morbi non sapien justo. Cras dignissim massa quis purus suscipit placerat. Sed in diam quam. Integer magna lorem, luctus quis bibendum sit amet, porta eget metus. Aenean elementum feugiat tincidunt. 
-Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Fusce non neque vel urna iaculis vulputate tristique non urna. Fusce sed neque tristique, iaculis odio vel, euismod risus. Sed vestibulum, est in varius accumsan, ante nisi dapibus libero, sed auctor leo ligula a lacus. Vivamus auctor non orci at convallis. Etiam elementum tortor a lectus imperdiet, ac porta ante volutpat. Duis nec ligula vel ligula accumsan auctor ut sed ante. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Morbi tincidunt lacus sit amet tincidunt feugiat. Etiam tempor posuere massa, id tincidunt arcu dapibus ut. Mauris eget imperdiet nibh. Quisque convallis quis justo ac rhoncus. In hac habitasse platea dictumst. Mauris aliquam ornare massa. Etiam consectetur sem risus.</TextBlock>
+Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Fusce non neque vel urna iaculis vulputate tristique non urna. Fusce sed neque tristique, iaculis odio vel, euismod risus. Sed vestibulum, est in varius accumsan, ante nisi dapibus libero, sed auctor leo ligula a lacus. Vivamus auctor non orci at convallis. Etiam elementum tortor a lectus imperdiet, ac porta ante volutpat. Duis nec ligula vel ligula accumsan auctor ut sed ante. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Morbi tincidunt lacus sit amet tincidunt feugiat. Etiam tempor posuere massa, id tincidunt arcu dapibus ut. Mauris eget imperdiet nibh. Quisque convallis quis justo ac rhoncus. In hac habitasse platea dictumst. Mauris aliquam ornare massa. Etiam consectetur sem risus.</TextBlock>-->
                 </Grid>
             </ScrollViewer>
 
