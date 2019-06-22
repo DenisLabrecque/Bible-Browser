@@ -38,32 +38,8 @@ namespace BibleBrowser
       /// Set dynamically by retrieval using the <code>BibleBook</code> enumeration as index for the <code>BookNames</code> loaded list.
       /// </summary>
       public string BookName { get => Version.BookNames[(int)Book]; }
-
-      /// <summary>
-      /// The chapter of this book. When set, this will throw an exception when out of range.
-      /// </summary>
-      public int Chapter {
-         get => Chapter;
-         private set {
-            if (value < 1)
-               throw new ArgumentOutOfRangeException("A chapter cannot be set to less than 1");
-            else if (value > Version.GetChapterCount(this))
-               throw new ArgumentOutOfRangeException("A chapter cannot be set to more than the number of chapters in the book");
-         }
-      }
-
-      /// <summary>
-      /// The verse in this book's chapter. When set, this will throw an exception when out of range.
-      /// </summary>
-      public int Verse {
-         get => Verse;
-         private set {
-            if (value < 1)
-               throw new ArgumentOutOfRangeException("A verse cannot be set to less than 1");
-            else if (value > Version.GetVerseCount(this))
-               throw new ArgumentOutOfRangeException("A verse cannot be set to more than the number of verses in the book");
-         }
-      }
+      public int Chapter { get; private set; }
+      public int Verse { get; private set; }
 
       #endregion
 
@@ -72,13 +48,27 @@ namespace BibleBrowser
 
       /// <summary>
       /// Default constructor.
+      /// If the chapter or verse are set too high, they will be clamped to the maximum chapter or verse.
+      /// If the chapter or verse are set too low, an <c>ArgumentOutOfRangeException</c> is thrown.
       /// </summary>
       public BibleReference(BibleVersion version, BibleBook book, int chapter = 1, int verse = 1)
       {
          Version = version ?? throw new ArgumentNullException("A BibleReference cannot be created with a null BibleVersion");
          Book = book;
-         Chapter = chapter;
-         Verse = verse;
+
+         if (chapter < 1)
+            throw new ArgumentOutOfRangeException("A chapter cannot be set to less than 1");
+         else if (chapter > Version.GetChapterCount(this))
+            Chapter = Version.GetChapterCount(this);
+         else
+            Chapter = chapter;
+
+         if (verse < 1)
+            throw new ArgumentOutOfRangeException("A verse cannot be set to less than 1");
+         else if (verse > Version.GetVerseCount(this))
+            Verse = Version.GetVerseCount(this);
+         else
+            Verse = verse;
 
          switch(book)
          {
@@ -165,66 +155,18 @@ namespace BibleBrowser
 
 
       /// <summary>
-      /// Set this reference to the wanted book.
-      /// Throw an <code>ArgumentException</code> if the book name does not exist.
-      /// This method is fluent and can be chained.
+      /// Convert a book name string to the <c>BibleBook</c> enumeration value.
       /// </summary>
-      /// <param name="bookName">The exact book name to set the reference to.</param>
-      public BibleReference SetBook(string bookName)
+      /// <param name="bookName">This book name had better be valid, or an <c>ArgumentException</c> will be thrown.</param>
+      /// <returns>A <c>BibleBook</c> enumeration value.</returns>
+      public BibleBook StringToBook(string bookName)
       {
          if (Version.BookNames.Contains(bookName))
          {
-            Book = (BibleBook)Version.BookNames.IndexOf(bookName);
+            return (BibleBook)Version.BookNames.IndexOf(bookName);
          }
          else
             throw new ArgumentException("The book name sent was not a valid book name in this version");
-
-         return this;
-      }
-
-
-      /// <summary>
-      /// Set the current book's chapter. Sets the verse to 1.
-      /// Cain be chained fluently.
-      /// </summary>
-      public BibleReference SetToChapter(int chapter)
-      {
-         chapter = Math.Clamp(Math.Abs(chapter), 1, int.MaxValue);
-
-         Chapter = chapter;
-         Verse = 1;
-         return this;
-      }
-
-
-      /// <summary>
-      /// Set the current book's chapter.
-      /// Cain be chained fluently.
-      /// </summary>
-      /// <param name="clamp">Whether to clamp the chapter and verse, or throw an error in case one is out of range.</param>
-      public BibleReference SetToChapter(int chapter, int verse, bool clamp = true)
-      {
-         try
-         {
-            Chapter = chapter;
-         }
-         catch (ArgumentOutOfRangeException)
-         {
-            Chapter = Version.GetChapterCount(this);
-         }
-
-         try
-         {
-            Verse = verse;
-         }
-         catch(ArgumentOutOfRangeException)
-         {
-            Verse = Version.GetChapterCount(this);
-         }
-
-         Chapter = chapter;
-         Verse = verse;
-         return this;
       }
 
 
@@ -269,18 +211,6 @@ namespace BibleBrowser
 
          return builder.ToString();
       }
-
-
-      /// <summary>
-      /// Set the chapter wanted for this book.
-      /// So that the chapter does not overflow, this usually requires setting the correct book first.
-      /// Will throw an
-      /// </summary>
-      /// <param name="chapter">The chapter to set this reference to.</param>
-      //public void SetChapter(int chapter)
-      //{
-
-      //}
 
 
       /// <summary>
@@ -451,11 +381,11 @@ namespace BibleBrowser
       /// <returns>A typographically correct biblical reference.</returns>
       public override string ToString()
       {
-         return BookName + " " + Chapter + ":" + Verse;
+         return BookName + " " + Chapter;
       }
 
       /// <summary>
-      /// Implicit string operator.
+      /// Implicit string operator (used by tabs).
       /// </summary>
       /// <param name="reference">The reference to convert to a string.</param>
       public static implicit operator string(BibleReference reference)

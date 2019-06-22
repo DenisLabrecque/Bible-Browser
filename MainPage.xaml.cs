@@ -391,19 +391,23 @@ namespace BibleBrowserUWP
             }
             else
             {
-               BrowserTab.Selected.Reference = reference.SetToChapter(chapter);
+               reference = new BibleReference(reference.Version, reference.Book, chapter);
+               BrowserTab.Selected.Reference = reference;
             }
          }
          else
          {
+            // Convert the book to the closest valid book
             bookName = BibleSearch.ClosestBookName(reference.Version, bookName);
             if (chapter == 0)
             {
-               BrowserTab.Selected.Reference = reference.SetBook(bookName).SetToChapter(1);
+               reference = new BibleReference(reference.Version, reference.StringToBook(bookName));
+               BrowserTab.Selected.Reference = reference;
             }
             else
             {
-               BrowserTab.Selected.Reference = reference.SetBook(bookName).SetToChapter(chapter);
+               reference = new BibleReference(reference.Version, reference.StringToBook(bookName), chapter);
+               BrowserTab.Selected.Reference = reference;
             }
          }
          PrintChapter(reference);
