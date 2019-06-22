@@ -9,48 +9,48 @@
    mc:Ignorable="d"
    Background="{ThemeResource SystemControlAccentAcrylicWindowAccentMediumHighBrush }">
 
-    <Page.Resources>
-        <Style x:Key="CommandButton" TargetType="Button" BasedOn="{StaticResource ButtonRevealStyle}">
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Margin" Value="1"/>
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="FontSize" Value="15"/>
-            <Setter Property="Height" Value="38"/>
-            <Setter Property="Width" Value="40"/>
-        </Style>
+   <Page.Resources>
+      <Style x:Key="CommandButton" TargetType="Button" BasedOn="{StaticResource ButtonRevealStyle}">
+         <Setter Property="BorderThickness" Value="1"/>
+         <Setter Property="Margin" Value="1"/>
+         <Setter Property="Background" Value="Transparent"/>
+         <Setter Property="FontSize" Value="15"/>
+         <Setter Property="Height" Value="38"/>
+         <Setter Property="Width" Value="40"/>
+      </Style>
 
-        <Style x:Key="TabBarButton" TargetType="Button" BasedOn="{StaticResource CommandButton}">
-            <Setter Property="Height" Value="30"/>
-            <Setter Property="Width" Value="35"/>
-        </Style>
+      <Style x:Key="TabBarButton" TargetType="Button" BasedOn="{StaticResource CommandButton}">
+         <Setter Property="Height" Value="30"/>
+         <Setter Property="Width" Value="35"/>
+      </Style>
 
-        <Style x:Key="TabCloseButton" TargetType="Button">
-            <Setter Property="Height" Value="34"/>
-            <Setter Property="Width" Value="28"/>
-            <Setter Property="Margin" Value="1"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Background" Value="Transparent"/>
-        </Style>
-        
-        <!-- A tab container -->
-        <Style x:Key="ListViewItemRevealStyle" TargetType="ListViewItem">
-            <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}"/>
-            <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}"/>
-            <Setter Property="Background" Value="{ThemeResource ListViewItemBackground}"/>
-            <Setter Property="Foreground" Value="{ThemeResource ListViewItemForeground}"/>
-            <Setter Property="TabNavigation" Value="Local"/>
-            <Setter Property="IsHoldingEnabled" Value="True"/>
-            <Setter Property="HorizontalContentAlignment" Value="Left"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="MinWidth" Value="{ThemeResource ListViewItemMinWidth}"/>
-            <Setter Property="MinHeight" Value="30"/>
-            <Setter Property="AllowDrop" Value="False"/>
-            <Setter Property="UseSystemFocusVisuals" Value="{StaticResource UseSystemFocusVisuals}"/>
-            <Setter Property="FocusVisualMargin" Value="0"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ListViewItem">
-                        <ListViewItemPresenter x:Name="Root" 
+      <Style x:Key="TabCloseButton" TargetType="Button">
+         <Setter Property="Height" Value="34"/>
+         <Setter Property="Width" Value="28"/>
+         <Setter Property="Margin" Value="1"/>
+         <Setter Property="BorderThickness" Value="0"/>
+         <Setter Property="Background" Value="Transparent"/>
+      </Style>
+
+      <!-- A tab container -->
+      <Style x:Key="ListViewItemRevealStyle" TargetType="ListViewItem">
+         <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}"/>
+         <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}"/>
+         <Setter Property="Background" Value="{ThemeResource ListViewItemBackground}"/>
+         <Setter Property="Foreground" Value="{ThemeResource ListViewItemForeground}"/>
+         <Setter Property="TabNavigation" Value="Local"/>
+         <Setter Property="IsHoldingEnabled" Value="True"/>
+         <Setter Property="HorizontalContentAlignment" Value="Left"/>
+         <Setter Property="VerticalContentAlignment" Value="Center"/>
+         <Setter Property="MinWidth" Value="{ThemeResource ListViewItemMinWidth}"/>
+         <Setter Property="MinHeight" Value="30"/>
+         <Setter Property="AllowDrop" Value="False"/>
+         <Setter Property="UseSystemFocusVisuals" Value="{StaticResource UseSystemFocusVisuals}"/>
+         <Setter Property="FocusVisualMargin" Value="0"/>
+         <Setter Property="Template">
+            <Setter.Value>
+               <ControlTemplate TargetType="ListViewItem">
+                  <ListViewItemPresenter x:Name="Root" 
                                                CheckBrush="{ThemeResource ListViewItemCheckBrush}"
                                                ContentMargin="0"
                                                CheckBoxBrush="{ThemeResource ListViewItemCheckBoxBrush}"
@@ -79,242 +79,221 @@
                                                SelectedPressedBackground="{ThemeResource AppBarBackgroundThemeBrush}"
                                                SelectedPointerOverBackground="{ThemeResource AppBarBackgroundThemeBrush}"
                                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}">
-                            <VisualStateManager.VisualStateGroups>
-                                <VisualStateGroup x:Name="CommonStates">
-                                    <VisualState x:Name="Normal"/>
-                                    <VisualState x:Name="Selected"/>
-                                    <VisualState x:Name="PointerOver">
-                                        <VisualState.Setters>
-                                            <Setter Target="Root.(RevealBrush.State)" Value="PointerOver"/>
-                                            <Setter Target="Root.RevealBorderBrush" Value="{ThemeResource ListViewItemRevealBorderBrushPointerOver}"/>
-                                        </VisualState.Setters>
-                                    </VisualState>
-                                    <VisualState x:Name="PointerOverSelected">
-                                        <VisualState.Setters>
-                                            <Setter Target="Root.(RevealBrush.State)" Value="PointerOver"/>
-                                            <Setter Target="Root.RevealBorderBrush" Value="{ThemeResource ListViewItemRevealBorderBrushPointerOver}"/>
-                                        </VisualState.Setters>
-                                    </VisualState>
-                                    <VisualState x:Name="PointerOverPressed">
-                                        <VisualState.Setters>
-                                            <Setter Target="Root.(RevealBrush.State)" Value="Pressed"/>
-                                            <Setter Target="Root.RevealBorderBrush" Value="{ThemeResource ListViewItemRevealBorderBrushPressed}"/>
-                                        </VisualState.Setters>
-                                    </VisualState>
-                                    <VisualState x:Name="Pressed">
-                                        <VisualState.Setters>
-                                            <Setter Target="Root.(RevealBrush.State)" Value="Pressed"/>
-                                            <Setter Target="Root.RevealBorderBrush" Value="{ThemeResource ListViewItemRevealBorderBrushPressed}"/>
-                                        </VisualState.Setters>
-                                    </VisualState>
-                                    <VisualState x:Name="PressedSelected">
-                                        <VisualState.Setters>
-                                            <Setter Target="Root.(RevealBrush.State)" Value="Pressed"/>
-                                            <Setter Target="Root.RevealBorderBrush" Value="{ThemeResource ListViewItemRevealBorderBrushPressed}"/>
-                                        </VisualState.Setters>
-                                    </VisualState>
-                                </VisualStateGroup>
-                                <VisualStateGroup x:Name="DisabledStates">
-                                    <VisualState x:Name="Enabled"/>
-                                    <VisualState x:Name="Disabled">
-                                        <VisualState.Setters>
-                                            <Setter Target="Root.RevealBorderThickness" Value="0"/>
-                                        </VisualState.Setters>
-                                    </VisualState>
-                                </VisualStateGroup>
-                            </VisualStateManager.VisualStateGroups>
-                        </ListViewItemPresenter>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style x:Key="TabListViewItemContainer" BasedOn="{StaticResource ListViewItemRevealStyle}" TargetType="ListViewItem"/>
-    </Page.Resources>
+                     <VisualStateManager.VisualStateGroups>
+                        <VisualStateGroup x:Name="CommonStates">
+                           <VisualState x:Name="Normal"/>
+                           <VisualState x:Name="Selected"/>
+                           <VisualState x:Name="PointerOver">
+                              <VisualState.Setters>
+                                 <Setter Target="Root.(RevealBrush.State)" Value="PointerOver"/>
+                                 <Setter Target="Root.RevealBorderBrush" Value="{ThemeResource ListViewItemRevealBorderBrushPointerOver}"/>
+                              </VisualState.Setters>
+                           </VisualState>
+                           <VisualState x:Name="PointerOverSelected">
+                              <VisualState.Setters>
+                                 <Setter Target="Root.(RevealBrush.State)" Value="PointerOver"/>
+                                 <Setter Target="Root.RevealBorderBrush" Value="{ThemeResource ListViewItemRevealBorderBrushPointerOver}"/>
+                              </VisualState.Setters>
+                           </VisualState>
+                           <VisualState x:Name="PointerOverPressed">
+                              <VisualState.Setters>
+                                 <Setter Target="Root.(RevealBrush.State)" Value="Pressed"/>
+                                 <Setter Target="Root.RevealBorderBrush" Value="{ThemeResource ListViewItemRevealBorderBrushPressed}"/>
+                              </VisualState.Setters>
+                           </VisualState>
+                           <VisualState x:Name="Pressed">
+                              <VisualState.Setters>
+                                 <Setter Target="Root.(RevealBrush.State)" Value="Pressed"/>
+                                 <Setter Target="Root.RevealBorderBrush" Value="{ThemeResource ListViewItemRevealBorderBrushPressed}"/>
+                              </VisualState.Setters>
+                           </VisualState>
+                           <VisualState x:Name="PressedSelected">
+                              <VisualState.Setters>
+                                 <Setter Target="Root.(RevealBrush.State)" Value="Pressed"/>
+                                 <Setter Target="Root.RevealBorderBrush" Value="{ThemeResource ListViewItemRevealBorderBrushPressed}"/>
+                              </VisualState.Setters>
+                           </VisualState>
+                        </VisualStateGroup>
+                        <VisualStateGroup x:Name="DisabledStates">
+                           <VisualState x:Name="Enabled"/>
+                           <VisualState x:Name="Disabled">
+                              <VisualState.Setters>
+                                 <Setter Target="Root.RevealBorderThickness" Value="0"/>
+                              </VisualState.Setters>
+                           </VisualState>
+                        </VisualStateGroup>
+                     </VisualStateManager.VisualStateGroups>
+                  </ListViewItemPresenter>
+               </ControlTemplate>
+            </Setter.Value>
+         </Setter>
+      </Style>
+      <Style x:Key="TabListViewItemContainer" BasedOn="{StaticResource ListViewItemRevealStyle}" TargetType="ListViewItem"/>
+   </Page.Resources>
 
-    <Grid Background="Transparent">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition />
-        </Grid.RowDefinitions>
+   <Grid Background="Transparent">
+      <Grid.RowDefinitions>
+         <RowDefinition Height="Auto"/>
+         <RowDefinition />
+      </Grid.RowDefinitions>
 
 
-        <!-- Official title bar (must be defined in code for the custom title bar) -->
-        <Grid x:Name="grdTitleBar"
+      <!-- Official title bar (must be defined in code for the custom title bar) -->
+      <Grid x:Name="grdTitleBar"
             Background="Transparent">
-            <!-- Width of the padding columns is set in LayoutMetricsChanged handler. -->
-            <!-- Using padding columns instead of Margin ensures that the background
+         <!-- Width of the padding columns is set in LayoutMetricsChanged handler. -->
+         <!-- Using padding columns instead of Margin ensures that the background
               paints the area under the caption control buttons (for transparent buttons). -->
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition x:Name="LeftPaddingColumn" Width="0"/>
-                <ColumnDefinition/>
-                <ColumnDefinition x:Name="RightPaddingColumn" Width="0"/>
-            </Grid.ColumnDefinitions>
-        </Grid>
+         <Grid.ColumnDefinitions>
+            <ColumnDefinition x:Name="LeftPaddingColumn" Width="0"/>
+            <ColumnDefinition/>
+            <ColumnDefinition x:Name="RightPaddingColumn" Width="0"/>
+         </Grid.ColumnDefinitions>
+      </Grid>
 
 
-        <!-- Actual tabbed interface -->
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="1*"/>
-            </Grid.ColumnDefinitions>
+      <!-- Actual tabbed interface -->
+      <Grid>
+         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="1*"/>
+         </Grid.ColumnDefinitions>
 
-            <!-- Tabs -->
-            <StackPanel Orientation="Horizontal"
+         <!-- Tabs -->
+         <StackPanel Orientation="Horizontal"
                         Background="Transparent">
 
-                <!-- Home Button -->
-                <Button Style="{StaticResource TabBarButton}">
-                    <FontIcon FontSize="15" Glyph="&#xE80F;"/>
-                </Button>
+            <!-- Home Button -->
+            <Button Style="{StaticResource TabBarButton}">
+               <FontIcon FontSize="15" Glyph="&#xE80F;"/>
+            </Button>
 
-                <!-- Tab List -->
-                <ListView ItemContainerStyle="{StaticResource TabListViewItemContainer}" x:Name="lvTabs"
+            <!-- Tab List -->
+            <ListView ItemContainerStyle="{StaticResource TabListViewItemContainer}" x:Name="lvTabs"
                           ItemsSource="{x:Bind Tabs}"
                           Height="Auto"
                           Background="Transparent"
                           SelectionChanged="LvTabs_SelectionChanged"
                           >
-                    <ListView.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <StackPanel Orientation="Horizontal" MinWidth="100" />
-                        </ItemsPanelTemplate>
-                    </ListView.ItemsPanel>
-                    <ListView.ItemTemplate>
-                        <DataTemplate x:DataType="local1:BrowserTab">
-                            <StackPanel Orientation="Horizontal"
+               <ListView.ItemsPanel>
+                  <ItemsPanelTemplate>
+                     <StackPanel Orientation="Horizontal" MinWidth="100" />
+                  </ItemsPanelTemplate>
+               </ListView.ItemsPanel>
+               <ListView.ItemTemplate>
+                  <DataTemplate x:DataType="local1:BrowserTab">
+                     <StackPanel Orientation="Horizontal"
                                         Height="30"
                                         Padding="10,0,2,0">
-                                <TextBlock Text="{x:Bind Reference.Version}"
+                        <TextBlock Text="{x:Bind Reference.Version}"
                                            FontSize="12"
                                            Margin="0,0,4,0"
                                            VerticalAlignment="Center"/>
-                                <TextBlock Text="{x:Bind Reference}"
+                        <TextBlock Text="{x:Bind Reference}"
                                            FontWeight="Bold"
                                            FontSize="12"
                                            VerticalAlignment="Center"/>
-                                <Button Style="{StaticResource TabCloseButton}"
+                        <Button Style="{StaticResource TabCloseButton}"
                                         Name="btnCloseTab"
                                         Tag="{x:Bind Guid}"
                                         Click="BtnCloseTab_Click">
-                                    <FontIcon FontSize="10" Glyph="&#xE711;"/>
-                                </Button>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
+                           <FontIcon FontSize="10" Glyph="&#xE711;"/>
+                        </Button>
+                     </StackPanel>
+                  </DataTemplate>
+               </ListView.ItemTemplate>
+            </ListView>
 
-                <!-- New Tab Button -->
-                <Button Name="btnNewTab"
+            <!-- New Tab Button -->
+            <Button Name="btnNewTab"
                         Style="{StaticResource TabBarButton}"
                         Click="BtnNewTab_Click">
-                    <FontIcon FontSize="15" Glyph="&#xE710;"/>
-                </Button>
-            </StackPanel>
-        </Grid>
+               <FontIcon FontSize="15" Glyph="&#xE710;"/>
+            </Button>
+         </StackPanel>
+      </Grid>
 
 
-        <!-- Main Content -->
-        <Grid Grid.Column="1"
+      <!-- Main Content -->
+      <Grid Grid.Column="1"
             Grid.Row="1"
             Background="White">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="1*"/>
-            </Grid.RowDefinitions>
+         <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+         </Grid.RowDefinitions>
 
-            <ScrollViewer Grid.Row="0"
+         <ScrollViewer Grid.Row="0"
                        Grid.Column="0"
                        Margin="0,0,0,0"
                        HorizontalScrollMode="Disabled"
                        HorizontalScrollBarVisibility="Hidden"
                        VerticalScrollBarVisibility="Hidden">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="1*"/>
-                    </Grid.RowDefinitions>
-                     <ListView Name="lvVerses"
-                               ItemsSource="{x:Bind Verses}">
-                  
-                     </ListView>
-                    <!--<TextBlock Name="tbMainText"
-                                TextWrapping="Wrap"
-                                Grid.Column="0"
-                                Grid.Row="0"
-                                Margin="0, 80"
-                                Width="1000">Suspendisse porta rhoncus mauris ac faucibus. Cras finibus, diam sit amet facilisis vestibulum, augue quam faucibus tellus, vel commodo felis enim ultricies lorem. Nulla egestas ante vitae vulputate posuere. Suspendisse potenti. Praesent at nisi nunc. Aliquam erat volutpat. Nullam eget quam a risus congue elementum. Suspendisse nisi nulla, blandit at lorem sit amet, viverra consequat urna. Maecenas in egestas tellus. Nullam luctus et felis vel eleifend. Curabitur rhoncus, neque ut fermentum blandit, tellus turpis vulputate nisi, nec dignissim lacus tellus nec metus. Nam vel feugiat dolor. Mauris fringilla tellus consequat pharetra vestibulum. Donec ut eleifend magna, in semper tellus. Vestibulum sit amet efficitur dui. Phasellus fringilla tortor risus, sit amet suscipit sem laoreet nec. 
-Nullam dapibus, augue eget egestas tristique, massa purus cursus felis, at faucibus ex sem in justo. Vestibulum et elit ipsum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nunc malesuada quam non leo ullamcorper placerat sit amet sed lorem. Etiam eget consequat ante, sed euismod arcu. Nulla facilisi. Sed tortor ex, rhoncus quis efficitur vel, pharetra in ipsum. Aliquam eu neque sit amet nisi laoreet tristique. Nulla eget congue dolor, eu fringilla neque. Sed auctor placerat elementum. Quisque egestas dignissim mattis. Sed sodales, erat in ultricies suscipit, odio felis euismod erat, non dapibus magna orci in tortor. Suspendisse mattis finibus dolor eu ultrices. Vivamus non orci id dolor condimentum placerat. Ut volutpat turpis scelerisque nisi blandit facilisis. 
-Etiam ut quam at mauris pharetra imperdiet non sagittis ligula. Vivamus ut ante nec purus fringilla molestie. Suspendisse quis luctus mi. Aenean interdum iaculis sollicitudin. Duis hendrerit mauris lacus, ac laoreet ligula commodo sit amet. Ut laoreet ipsum ac consequat efficitur. Donec laoreet tristique lacus, ultricies aliquet metus sollicitudin sit amet. Ut sed aliquet elit. Phasellus pharetra, dui congue scelerisque tincidunt, urna ipsum tempus orci, luctus accumsan nibh ipsum id velit. Integer elit sapien, hendrerit vel convallis sed, auctor sit amet lorem. Aliquam convallis aliquam erat, vitae molestie justo. Morbi vehicula enim eget justo accumsan porttitor. Vivamus eget quam purus. Cras nec pulvinar tellus. 
-Nulla in nisl eget est scelerisque accumsan sed a justo. Morbi cursus mi malesuada ipsum egestas finibus. In mollis congue massa, eget semper lacus auctor sed. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Integer sit amet varius nisi, et vestibulum neque. Morbi non convallis lorem, congue imperdiet dui. Vivamus dignissim sapien id purus volutpat venenatis. Cras non lacus sapien. 
-Morbi ultrices lorem enim, in vehicula nunc aliquet cursus. Praesent iaculis, odio semper luctus malesuada, dui enim semper est, efficitur pretium justo dolor sit amet orci. Quisque ut placerat urna, non eleifend dui. Fusce mollis, dolor a euismod commodo, turpis lectus pellentesque felis, eget lobortis neque urna at eros. Pellentesque bibendum eros a porta viverra. Donec ultricies turpis quis sollicitudin lobortis. Ut tincidunt lorem sed elit iaculis iaculis eget mollis dolor. Aenean luctus dapibus metus id imperdiet. Quisque pharetra a elit id maximus. 
-Integer diam purus, scelerisque eget ligula a, malesuada bibendum erat. Curabitur rhoncus diam finibus sem porttitor sodales. Donec porta urna ac imperdiet interdum. Donec cursus, tellus sed sagittis pharetra, erat lorem vulputate nulla, ac semper massa nibh sed erat. Aenean efficitur turpis nunc, at sollicitudin ex auctor non. Aenean consequat leo eu lorem porttitor, ac cursus nulla dapibus. Nam ut tellus sit amet tellus sodales tincidunt. Suspendisse nec magna vehicula, commodo leo nec, tempus eros. Donec cursus ipsum ut mauris bibendum porta. 
-Curabitur tincidunt, eros ut euismod placerat, ex lacus porta odio, non lobortis tellus sapien eget ex. Integer ullamcorper nunc justo, at dictum lacus scelerisque eu. Cras suscipit aliquet tincidunt. Cras euismod urna elit, sed semper libero elementum quis. In sagittis diam et ante lacinia faucibus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Integer dictum faucibus turpis, ac interdum massa tincidunt a. In imperdiet aliquet quam. Mauris fermentum vitae tortor in mollis. Integer vestibulum tortor nibh, et interdum nisi tincidunt eu. Sed eu rhoncus enim. 
-Sed semper tellus id sodales pellentesque. Integer vel blandit diam, a rhoncus tortor. Aliquam facilisis imperdiet ligula, nec tincidunt tortor mollis at. Morbi euismod accumsan diam vel ultrices. Morbi hendrerit tortor arcu, et facilisis ex imperdiet eu. Nulla ac iaculis risus, et ornare sem. Nunc tempus orci vitae imperdiet ultrices. Cras odio enim, convallis a tellus ut, ullamcorper dignissim ante. 
-Donec vehicula malesuada egestas. Morbi iaculis convallis velit a pulvinar. Integer ultricies accumsan imperdiet. Nam et suscipit mauris. Pellentesque bibendum sollicitudin scelerisque. Vestibulum non ex ac velit bibendum scelerisque eu nec enim. Nulla facilisi. Praesent in ultricies magna. Nam eu risus est. Donec elementum, orci vitae varius posuere, purus lorem vehicula augue, ut semper est tortor sed magna. 
-Suspendisse in justo posuere, egestas diam eu, ullamcorper enim. Suspendisse scelerisque maximus lectus non aliquet. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Curabitur a placerat mauris. Pellentesque imperdiet elementum convallis. Sed id nulla justo. Pellentesque odio erat, egestas ut mi et, dictum gravida ligula. Curabitur mollis, purus et accumsan sodales, tellus arcu malesuada nisi, vel interdum augue massa congue nisl. Nam ac dolor efficitur, sodales libero pellentesque, pharetra nulla. Praesent a nibh arcu. 
-Nullam a mollis metus. Etiam vitae sodales orci, sit amet vehicula tortor. Etiam hendrerit, libero aliquam varius consectetur, dui sem ultrices purus, ut venenatis turpis nibh sit amet ante. Nunc sed tortor in orci molestie elementum. Donec malesuada metus sollicitudin feugiat vulputate. Vivamus in risus tincidunt, posuere risus in, ornare odio. Mauris condimentum neque quam, vel condimentum sapien egestas sed. Nam ornare laoreet est, non dignissim diam venenatis et. Praesent et diam dui. Nam quis commodo sapien, ac dapibus augue. Donec iaculis aliquam ultricies. Morbi eu cursus neque. Praesent elit erat, sodales in consectetur ut, sodales quis ligula. Nunc suscipit euismod felis, vitae hendrerit tellus placerat at. Quisque eget nisi non nulla interdum vestibulum. 
-Vestibulum sapien dolor, hendrerit in pulvinar nec, tempus sit amet libero. Ut accumsan lobortis tortor quis dapibus. Nunc blandit risus vel metus bibendum bibendum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nunc vitae pretium nunc. Sed eu auctor nibh, vel dictum lorem. Aenean fermentum tortor vel nibh mollis convallis. Vestibulum id lorem sodales, sodales nibh in, congue odio. Donec scelerisque velit nulla, eu vehicula eros dignissim vel. Vestibulum cursus nisl id magna aliquam dictum. Quisque fermentum elit at nunc dignissim facilisis. Suspendisse ante lacus, vehicula eu sapien eget, vulputate sagittis ex. In felis purus, consectetur a nisl at, lacinia dignissim enim. 
-Nullam tincidunt, massa quis bibendum scelerisque, odio lorem lacinia ex, id suscipit dolor tellus eget lectus. Duis purus lectus, sagittis ac nisi id, convallis dictum diam. Etiam pulvinar orci at justo tempus, nec interdum risus porttitor. Duis hendrerit quam nisl, ut rhoncus sem mattis ac. Maecenas maximus consequat euismod. Proin dui mi, ullamcorper sit amet ornare tincidunt, tristique eget quam. Donec a turpis blandit, suscipit dolor non, tempor ipsum. 
-Vivamus eleifend faucibus ligula, viverra luctus massa fermentum vulputate. Nam nulla sem, elementum a suscipit lobortis, placerat eget orci. Sed dictum semper erat et viverra. Phasellus congue varius metus ut volutpat. Mauris ac enim at neque finibus vestibulum. Fusce dictum malesuada lacinia. Phasellus pharetra arcu eget nisi cursus, eu tristique justo scelerisque. Nulla facilisi. Aenean in pulvinar ipsum. 
-Proin vulputate sed magna at vulputate. Integer in quam suscipit, efficitur quam nec, efficitur tortor. Phasellus vulputate magna sed lacus vulputate, et dictum arcu pellentesque. Phasellus ornare cursus metus vel auctor. Curabitur non leo a lorem congue gravida. Vivamus lectus lectus, convallis vitae rhoncus at, tincidunt ornare odio. Nunc ut gravida turpis. Aliquam ante lacus, tristique sed lobortis non, eleifend eget leo. Aenean semper vel elit et eleifend. 
-Curabitur tincidunt cursus sapien. Nulla finibus quis leo a cursus. Integer bibendum erat nibh. Nulla malesuada posuere enim, congue feugiat ligula lobortis non. In sed pharetra diam. Quisque in purus id lorem pharetra tristique non a sapien. Sed dictum pharetra velit, at finibus tellus cursus malesuada. Duis ultricies maximus elit, vel aliquam dui tristique in. 
-Sed sed maximus odio, ac tristique quam. Suspendisse potenti. Praesent vel consectetur felis, at tristique magna. Nullam consequat ligula eget iaculis iaculis. Morbi efficitur dapibus velit, eget congue ligula imperdiet sed. Donec vulputate elit sed elit vestibulum auctor. Ut varius, nulla a imperdiet dapibus, dui nunc scelerisque dolor, vitae rutrum sapien lorem at diam. Suspendisse fermentum nisi eget sapien imperdiet, a luctus lacus laoreet. Morbi vel diam hendrerit, dapibus turpis sit amet, gravida augue. Curabitur lobortis magna eget placerat tempor. Nulla facilisi. Nullam tempor vitae libero nec porttitor. Ut placerat lacus purus, eget ultrices dui cursus tempor. 
-Cras gravida lorem a luctus bibendum. Morbi dapibus tristique nibh et bibendum. Nulla ut finibus elit. Nulla pulvinar lacus ligula, congue malesuada massa pellentesque rhoncus. Integer eget diam sed nibh efficitur porttitor nec sit amet nibh. Integer id luctus sapien, vel feugiat velit. Mauris faucibus enim vel tempus laoreet. Quisque posuere et sapien ac fringilla. Praesent pellentesque dui commodo turpis pretium suscipit. Cras eleifend massa in eros consectetur fermentum. Sed a diam dui. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Etiam purus dolor, egestas at interdum non, finibus at nibh. Integer sit amet tincidunt nulla, non cursus magna. 
-Aliquam fringilla iaculis ante, a feugiat odio. Interdum et malesuada fames ac ante ipsum primis in faucibus. Pellentesque volutpat urna a ipsum sodales pulvinar. Morbi non sapien justo. Cras dignissim massa quis purus suscipit placerat. Sed in diam quam. Integer magna lorem, luctus quis bibendum sit amet, porta eget metus. Aenean elementum feugiat tincidunt. 
-Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Fusce non neque vel urna iaculis vulputate tristique non urna. Fusce sed neque tristique, iaculis odio vel, euismod risus. Sed vestibulum, est in varius accumsan, ante nisi dapibus libero, sed auctor leo ligula a lacus. Vivamus auctor non orci at convallis. Etiam elementum tortor a lectus imperdiet, ac porta ante volutpat. Duis nec ligula vel ligula accumsan auctor ut sed ante. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Morbi tincidunt lacus sit amet tincidunt feugiat. Etiam tempor posuere massa, id tincidunt arcu dapibus ut. Mauris eget imperdiet nibh. Quisque convallis quis justo ac rhoncus. In hac habitasse platea dictumst. Mauris aliquam ornare massa. Etiam consectetur sem risus.</TextBlock>-->
-                </Grid>
-            </ScrollViewer>
+            <Grid>
+               <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="800"/>
+               </Grid.ColumnDefinitions>
+               <Grid.RowDefinitions>
+                  <RowDefinition Height="1*"/>
+               </Grid.RowDefinitions>
+               <RichTextBlock Name="rtbVerses"
+                              Margin="117,80,0,80"
+                           TextWrapping="WrapWholeWords"
+                           TextAlignment="Left" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                  <Paragraph>Quisque diam erat, suscipit at purus non, bibendum molestie urna. Mauris pulvinar mauris lectus, vel pellentesque orci ultrices quis. Nam aliquam, libero in pharetra rhoncus, arcu orci vestibulum sapien, sit amet cursus nisi lectus vitae turpis. Pellentesque tempus ligula non metus maximus, ac feugiat felis facilisis. Sed ut lorem ligula. In hac habitasse platea dictumst. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Phasellus nec tristique neque. Maecenas eu tincidunt arcu. Sed tempor, nibh sit amet vehicula finibus, elit ligula ultrices dui, nec tincidunt eros erat sit amet lorem. Donec posuere sagittis velit. Nulla facilisi. Donec tempor, velit ac pulvinar convallis, dui erat ultricies odio, non imperdiet diam magna vitae ex. Quisque auctor hendrerit elementum. Quisque quis eros finibus leo commodo sodales id ut tellus. Donec suscipit eget felis sed sodales.</Paragraph>
+                  <Paragraph>Nam sed convallis arcu, a tempor ex. Curabitur ut ante a massa fermentum tristique eu vitae nisi. Donec et lectus nec mauris pellentesque pellentesque eu nec tellus. Maecenas fermentum ullamcorper condimentum. Pellentesque ut blandit eros. Pellentesque ornare volutpat erat ut commodo. Nam ut ultricies tellus, vitae tristique ex. Aenean varius blandit ipsum, quis sollicitudin purus interdum tincidunt. Phasellus a odio lacus. In at libero nec lacus vulputate iaculis.</Paragraph>
+                  <Paragraph>Donec semper pulvinar turpis, ut ullamcorper metus vehicula at. Donec consectetur sed ex ac semper. Aenean et nulla turpis. Praesent orci leo, gravida rutrum finibus id, porttitor quis ligula. Donec nec lectus sit amet lectus tempus faucibus vel sit amet est. Mauris eu nulla non purus sollicitudin consequat. Sed et ligula a mauris gravida scelerisque at et sapien. Fusce id dictum metus, nec bibendum nunc. Nunc erat erat, bibendum sit amet aliquet id, gravida vel magna. In cursus ex eget leo congue pharetra. Vivamus vitae mattis risus. Nullam condimentum eros dolor. Aliquam fermentum varius libero nec aliquam. Praesent ac enim vitae enim egestas maximus. Etiam non nisl vitae sapien gravida commodo.</Paragraph>
+               </RichTextBlock>
+            </Grid>
+         </ScrollViewer>
 
 
-            <!-- Command Bar -->
-            <Grid Height="40"
+         <!-- Command Bar -->
+         <Grid Height="40"
                VerticalAlignment="Top"
                Background="Transparent">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="90"/>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="90"/>
-                </Grid.ColumnDefinitions>
+            <Grid.ColumnDefinitions>
+               <ColumnDefinition Width="90"/>
+               <ColumnDefinition Width="1*"/>
+               <ColumnDefinition Width="90"/>
+            </Grid.ColumnDefinitions>
 
-                <!-- Previous and Next buttons -->
-                <StackPanel Grid.Column="0"
+            <!-- Previous and Next buttons -->
+            <StackPanel Grid.Column="0"
                         Orientation="Horizontal"
                         Background="{StaticResource AppBarBackgroundThemeBrush}">
 
-                    <!-- Back -->
-                    <Button Style="{StaticResource CommandButton}"
-                            Name="btnPrevious">
-                        <FontIcon FontSize="15" Glyph="&#xE72B;"/>
-                    </Button>
+               <!-- Back -->
+               <Button Style="{StaticResource CommandButton}"
+                            Name="btnPrevious" Click="BtnPrevious_Click">
+                  <FontIcon FontSize="15" Glyph="&#xE72B;"/>
+               </Button>
 
-                    <!-- Next -->
-                    <Button Style="{StaticResource CommandButton}"
+               <!-- Next -->
+               <Button Style="{StaticResource CommandButton}"
                             Name="btnNext"
                             AccessKey="LeftArrow">
-                        <FontIcon FontSize="15" Glyph="&#xE72A;"/>
-                    </Button>
-                </StackPanel>
+                  <FontIcon FontSize="15" Glyph="&#xE72A;"/>
+               </Button>
+            </StackPanel>
 
-                <!-- Search -->
-                <StackPanel Grid.Column="1"
+            <!-- Search -->
+            <StackPanel Grid.Column="1"
                             BorderThickness="5"
                             BorderBrush="{StaticResource AppBarBackgroundThemeBrush}">
-                    <Grid BorderBrush="Gray"
+               <Grid BorderBrush="Gray"
                           BorderThickness="1"
                           Background="{StaticResource SystemControlBaseMediumLowAcrylicElementMediumBrush}">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="1*"/>
-                        </Grid.ColumnDefinitions>
+                  <Grid.ColumnDefinitions>
+                     <ColumnDefinition Width="Auto"/>
+                     <ColumnDefinition Width="1*"/>
+                  </Grid.ColumnDefinitions>
 
-                        <Button Grid.Column="0"
+                  <Button Grid.Column="0"
                             Content="KJV"
                             BorderThickness="0"
                             Background="Transparent"/>
 
-                        <AutoSuggestBox Name="asbSearch"
+                  <AutoSuggestBox Name="asbSearch"
                                         Grid.Column="1"
                                         PlaceholderText="Reference or word search"
                                         BorderThickness="0"
@@ -322,36 +301,36 @@ Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculu
                                         Margin="0"
                                         VerticalAlignment="Center"
                                         Height="26" QuerySubmitted="AsbSearch_QuerySubmitted"/>
-                    </Grid>
-                </StackPanel>
+               </Grid>
+            </StackPanel>
 
 
-                <!-- Options -->
-                <StackPanel Grid.Column="2"
+            <!-- Options -->
+            <StackPanel Grid.Column="2"
                         Orientation="Horizontal"
                         FlowDirection="RightToLeft"
                         Background="{StaticResource AppBarBackgroundThemeBrush}">
 
-                    <!-- More -->
-                    <Button Style="{StaticResource CommandButton}">
-                        <FontIcon FontSize="15" Glyph="&#xE712;"/>
-                    </Button>
+               <!-- More -->
+               <Button Style="{StaticResource CommandButton}">
+                  <FontIcon FontSize="15" Glyph="&#xE712;"/>
+               </Button>
 
-                    <!-- Play (read out loud) -->
-                    <Button Name="btnPlay"
+               <!-- Play (read out loud) -->
+               <Button Name="btnPlay"
                             Style="{StaticResource CommandButton}"
                             AutomationProperties.AcceleratorKey="p"
                             Click="BtnPlay_Click">
-                        <FontIcon FontSize="15" Glyph="&#xE768;"/>
-                    </Button>
-                    <!-- Pause (read out loud) -->
-                    <Button Name="btnPause"
+                  <FontIcon FontSize="15" Glyph="&#xE768;"/>
+               </Button>
+               <!-- Pause (read out loud) -->
+               <Button Name="btnPause"
                             Style="{StaticResource CommandButton}"
                             Visibility="Collapsed" Click="BtnPause_Click">
-                        <FontIcon FontSize="15" Glyph="&#xE769;"/>
-                    </Button>
-                </StackPanel>
-            </Grid>
-        </Grid>
-    </Grid>
+                  <FontIcon FontSize="15" Glyph="&#xE769;"/>
+               </Button>
+            </StackPanel>
+         </Grid>
+      </Grid>
+   </Grid>
 </Page>

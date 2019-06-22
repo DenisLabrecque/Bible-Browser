@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -40,8 +41,6 @@ namespace BibleBrowserUWP
       // The object for controlling the speech synthesis engine (voice).
       SpeechSynthesizer m_synth = new SpeechSynthesizer();
       bool m_isPlaybackStarted = false;
-      
-      static string VerseText = "Testing."; // TODO for text reader
 
       #endregion
 
@@ -49,7 +48,6 @@ namespace BibleBrowserUWP
       #region Properties
 
       TrulyObservableCollection<BrowserTab> Tabs { get => BrowserTab.Tabs; }
-      TrulyObservableCollection<Verse> Verses { get => BrowserTab.Verses; }
 
       #endregion
 
@@ -61,17 +59,8 @@ namespace BibleBrowserUWP
          // Open the tab that was active before the app was last closed
          lvTabs.SelectedItem = BrowserTab.Selected;
 
-
-
          string info = BibleLoader.TestInformation();
          string temp = BibleLoader.TestBookNames();
-
-
-
-         //tbMainText.Text = info + temp;
-
-         //tbMainText.Text = new BibleReference(BiblesLoaded.Version("ylt.xml"), BibleBook.iiS, 1, 1);
-         //tbMainText.Text = new BibleReference(0, (int)BookShortName.Jb, new ChapterVerse(1, 2, "a"), new ChapterVerse(0)).ToString();
       }
 
 
@@ -82,12 +71,12 @@ namespace BibleBrowserUWP
       {
          if(m_isPlaybackStarted)
          {
-               m_mediaElement.Play();
+            m_mediaElement.Play();
          }
          else
          {
             // Generate the audio stream from plain text.
-            SpeechSynthesisStream stream = await m_synth.SynthesizeTextToStreamAsync(VerseText);
+            SpeechSynthesisStream stream = await m_synth.SynthesizeTextToStreamAsync(BrowserTab.Selected.Reference.GetChapterPlainText());
 
             // Send the stream to the media object.
             m_mediaElement.SetSource(stream, stream.ContentType);
@@ -168,6 +157,14 @@ namespace BibleBrowserUWP
          btnPlay.Visibility = Visibility.Visible;
       }
 
+      private void BtnPrevious_Click(object sender, RoutedEventArgs e)
+      {
+         BibleReference reference = BrowserTab.Selected.Previous;
+         BrowserTab.Selected.Reference = reference;
+         PrintChapter(reference);
+         ActivateButtons();
+      }
+
       private void CoreTitleBar_LayoutMetricsChanged(CoreApplicationViewTitleBar sender, object args)
       {
          UpdateTitleBarLayout(sender);
@@ -202,21 +199,69 @@ namespace BibleBrowserUWP
          btnPlay.Visibility = Visibility.Visible;
 
          // Only display the reference when there is still a tab to show; if not, we are closing the app anyway
-         if (lvTabs.Items.Count > 1)
+         if (lvTabs.Items.Count > 0)
          {
-            ShowBibleTextTemp(BrowserTab.Selected.Reference);
+            PrintChapter(BrowserTab.Selected.Reference);
+         }
+
+         ActivateButtons();
+      }
+      
+
+      /// <summary>
+      /// Based on the current tab, decide whether the Previous, Next, and Play commands should be clickable.
+      /// </summary>
+      private void ActivateButtons()
+      {
+         // New tab: no button should be clickable
+         if (BrowserTab.Selected.Reference == null)
+         {
+            btnPrevious.IsEnabled = false;
+            btnNext.IsEnabled = false;
+            btnPlay.IsEnabled = false;
+         }
+         // There is text already displayed: check whether there is history
+         else
+         {
+            btnPlay.IsEnabled = true;
+
+            // There is a history of references
+            if (BrowserTab.Selected.History.Count >= 2)
+            {
+               if (BrowserTab.Selected.Next == null)
+                  btnNext.IsEnabled = false;
+               else
+                  btnNext.IsEnabled = true;
+
+               if (BrowserTab.Selected.Previous == null)
+                  btnPrevious.IsEnabled = false;
+               else
+                  btnPrevious.IsEnabled = true;
+            }
+            // There is no history
+            else
+            {
+               btnPrevious.IsEnabled = false;
+               btnNext.IsEnabled = false;
+            }
          }
       }
 
-      private void ShowBibleTextTemp(BibleReference reference)
-      {
-         ///Verses = reference.Version.GetChapterVerses(reference);
 
-         //tbMainText.Text = string.Empty;
-         //foreach (string value in contents)
-         //{
-         //   tbMainText.Text += value;
-         //}
+      /// <summary>
+      /// Print a chapter of the Bible to the app page according to the reference sent.
+      /// </summary>
+      /// <param name="reference">The chapter to print.</param>
+      private void PrintChapter(BibleReference reference)
+      {
+         // Remove previous contents
+         rtbVerses.Blocks.Clear();
+
+         // New tab, leave blank
+         if (BrowserTab.Selected.Reference == null)
+            return;
+         else
+            rtbVerses.Blocks.Add(reference.GetChapterTextFormatted());
       }
 
 
@@ -251,6 +296,8 @@ namespace BibleBrowserUWP
             Tabs.RemoveAt(0);
             CoreApplication.Exit();
          }
+
+         ActivateButtons();
       }
 
 
@@ -261,6 +308,7 @@ namespace BibleBrowserUWP
       {
          Tabs.Add(new BrowserTab());
          lvTabs.SelectedIndex = Tabs.Count - 1;
+         ActivateButtons();
       }
 
 
@@ -271,17 +319,94 @@ namespace BibleBrowserUWP
       /// <param name="args"></param>
       private void AsbSearch_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
       {
+         // Have a reference to go to ready
          BibleReference reference = BrowserTab.Selected.Reference;
-         //tbMainText.Text = BrowserTab.Selected.Reference + ";//";
          if (reference == null)
             reference = new BibleReference(BibleLoader.DefaultVersion, BibleBook.Gn);
 
-         // Find which Bible book the search query is closest to
-         string closestBook = BibleSearch.ClosestBookName(reference.Version, args.QueryText);
+         // Separate the query into book name and verse
+         List<string> queryElements = args.QueryText.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
+         int bookNumeral = 0;
+         string bookName = null;
+         int chapter = 0;
+         
+         // There must only be a book name
+         if(queryElements.Count == 1)
+         {
+            bookName = BibleSearch.ClosestBookName(reference.Version, queryElements[0]);
+         }
+         else
+         {
+            int[] numberMatrix = new int[queryElements.Count]; // Where numbers are in the query elements
+
+            // Determine where the numbers are in the query elements
+            int number = 0;
+            for(int i = 0; i < queryElements.Count; i++)
+            {
+               int.TryParse(queryElements[i], out number); // A fault here is that Roman numerals won't work, and the book name is assigned to the numeral TODO
+               if (number != 0)
+                  numberMatrix[i] = Math.Abs(number);
+               else
+                  numberMatrix[i] = 0;
+            }
+
+            // Assign book number, book name, and chapter in sequence
+            for(int i = 0; i < queryElements.Count; i++)
+            {
+               // Book numeral
+               if(bookName == null && bookNumeral == 0 && numberMatrix[i] != 0)
+               {
+                  bookNumeral = numberMatrix[i];
+                  Debug.WriteLine("Book numeral entered as " + bookNumeral);
+                  continue;
+               }
+               // Book Name
+               else if(bookName == null && numberMatrix[i] == 0)
+               {
+                  bookName = queryElements[i];
+                  continue;
+               }
+               // Chapter
+               else if(chapter == 0 && numberMatrix[i] != 0)
+               {
+                  chapter = numberMatrix[i];
+                  break; // Stop here
+               }
+            }
+
+            // Add the book numeral to the book name
+            if(bookNumeral != 0)
+            {
+               bookName = bookNumeral + " " + bookName;
+            }
+            Debug.WriteLine("The user entered " + bookName + " " + chapter);
+         }
          
          // Display the reference and contents
-         BrowserTab.Selected.Reference = reference.SetBook(closestBook).SetToFirstChapter();
-         ShowBibleTextTemp(reference);
+         if(bookName == null)
+         {
+            if(chapter == 0)
+            {
+               // Don't change anything
+            }
+            else
+            {
+               BrowserTab.Selected.Reference = reference.SetToChapter(chapter);
+            }
+         }
+         else
+         {
+            bookName = BibleSearch.ClosestBookName(reference.Version, bookName);
+            if (chapter == 0)
+            {
+               BrowserTab.Selected.Reference = reference.SetBook(bookName).SetToChapter(1);
+            }
+            else
+            {
+               BrowserTab.Selected.Reference = reference.SetBook(bookName).SetToChapter(chapter);
+            }
+         }
+         PrintChapter(reference);
       }
       #endregion
    }

@@ -1,4 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using Windows.UI;
+using Windows.UI.Xaml.Documents;
+using Windows.UI.Xaml.Media;
 
 namespace BibleBrowser
 {
@@ -33,8 +38,32 @@ namespace BibleBrowser
       /// Set dynamically by retrieval using the <code>BibleBook</code> enumeration as index for the <code>BookNames</code> loaded list.
       /// </summary>
       public string BookName { get => Version.BookNames[(int)Book]; }
-      public int Chapter { get; private set; }
-      public int Verse { get; private set; }
+
+      /// <summary>
+      /// The chapter of this book. When set, this will throw an exception when out of range.
+      /// </summary>
+      public int Chapter {
+         get => Chapter;
+         private set {
+            if (value < 1)
+               throw new ArgumentOutOfRangeException("A chapter cannot be set to less than 1");
+            else if (value > Version.GetChapterCount(this))
+               throw new ArgumentOutOfRangeException("A chapter cannot be set to more than the number of chapters in the book");
+         }
+      }
+
+      /// <summary>
+      /// The verse in this book's chapter. When set, this will throw an exception when out of range.
+      /// </summary>
+      public int Verse {
+         get => Verse;
+         private set {
+            if (value < 1)
+               throw new ArgumentOutOfRangeException("A verse cannot be set to less than 1");
+            else if (value > Version.GetVerseCount(this))
+               throw new ArgumentOutOfRangeException("A verse cannot be set to more than the number of verses in the book");
+         }
+      }
 
       #endregion
 
@@ -155,14 +184,90 @@ namespace BibleBrowser
 
 
       /// <summary>
-      /// Set this reference to the current book's first chapter and verse.
-      /// This method is fluent and can be chained.
+      /// Set the current book's chapter. Sets the verse to 1.
+      /// Cain be chained fluently.
       /// </summary>
-      public BibleReference SetToFirstChapter()
+      public BibleReference SetToChapter(int chapter)
       {
-         Chapter = 1;
+         chapter = Math.Clamp(Math.Abs(chapter), 1, int.MaxValue);
+
+         Chapter = chapter;
          Verse = 1;
          return this;
+      }
+
+
+      /// <summary>
+      /// Set the current book's chapter.
+      /// Cain be chained fluently.
+      /// </summary>
+      /// <param name="clamp">Whether to clamp the chapter and verse, or throw an error in case one is out of range.</param>
+      public BibleReference SetToChapter(int chapter, int verse, bool clamp = true)
+      {
+         try
+         {
+            Chapter = chapter;
+         }
+         catch (ArgumentOutOfRangeException)
+         {
+            Chapter = Version.GetChapterCount(this);
+         }
+
+         try
+         {
+            Verse = verse;
+         }
+         catch(ArgumentOutOfRangeException)
+         {
+            Verse = Version.GetChapterCount(this);
+         }
+
+         Chapter = chapter;
+         Verse = verse;
+         return this;
+      }
+
+
+      /// <summary>
+      /// Gets the full chapter text formatted into paragraphs with verse numbers.
+      /// </summary>
+      /// <returns>A formatted paragrpah with verse numbers.</returns>
+      public Paragraph GetChapterTextFormatted()
+      {
+         List<string> verses = Version.GetChapterVerses(this);
+
+         Paragraph paragraph = new Paragraph();
+         for (int i = 0; i < verses.Count; i++)
+         {
+            Run number = new Run();
+            number.Foreground = new SolidColorBrush(Colors.Orange);
+            number.Text = (i + 1).ToString();
+            paragraph.Inlines.Add(number);
+
+            Run verse = new Run();
+            verse.Text = verses[i];
+            paragraph.Inlines.Add(verse);
+         }
+
+         return paragraph;
+      }
+
+
+      /// <summary>
+      /// Get text for the audio reador.
+      /// </summary>
+      /// <returns>Plain text that is readable out loud. Each verse has a line return.</returns>
+      public string GetChapterPlainText()
+      {
+         StringBuilder builder = new StringBuilder();
+         List<string> verses = Version.GetChapterVerses(this);
+
+         foreach(string verse in verses)
+         {
+            builder.AppendLine(verse);
+         }
+
+         return builder.ToString();
       }
 
 

@@ -41,19 +41,6 @@ namespace BibleBrowser
       public static TrulyObservableCollection<BrowserTab> Tabs = new TrulyObservableCollection<BrowserTab>();
 
       /// <summary>
-      /// The verses in the currently open tab's chapter.
-      /// </summary>
-      public static TrulyObservableCollection<Verse> Verses {
-         get {
-            TrulyObservableCollection<Verse> verses = new TrulyObservableCollection<Verse>();
-            if (Selected == null || Selected.Reference == null)
-               return verses; // Blank page
-            else
-               return Selected.Reference.Version.GetChapterVerses(Selected.Reference);
-         }
-      }
-
-      /// <summary>
       /// The currently selected browser tab.
       /// </summary>
       public static BrowserTab Selected {
@@ -64,7 +51,8 @@ namespace BibleBrowser
             }
             else if (Tabs.Count - 1 < SelectedIndex)
             {
-               throw new Exception("The selected index was greater than the current number of tabs");
+               SelectedIndex = Tabs.IndexOf(Tabs.LastOrDefault());
+               return Tabs[SelectedIndex];
             }
             else
                return Tabs[SelectedIndex];
@@ -98,7 +86,29 @@ namespace BibleBrowser
          }
       }
 
+      /// <summary>
+      /// Return the next available reference, or null if there is none more.
+      /// </summary>
+      public BibleReference Next {
+         get {
+            if(m_HistoryIndex < History.Count - 1)
+               return History[m_HistoryIndex + 1];
+            else
+               return null;
+         }
+      }
 
+      /// <summary>
+      /// Return the past visited reference, or null if there was none.
+      /// </summary>
+      public BibleReference Previous {
+         get {
+            if (m_HistoryIndex > 0)
+               return History[m_HistoryIndex - 1];
+            else
+               return null;
+         }
+      }
 
       #endregion
 

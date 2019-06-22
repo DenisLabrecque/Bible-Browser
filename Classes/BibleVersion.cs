@@ -35,6 +35,9 @@ namespace BibleBrowser
       public List<string> BookAbbreviations { get; } = new List<string>();
       public List<int> BookNumbers { get; } = new List<int>();
 
+      /// <summary>
+      /// Automatically loads a Bible's XDocument when needed.
+      /// </summary>
       public XDocument XDocument {
          get {
             if (m_xDocument == null)
@@ -49,9 +52,9 @@ namespace BibleBrowser
       #region Constructor
 
       /// <summary>
-      /// Constructor with a known Bible version.
+      /// Constructor which loads a known Bible version <c>XDocument</c> and sets metadata about it.
       /// </summary>
-      /// <param name="fileName">The Bible version file name wanted to use.</param>
+      /// <param name="fileName">The Bible version file name wanted to load.</param>
       public BibleVersion(string fileName)
       {
          m_filePath = Path.Combine(Package.Current.InstalledLocation.Path, BibleLoader.BIBLE_PATH + "/" + fileName);
@@ -84,9 +87,9 @@ namespace BibleBrowser
       /// </summary>
       /// <param name="reference">The chapter to look up</param>
       /// <returns>A list of strings that are the contents of each verse in the Bible's chapter.</returns>
-      public TrulyObservableCollection<Verse> GetChapterVerses(BibleReference reference)
+      public List<string> GetChapterVerses(BibleReference reference)
       {
-         TrulyObservableCollection<Verse> verseContents = new TrulyObservableCollection<Verse>();
+         List<string> verseContents = new List<string>();
          if (reference == null)
             return verseContents; // Blank page
          
@@ -95,10 +98,35 @@ namespace BibleBrowser
          
          foreach(XElement element in chapter.Elements())
          {
-            verseContents.Add(new Verse(element.Value));
+            verseContents.Add(element.Value);
          }
 
          return verseContents;
+      }
+
+
+      /// <summary>
+      /// Find how many chapters are in a certain book of the Bible.
+      /// </summary>
+      /// <param name="reference">The book to look up (chapter number ignored).</param>
+      /// <returns>The number of chapters in the book.</returns>
+      public int GetChapterCount(BibleReference reference)
+      {
+         XElement book = XDocument.Descendants("BIBLEBOOK").ElementAt((int)reference.Book);
+         return book.Descendants("CHAPTER").Count();
+      }
+
+
+      /// <summary>
+      /// Find how many verses are in a certain book chapter of the Bible.
+      /// </summary>
+      /// <param name="reference">The book and chapter to look up (verse number ignored).</param>
+      /// <returns>The number of verses in the chapter.</returns>
+      public int GetVerseCount(BibleReference reference)
+      {
+         XElement book = XDocument.Descendants("BIBLEBOOK").ElementAt((int)reference.Book);
+         XElement chapter = book.Descendants("CHAPTER").ElementAt(reference.Chapter - 1);
+         return chapter.Descendants("VERS").Count();
       }
 
 
