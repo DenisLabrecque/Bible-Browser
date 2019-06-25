@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Windows.Storage;
 
 namespace BibleBrowser
@@ -34,6 +36,7 @@ namespace BibleBrowser
 
       private const string KEYHISTINDX = "tab_selected_index";
       private static ApplicationDataContainer m_localSettings = ApplicationData.Current.LocalSettings;
+      private static StorageFolder m_localFolder = ApplicationData.Current.LocalFolder;
 
       /// <summary>
       /// A list of open tabs. TODO initialize at startup.
@@ -47,7 +50,8 @@ namespace BibleBrowser
          get {
             if (Tabs.Count == 0)
             {
-               throw new Exception("No selected tab because there are no tabs");
+               return null;
+               //throw new Exception("No selected tab because there are no tabs");
             }
             else if (Tabs.Count - 1 < SelectedIndex)
             {
@@ -99,7 +103,7 @@ namespace BibleBrowser
       }
 
       /// <summary>
-      /// Return the past visited reference, or null if there was none.
+      /// Return the past visited reference, or null if there is none.
       /// </summary>
       public BibleReference Previous {
          get {
@@ -132,22 +136,57 @@ namespace BibleBrowser
       /// Get the currently active <c>BibleReference</c> from history.
       /// If there is none, return <c>null</c>.
       /// </summary>
-      public BibleReference Reference { get {
+      public BibleReference Reference {
+         get {
             if (History.Count > 0)
                return History[m_HistoryIndex];
             else
                //throw new Exception("Reference is null");
                return null;
          }
-         set {
-            if (value == null)
-               throw new Exception("Do not assign null to a Bible reference");
-            else
+      }
+
+      public enum NavigationMode { Previous, Add, Next }
+
+      /// <summary>
+      /// Navigate to a reference and add it to history as necessary.
+      /// </summary>
+      /// <param name="reference">The reference to visit; do not pass in <c>null</c>.
+      /// This <c>ref</c> parameter returns the navigation result (so it can be navigated to).</param>
+      /// <param name="mode">When the <c>NavigationMode</c> is <c>Previous</c> or <c>Next</c>, the reference is moved to but not added in history.</param>
+      public void GoToReference(ref BibleReference reference, NavigationMode mode = NavigationMode.Add)
+      {
+         if (reference == null)
+            throw new Exception("Do not assign null to a Bible reference in history");
+         else
+         {
+            switch(mode)
             {
-               History.Add(value);
-               m_HistoryIndex = History.Count - 1;
-               NotifyPropertyChanged();
+               case NavigationMode.Add:
+                  // Delete history that's past the current item
+                  for (int i = m_HistoryIndex; i < History.Count; i++)
+                  {
+                     if (i > m_HistoryIndex)
+                        History.RemoveAt(i);
+                  }
+                  History.Add(reference);
+                  m_HistoryIndex = History.Count - 1;
+                  NotifyPropertyChanged();
+                  return;
+
+               case NavigationMode.Previous:
+                  m_HistoryIndex = Math.Clamp(m_HistoryIndex - 1, 0, History.Count - 1);
+                  reference = History[m_HistoryIndex];
+                  NotifyPropertyChanged();
+                  return;
+
+               case NavigationMode.Next:
+                  m_HistoryIndex = Math.Clamp(m_HistoryIndex + 1, 0, History.Count - 1);
+                  reference = History[m_HistoryIndex];
+                  NotifyPropertyChanged();
+                  return;
             }
+
          }
       }
 
@@ -163,26 +202,14 @@ namespace BibleBrowser
 
       /// <summary>
       /// Static constructor.
-      /// List browser tabs that were open in the past. /// TODO
+      /// List browser tabs that were open in the past.
       /// </summary>
       static BrowserTab()
       {
-         Tabs.Add(
-            new BrowserTab(
-               new BibleReference(
-                  BibleLoader.Version(BibleLoader.m_BibleFileNames[0]), BibleBook.Gn, 1, 1)));
-         Tabs.Add(
-            new BrowserTab(
-               new BibleReference(
-                  BibleLoader.Version(BibleLoader.m_BibleFileNames[0]), BibleBook.Rm, 1)));
-         Tabs.Add(
-            new BrowserTab(
-               new BibleReference(
-                  BibleLoader.Version(BibleLoader.m_BibleFileNames[0]), BibleBook.Lc, 1)));
-         Tabs.Add(
-            new BrowserTab(
-               new BibleReference(
-                  BibleLoader.Version(BibleLoader.m_BibleFileNames[0]), BibleBook.Rev, 22)));
+         // Default view before the previous tabs are restored from memory
+         // We do this because it's impossible to call an async operation (read stored XML) from a static method.
+         Tabs.Add(new BrowserTab());
+         //Task.Run(() => LoadSavedTabs()).Wait();
       }
 
       /// <summary>
@@ -222,6 +249,65 @@ namespace BibleBrowser
             return Guid.ToString();
          else
             return "[" + reference.Version + "] " + reference.SimplifiedReference;
+      }
+
+      /// <summary>
+      /// Save the presently open tabs to an XML document.
+      /// </summary>
+      public static async Task SaveOpenTabs()
+      {
+         // Create a new XML document root node
+         XDocument document = new XDocument(new XElement("SavedTabs"));
+
+         // Save each open tab to the XML document
+         foreach (BrowserTab tab in Tabs)
+         {
+            XElement element = new XElement("Reference",
+               new XElement("Version", tab.Reference.Version.VersionName),
+               new XElement("BookName", tab.Reference.BookName),
+               new XElement("Chapter", tab.Reference.Chapter),
+               new XElement("Verse", tab.Reference.Verse)
+            );
+            document.Root.Add(element);
+         }
+
+         // Save the resulting XML document
+         StorageFile writeFile = await m_localFolder.CreateFileAsync("SavedTabs.xml", CreationCollisionOption.ReplaceExisting);
+         await FileIO.WriteTextAsync(writeFile, document.ToString());
+      }
+
+
+      /// <summary>
+      /// Initialize the tabs to when the browser was previously open.
+      /// Assign the tabs to the loaded data.
+      /// </summary>
+      public static async Task LoadSavedTabs()
+      {
+         // Read the saved XML tabs
+         StorageFile readFile = await m_localFolder.GetFileAsync("SavedTabs.xml");
+         string text = await FileIO.ReadTextAsync(readFile);
+         XDocument XMLTabs = XDocument.Parse(text);
+
+         Debug.WriteLine("Tabs loaded: " + XMLTabs);
+
+         // Create the tabs from XML
+         IEnumerable<XElement> tabs = XMLTabs.Descendants("Reference");
+         TrulyObservableCollection<BrowserTab> browserTabs = new TrulyObservableCollection<BrowserTab>();
+         foreach(XElement node in tabs)
+         {
+            // Get the information from XML
+            BibleVersion bibleVersion = new BibleVersion(node.Element("Version").Value);
+            string bookName = node.Element("BookName").Value;
+            BibleBook book = BibleReference.StringToBook(bookName, bibleVersion);
+            int chapter = int.Parse(node.Element("Chapter").Value);
+            int verse = int.Parse(node.Element("Verse").Value);
+
+            // Create the reference that goes in the tab
+            BibleReference reference = new BibleReference(bibleVersion, book, chapter, verse);
+            browserTabs.Add(new BrowserTab(reference));
+         }
+
+         Tabs = browserTabs;
       }
 
       #endregion

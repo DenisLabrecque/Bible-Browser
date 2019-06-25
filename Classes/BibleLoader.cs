@@ -1,22 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 using System.Xml.Linq;
-using Windows.ApplicationModel;
 
 namespace BibleBrowser
 {
@@ -26,7 +11,7 @@ namespace BibleBrowser
    /// </summary>
    static class BibleLoader
    {
-      #region Members
+      #region Properties
 
       /// <summary>
       /// Maintains a list of the XML Bible names and book names in the versions' languages.
@@ -56,11 +41,6 @@ namespace BibleBrowser
       #endregion
 
 
-      #region Properties
-
-      #endregion
-
-
       #region Methods
 
       /// <summary>
@@ -69,8 +49,11 @@ namespace BibleBrowser
       /// </summary>
       static BibleLoader()
       {
+         // Create a new meta object for each Bible for fast retrieval.
          foreach (string fileName in m_BibleFileNames)
-               LoadedBibles.Add(fileName, new BibleVersion(fileName)); // Create a new meta object for each Bible for fast retrieval.
+         {
+            LoadedBibles.Add(fileName, new BibleVersion(fileName));
+         }
       }
 
 

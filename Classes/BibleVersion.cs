@@ -17,7 +17,6 @@ namespace BibleBrowser
    /// </summary>
    class BibleVersion
    {
-
       #region Members
 
       string m_filePath;

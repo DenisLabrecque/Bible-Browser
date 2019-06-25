@@ -1,28 +1,17 @@
 ﻿using BibleBrowser;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Windows.ApplicationModel.Core;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.Media.SpeechSynthesis;
 using Windows.Storage;
 using Windows.UI;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -58,9 +47,6 @@ namespace BibleBrowserUWP
 
          // Open the tab that was active before the app was last closed
          lvTabs.SelectedItem = BrowserTab.Selected;
-
-         string info = BibleLoader.TestInformation();
-         string temp = BibleLoader.TestBookNames();
       }
 
 
@@ -157,10 +143,26 @@ namespace BibleBrowserUWP
          btnPlay.Visibility = Visibility.Visible;
       }
 
+
+      /// <summary>
+      /// Go to the previous reference in the current tab's history.
+      /// </summary>
       private void BtnPrevious_Click(object sender, RoutedEventArgs e)
       {
-         BibleReference reference = BrowserTab.Selected.Previous;
-         BrowserTab.Selected.Reference = reference;
+         BibleReference reference = BrowserTab.Selected.Reference;
+         BrowserTab.Selected.GoToReference(ref reference, BrowserTab.NavigationMode.Previous);
+         PrintChapter(reference);
+         ActivateButtons();
+      }
+
+
+      /// <summary>
+      /// Go to the next reference in the current tab's history.
+      /// </summary>
+      private void BtnNext_Click(object sender, RoutedEventArgs e)
+      {
+         BibleReference reference = BrowserTab.Selected.Reference;
+         BrowserTab.Selected.GoToReference(ref reference, BrowserTab.NavigationMode.Next);
          PrintChapter(reference);
          ActivateButtons();
       }
@@ -203,6 +205,9 @@ namespace BibleBrowserUWP
          {
             PrintChapter(BrowserTab.Selected.Reference);
          }
+
+         // Focus on the search bar
+         asbSearch.Focus(FocusState.Keyboard);
 
          ActivateButtons();
       }
@@ -297,6 +302,7 @@ namespace BibleBrowserUWP
             CoreApplication.Exit();
          }
 
+         asbSearch.Focus(FocusState.Keyboard);
          ActivateButtons();
       }
 
@@ -308,6 +314,7 @@ namespace BibleBrowserUWP
       {
          Tabs.Add(new BrowserTab());
          lvTabs.SelectedIndex = Tabs.Count - 1;
+         asbSearch.Text = string.Empty;
          ActivateButtons();
       }
 
@@ -392,7 +399,7 @@ namespace BibleBrowserUWP
             else
             {
                reference = new BibleReference(reference.Version, reference.Book, chapter);
-               BrowserTab.Selected.Reference = reference;
+               BrowserTab.Selected.GoToReference(ref reference, BrowserTab.NavigationMode.Add);
             }
          }
          else
@@ -401,17 +408,72 @@ namespace BibleBrowserUWP
             bookName = BibleSearch.ClosestBookName(reference.Version, bookName);
             if (chapter == 0)
             {
-               reference = new BibleReference(reference.Version, reference.StringToBook(bookName));
-               BrowserTab.Selected.Reference = reference;
+               reference = new BibleReference(reference.Version, BibleReference.StringToBook(bookName, reference.Version));
+               BrowserTab.Selected.GoToReference(ref reference, BrowserTab.NavigationMode.Add);
             }
             else
             {
-               reference = new BibleReference(reference.Version, reference.StringToBook(bookName), chapter);
-               BrowserTab.Selected.Reference = reference;
+               reference = new BibleReference(reference.Version, BibleReference.StringToBook(bookName, reference.Version), chapter);
+               BrowserTab.Selected.GoToReference(ref reference, BrowserTab.NavigationMode.Add);
             }
          }
          PrintChapter(reference);
+         asbSearch.Text = string.Empty;
+         DropdownVisibilityAndText();
       }
       #endregion
+
+      private void AsbSearch_GotFocus(object sender, RoutedEventArgs e)
+      {
+         DropdownVisibilityAndText();
+      }
+
+      /// <summary>
+      /// Set version, book, and chapter selection box visibility and content.
+      /// </summary>
+      private void DropdownVisibilityAndText()
+      {
+         BibleReference reference = BrowserTab.Selected.Reference;
+         if(reference == null)
+         {
+            HideAllDropdowns();
+         }
+         else
+         {
+            if(asbSearch.Text == null)
+            {
+               HideAllDropdowns();
+            }
+            else
+            {
+               ddbVersion.Content = reference.Version;
+               ddbBook.Content = reference.BookName;
+               ddbChapter.Content = reference.Chapter;
+               ShowAllDropdowns();
+            }
+         }
+      }
+      
+
+      /// <summary>
+      /// Set version, book, and chapter selection boxes to be hidden.
+      /// </summary>
+      private void HideAllDropdowns()
+      {
+         ddbVersion.Visibility = Visibility.Collapsed;
+         ddbBook.Visibility = Visibility.Collapsed;
+         ddbChapter.Visibility = Visibility.Collapsed;
+      }
+
+
+      /// <summary>
+      /// Set version, book, and chapter selection boxes to be visible.
+      /// </summary>
+      private void ShowAllDropdowns()
+      {
+         ddbVersion.Visibility = Visibility.Visible;
+         ddbBook.Visibility = Visibility.Visible;
+         ddbChapter.Visibility = Visibility.Visible;
+      }
    }
 }

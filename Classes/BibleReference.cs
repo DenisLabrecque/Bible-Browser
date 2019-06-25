@@ -159,11 +159,11 @@ namespace BibleBrowser
       /// </summary>
       /// <param name="bookName">This book name had better be valid, or an <c>ArgumentException</c> will be thrown.</param>
       /// <returns>A <c>BibleBook</c> enumeration value.</returns>
-      public BibleBook StringToBook(string bookName)
+      public static BibleBook StringToBook(string bookName, BibleVersion version)
       {
-         if (Version.BookNames.Contains(bookName))
+         if (version.BookNames.Contains(bookName))
          {
-            return (BibleBook)Version.BookNames.IndexOf(bookName);
+            return (BibleBook)version.BookNames.IndexOf(bookName);
          }
          else
             throw new ArgumentException("The book name sent was not a valid book name in this version");
