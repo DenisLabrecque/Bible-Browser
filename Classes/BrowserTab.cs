@@ -262,14 +262,21 @@ namespace BibleBrowser
          // Save each open tab to the XML document
          foreach (BrowserTab tab in Tabs)
          {
-            XElement element = new XElement("Reference",
-               new XElement("Version", tab.Reference.Version.VersionName),
-               new XElement("BookName", tab.Reference.BookName),
-               new XElement("Chapter", tab.Reference.Chapter),
-               new XElement("Verse", tab.Reference.Verse)
-            );
-            document.Root.Add(element);
+            if (tab.Reference != null)
+            {
+               XElement element = new XElement("Reference",
+                  new XElement("FileName", tab.Reference.Version.FileName),
+                  new XElement("BookName", tab.Reference.BookName),
+                  new XElement("Chapter", tab.Reference.Chapter),
+                  new XElement("Verse", tab.Reference.Verse)
+               );
+               document.Root.Add(element);
+            }
          }
+
+         // Debug the file contents
+         Debug.WriteLine("Tabs saved as :");
+         Debug.WriteLine(document);
 
          // Save the resulting XML document
          StorageFile writeFile = await m_localFolder.CreateFileAsync("SavedTabs.xml", CreationCollisionOption.ReplaceExisting);
@@ -283,31 +290,59 @@ namespace BibleBrowser
       /// </summary>
       public static async Task LoadSavedTabs()
       {
-         // Read the saved XML tabs
-         StorageFile readFile = await m_localFolder.GetFileAsync("SavedTabs.xml");
-         string text = await FileIO.ReadTextAsync(readFile);
-         XDocument XMLTabs = XDocument.Parse(text);
-
-         Debug.WriteLine("Tabs loaded: " + XMLTabs);
-
-         // Create the tabs from XML
-         IEnumerable<XElement> tabs = XMLTabs.Descendants("Reference");
-         TrulyObservableCollection<BrowserTab> browserTabs = new TrulyObservableCollection<BrowserTab>();
-         foreach(XElement node in tabs)
+         // There may not be a saved document
+         try
          {
-            // Get the information from XML
-            BibleVersion bibleVersion = new BibleVersion(node.Element("Version").Value);
-            string bookName = node.Element("BookName").Value;
-            BibleBook book = BibleReference.StringToBook(bookName, bibleVersion);
-            int chapter = int.Parse(node.Element("Chapter").Value);
-            int verse = int.Parse(node.Element("Verse").Value);
+            // Read the saved XML tabs
+            StorageFile readFile = await m_localFolder.GetFileAsync("SavedTabs.xml");
+            string text = await FileIO.ReadTextAsync(readFile);
+            // Debug file contents
+            Debug.WriteLine("The saved tabs xml file contents :");
+            Debug.WriteLine(text);
+            XDocument XMLTabs = XDocument.Parse(text);
 
-            // Create the reference that goes in the tab
-            BibleReference reference = new BibleReference(bibleVersion, book, chapter, verse);
-            browserTabs.Add(new BrowserTab(reference));
+            // Debug the file contents
+            Debug.WriteLine("Tabs loaded :");
+            Debug.WriteLine(XMLTabs);
+
+            // Create the tab list from XML
+            IEnumerable<XElement> tabs = XMLTabs.Descendants("Reference");
+            TrulyObservableCollection<BrowserTab> savedTabs = new TrulyObservableCollection<BrowserTab>();
+            foreach (XElement node in tabs)
+            {
+               // Get the information from XML
+               BibleVersion bibleVersion = new BibleVersion(node.Element("FileName").Value);
+               string bookName = node.Element("BookName").Value;
+               BibleBook book = BibleReference.StringToBook(bookName, bibleVersion);
+               int chapter = int.Parse(node.Element("Chapter").Value);
+               int verse = int.Parse(node.Element("Verse").Value);
+
+               // Create the reference that goes in the tab
+               BibleReference reference = new BibleReference(bibleVersion, book, chapter, verse);
+               savedTabs.Add(new BrowserTab(reference));
+            }
+
+            // Add the tabs to the browser
+            foreach (BrowserTab tab in savedTabs)
+            {
+               Tabs.Add(tab);
+            }
          }
-
-         Tabs = browserTabs;
+         catch(System.IO.FileNotFoundException fileNotFoundE)
+         {
+            Debug.WriteLine("A resource was not loaded correctly; this may be a missing bible version :");
+            Debug.WriteLine(fileNotFoundE.Message);
+         }
+         catch (System.Xml.XmlException xmlE) // Parse error
+         {
+            Debug.WriteLine("Reading the saved tabs xml file choked :");
+            Debug.WriteLine(xmlE.Message);
+         }
+         catch (Exception e)
+         {
+            Debug.WriteLine("Loading saved tabs was interrupted :");
+            Debug.WriteLine(e.Message);
+         }
       }
 
       #endregion

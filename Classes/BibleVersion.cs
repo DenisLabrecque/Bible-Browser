@@ -35,6 +35,11 @@ namespace BibleBrowser
       public List<int> BookNumbers { get; } = new List<int>();
 
       /// <summary>
+      /// The xml document file name + extension (excluding the path).
+      /// </summary>
+      public string FileName { get; private set; }
+
+      /// <summary>
       /// Automatically loads a Bible's XDocument when needed.
       /// </summary>
       public XDocument XDocument {
@@ -56,6 +61,7 @@ namespace BibleBrowser
       /// <param name="fileName">The Bible version file name wanted to load.</param>
       public BibleVersion(string fileName)
       {
+         FileName = fileName;
          m_filePath = Path.Combine(Package.Current.InstalledLocation.Path, BibleLoader.BIBLE_PATH + "/" + fileName);
 
          // Set information from XML
@@ -97,7 +103,7 @@ namespace BibleBrowser
          
          foreach(XElement element in chapter.Elements())
          {
-            verseContents.Add(element.Value);
+            verseContents.Add(element.Value.FormatTypographically());
          }
 
          return verseContents;

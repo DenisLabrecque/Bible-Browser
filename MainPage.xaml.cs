@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Windows.ApplicationModel;
 using Windows.ApplicationModel.Core;
 using Windows.Media.SpeechSynthesis;
 using Windows.Storage;
@@ -47,6 +48,32 @@ namespace BibleBrowserUWP
 
          // Open the tab that was active before the app was last closed
          lvTabs.SelectedItem = BrowserTab.Selected;
+
+         // Load previous tabs when the app opens
+         Application.Current.LeavingBackground += new LeavingBackgroundEventHandler(App_LeavingBackground);
+         // Save tabs when the app closes
+         Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
+      }
+
+
+      /// <summary>
+      /// Fires when the app is opened, and when the app gets re-selected.
+      /// </summary>
+      async void App_LeavingBackground(Object sender, LeavingBackgroundEventArgs e)
+      {
+         Debug.WriteLine("App leaving background!");
+         await BrowserTab.LoadSavedTabs();
+      }
+
+
+      /// <summary>
+      /// Fires whenever the user switches to another app, the desktop, or the Start screen
+      /// Save the currently open tabs to an XML file.
+      /// </summary>
+      async void App_Suspending(Object sender, SuspendingEventArgs e)
+      {
+         await BrowserTab.SaveOpenTabs();
+         Debug.WriteLine("The app is suspending!");
       }
 
 
@@ -474,6 +501,11 @@ namespace BibleBrowserUWP
          ddbVersion.Visibility = Visibility.Visible;
          ddbBook.Visibility = Visibility.Visible;
          ddbChapter.Visibility = Visibility.Visible;
+      }
+
+      private async void Home_Click(object sender, RoutedEventArgs e)
+      {
+         await BrowserTab.SaveOpenTabs();
       }
    }
 }

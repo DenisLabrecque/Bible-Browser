@@ -164,7 +164,9 @@
                         Background="Transparent">
 
             <!-- Home Button -->
-            <Button Style="{StaticResource TabBarButton}">
+            <Button Style="{StaticResource TabBarButton}"
+                    Name="Home" Click="Home_Click"
+                    >
                <FontIcon FontSize="15" Glyph="&#xE80F;"/>
             </Button>
 
