@@ -32,6 +32,9 @@ namespace BibleBrowserUWP
       SpeechSynthesizer m_synth = new SpeechSynthesizer();
       bool m_isPlaybackStarted = false;
 
+      const int MINMARGIN = 90;
+      const int MAXTEXTWIDTH = 600;
+
       #endregion
 
 
@@ -49,10 +52,31 @@ namespace BibleBrowserUWP
          // Open the tab that was active before the app was last closed
          lvTabs.SelectedItem = BrowserTab.Selected;
 
+         // Ensure the text remains within the window size
+         this.SizeChanged += MainPage_SizeChanged;
          // Load previous tabs when the app opens
          Application.Current.LeavingBackground += new LeavingBackgroundEventHandler(App_LeavingBackground);
          // Save tabs when the app closes
          Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
+      }
+
+
+
+      /// <summary>
+      /// Fires when the window size is changed by dragging, snapping, or pixel density.
+      /// </summary>
+      private void MainPage_SizeChanged(object sender, SizeChangedEventArgs e)
+      {
+         // Reduce the main text to fit within margins
+         if (e.NewSize.Width < (2 * MINMARGIN) + MAXTEXTWIDTH)
+         {
+            rtbVerses.Width = e.NewSize.Width - (2 * MINMARGIN);
+         }
+         // The margins must increase to center the text
+         else
+         {
+            rtbVerses.Width = MAXTEXTWIDTH;
+         }
       }
 
 

@@ -7,7 +7,7 @@
    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
    xmlns:local1="using:BibleBrowser"
    mc:Ignorable="d"
-   Background="{ThemeResource SystemControlAccentAcrylicWindowAccentMediumHighBrush }">
+   Background="{ThemeResource SystemControlAccentAcrylicWindowAccentMediumHighBrush }" FontFamily="Segoe MDL2 Assets">
 
    <Page.Resources>
       <Style x:Key="CommandButton" TargetType="Button" BasedOn="{StaticResource ButtonRevealStyle}">
@@ -30,6 +30,12 @@
          <Setter Property="Margin" Value="1"/>
          <Setter Property="BorderThickness" Value="0"/>
          <Setter Property="Background" Value="Transparent"/>
+      </Style>
+
+      <Style x:Key="VerseNumber" TargetType="Run">
+         <Setter Property="Foreground" Value="{StaticResource SystemColorHighlightTextBrush}"/>
+         <Setter Property="FontSize" Value="16"/>
+         <Setter Property="CharacterSpacing" Value="20"/>
       </Style>
 
       <!-- A tab container -->
@@ -232,15 +238,22 @@
                        VerticalScrollBarVisibility="Hidden">
             <Grid>
                <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="800"/>
+                  <ColumnDefinition/>
                </Grid.ColumnDefinitions>
                <Grid.RowDefinitions>
                   <RowDefinition Height="1*"/>
                </Grid.RowDefinitions>
                <RichTextBlock Name="rtbVerses"
-                              Margin="117,80,0,80"
+                              Margin="0,80,0,90"
+                              MaxWidth="600"
+                              MinWidth="300"
+                              FontFamily="/Assets/Fonts/Roboto.ttf#Roboto Slab"
+                              FontSize="16"
+                              LineHeight="25"
                            TextWrapping="WrapWholeWords"
-                           TextAlignment="Left" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                           TextAlignment="Left"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch">
                   <Paragraph>Quisque diam erat, suscipit at purus non, bibendum molestie urna. Mauris pulvinar mauris lectus, vel pellentesque orci ultrices quis. Nam aliquam, libero in pharetra rhoncus, arcu orci vestibulum sapien, sit amet cursus nisi lectus vitae turpis. Pellentesque tempus ligula non metus maximus, ac feugiat felis facilisis. Sed ut lorem ligula. In hac habitasse platea dictumst. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Phasellus nec tristique neque. Maecenas eu tincidunt arcu. Sed tempor, nibh sit amet vehicula finibus, elit ligula ultrices dui, nec tincidunt eros erat sit amet lorem. Donec posuere sagittis velit. Nulla facilisi. Donec tempor, velit ac pulvinar convallis, dui erat ultricies odio, non imperdiet diam magna vitae ex. Quisque auctor hendrerit elementum. Quisque quis eros finibus leo commodo sodales id ut tellus. Donec suscipit eget felis sed sodales.</Paragraph>
                   <Paragraph>Nam sed convallis arcu, a tempor ex. Curabitur ut ante a massa fermentum tristique eu vitae nisi. Donec et lectus nec mauris pellentesque pellentesque eu nec tellus. Maecenas fermentum ullamcorper condimentum. Pellentesque ut blandit eros. Pellentesque ornare volutpat erat ut commodo. Nam ut ultricies tellus, vitae tristique ex. Aenean varius blandit ipsum, quis sollicitudin purus interdum tincidunt. Phasellus a odio lacus. In at libero nec lacus vulputate iaculis.</Paragraph>
                   <Paragraph>Donec semper pulvinar turpis, ut ullamcorper metus vehicula at. Donec consectetur sed ex ac semper. Aenean et nulla turpis. Praesent orci leo, gravida rutrum finibus id, porttitor quis ligula. Donec nec lectus sit amet lectus tempus faucibus vel sit amet est. Mauris eu nulla non purus sollicitudin consequat. Sed et ligula a mauris gravida scelerisque at et sapien. Fusce id dictum metus, nec bibendum nunc. Nunc erat erat, bibendum sit amet aliquet id, gravida vel magna. In cursus ex eget leo congue pharetra. Vivamus vitae mattis risus. Nullam condimentum eros dolor. Aliquam fermentum varius libero nec aliquam. Praesent ac enim vitae enim egestas maximus. Etiam non nisl vitae sapien gravida commodo.</Paragraph>
@@ -295,51 +308,50 @@
                   <!-- Select version, book name, and chapter -->
                   <StackPanel Orientation="Horizontal">
                      <!-- Select version -->
-                     <DropDownButton Name="ddbVersion"
-                                     Content="KJV">
-                        <DropDownButton.Flyout>
+                     <Button Name="ddbVersion"
+                             Style="{StaticResource TextBlockButtonStyle}"
+                             Content="KJV">
+                        <Button.Flyout>
                            <MenuFlyout Placement="Bottom">
                               <MenuFlyoutItem Text="King James Version"/>
                               <MenuFlyoutItem Text="Young's Literal Translation"/>
                               <MenuFlyoutItem Text="Louis Segond"/>
                            </MenuFlyout>
-                        </DropDownButton.Flyout>
-                     </DropDownButton>
+                        </Button.Flyout>
+                     </Button>
 
                      <!-- Select book name -->
-                     <DropDownButton Name="ddbBook"
-                                     Content="Genesis">
-                        <DropDownButton.Flyout>
+                     <Button Name="ddbBook"
+                             Style="{StaticResource TextBlockButtonStyle}"
+                             Content="Genesis">
+                        <Button.Flyout>
                            <MenuFlyout Placement="Bottom">
                               <MenuFlyoutItem Text="Genesis"/>
                               <MenuFlyoutItem Text="Exodus"/>
                               <MenuFlyoutItem Text="Leviticus"/>
                            </MenuFlyout>
-                        </DropDownButton.Flyout>
-                     </DropDownButton>
+                        </Button.Flyout>
+                     </Button>
 
                      <!-- Select chapter number -->
-                     <DropDownButton Name="ddbChapter"
-                                     Content="1">
-                        <DropDownButton.Flyout>
+                     <Button Name="ddbChapter"
+                             Style="{StaticResource TextBlockButtonStyle}"
+                             Content="1">
+                        <Button.Flyout>
                            <MenuFlyout Placement="Bottom">
                               <MenuFlyoutItem Text="1"/>
                               <MenuFlyoutItem Text="2"/>
                               <MenuFlyoutItem Text="3"/>
                            </MenuFlyout>
-                        </DropDownButton.Flyout>
-                     </DropDownButton>
+                        </Button.Flyout>
+                     </Button>
                   </StackPanel>
 
                   <AutoSuggestBox Name="asbSearch"
                                   TabIndex="0"
                                         Grid.Column="1"
                                         PlaceholderText="Reference or word search"
-                                        BorderThickness="0"
-                                        Background="Transparent"
-                                        Margin="0"
-                                        VerticalAlignment="Center"
-                                        Height="26" QuerySubmitted="AsbSearch_QuerySubmitted" GotFocus="AsbSearch_GotFocus"/>
+                                        QuerySubmitted="AsbSearch_QuerySubmitted" GotFocus="AsbSearch_GotFocus"/>
                </Grid>
             </StackPanel>
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Windows.UI;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Media;
 
@@ -181,10 +182,15 @@ namespace BibleBrowser
          Paragraph paragraph = new Paragraph();
          for (int i = 0; i < verses.Count; i++)
          {
-            Run number = new Run();
-            number.Foreground = new SolidColorBrush(Colors.Orange);
-            number.Text = (i + 1).ToString();
-            paragraph.Inlines.Add(number);
+            if (i > 0) // Don't number verse 1
+            {
+               Run number = new Run();
+               number.Foreground = new SolidColorBrush((Color)Application.Current.Resources["SystemAccentColor"]);
+               number.FontSize = 12;
+               number.CharacterSpacing = 20;
+               number.Text = " " + (i + 1).ToString() + " ";
+               paragraph.Inlines.Add(number);
+            }
 
             Run verse = new Run();
             verse.Text = verses[i];
