@@ -25,29 +25,55 @@ namespace BibleBrowser
             // Ignore words
             if (char.IsLetterOrDigit(text[i]) || char.IsPunctuation(text[i]))
             {
+               // Mdash
+               if (text[i] == '-')
+               {
+                  // --
+                  if (i + 1 < text.Length && text[i] == '-' && (text[i + 1] == '-' || char.IsWhiteSpace(text[i + 1])))
+                  {
+                     builder.Append('—');
+                     continue;
+                  }
+                  // End of line -
+                  else if (i + 1 == text.Length)
+                  {
+                     builder.Append('—');
+                     continue;
+                  }
+               }
                builder.Append(text[i]);
                continue;
             }
             // Only include whitespace between two characters
             else if (char.IsWhiteSpace(text[i]))
             {
+               // The last character is whitespace
+               if (i + 1 == text.Length)
+               {
+                  continue;
+               }
                // If the next character is whitespace, no need to include this one
-               if (i + 1 < text.Length && char.IsWhiteSpace(text[i + 1]))
+               else if (i + 1 < text.Length && char.IsWhiteSpace(text[i + 1]))
                {
                   continue;
                }
-               // Previous m-dash
-               else if(i - 2 > 0 && (text[i - 1] == '-' && text[i - 2] == '-') || (text[i - 1] == '-' && char.IsWhiteSpace(text[i - 2])))
+               // Before an mdash
+               else if(i + 1 < text.Length && text[i + 1] == '-')
                {
                   continue;
                }
-               // An m-dash
-               else if(i + 2 < text.Length && (text[i + 1] == '-' && text[i + 2] == '-') || (text[i + 1] == '-' && char.IsWhiteSpace(text[i + 2])))
-               {
-                  builder.Append('—');
-                  i += 2;
-                  continue;
-               }
+               //// Previous m-dash
+               //else if (i - 2 > 0 && (text[i - 1] == '-' && text[i - 2] == '-') || (text[i - 1] == '-' && char.IsWhiteSpace(text[i - 2])))
+               //{
+               //   continue;
+               //}
+               //// An m-dash
+               //else if (i + 2 < text.Length && (text[i + 1] == '-' && text[i + 2] == '-') || (text[i + 1] == '-' && char.IsWhiteSpace(text[i + 2])))
+               //{
+               //   builder.Append('—');
+               //   continue;
+               //}
+               // Valid space
                else
                {
                   builder.Append(text[i]);

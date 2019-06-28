@@ -129,6 +129,7 @@
     <Content Include="Assets\Fonts\Roboto-ThinItalic.ttf" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Bibles\lsg.xml" />
     <Content Include="Bibles\ylt.xml">
       <SubType>Designer</SubType>
     </Content>

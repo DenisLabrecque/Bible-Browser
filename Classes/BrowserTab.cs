@@ -39,19 +39,18 @@ namespace BibleBrowser
       private static StorageFolder m_localFolder = ApplicationData.Current.LocalFolder;
 
       /// <summary>
-      /// A list of open tabs. TODO initialize at startup.
+      /// A list of open tabs.
       /// </summary>
       public static TrulyObservableCollection<BrowserTab> Tabs = new TrulyObservableCollection<BrowserTab>();
 
       /// <summary>
-      /// The currently selected browser tab.
+      /// The currently selected browser tab. May return null.
       /// </summary>
       public static BrowserTab Selected {
          get {
             if (Tabs.Count == 0)
             {
                return null;
-               //throw new Exception("No selected tab because there are no tabs");
             }
             else if (Tabs.Count - 1 < SelectedIndex)
             {

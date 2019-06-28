@@ -19,10 +19,23 @@ namespace BibleBrowser
       public static Dictionary<string, BibleVersion> LoadedBibles { get; private set; } = new Dictionary<string, BibleVersion>();
 
       /// <summary>
+      /// The <c>BibleVersion</c>s available to read from.
+      /// </summary>
+      public static List<BibleVersion> Bibles {
+         get {
+            List<BibleVersion> bibles = new List<BibleVersion>();
+            foreach (var bible in LoadedBibles)
+               bibles.Add(bible.Value);
+            return bibles;
+         }
+      }
+
+      /// <summary>
       /// A list of all the local files that contain Bibles we want to read from.
       /// </summary>
       public static readonly List<string> m_BibleFileNames = new List<string>() {
-         "ylt.xml"
+         "ylt.xml",
+         "lsg.xml"
       };
 
       /// <summary>

@@ -23,7 +23,7 @@ namespace BibleBrowserUWP
    /// </summary>
    public sealed partial class MainPage : Page
    {
-      #region Member Variables
+      #region Member Variables and Constants
 
       // The media object for controlling and playing audio.
       MediaElement m_mediaElement = new MediaElement();
@@ -258,7 +258,7 @@ namespace BibleBrowserUWP
          }
 
          // Focus on the search bar
-         asbSearch.Focus(FocusState.Keyboard);
+         asbSearch.Focus(FocusState.Programmatic);
 
          ActivateButtons();
       }
@@ -349,7 +349,6 @@ namespace BibleBrowserUWP
          // There is no new tab to show; close the app
          else
          {
-            Tabs.RemoveAt(0);
             CoreApplication.Exit();
          }
 
@@ -368,149 +367,60 @@ namespace BibleBrowserUWP
          asbSearch.Text = string.Empty;
          ActivateButtons();
       }
-
-
-      /// <summary>
-      /// Search or find a reference.
-      /// </summary>
-      /// <param name="sender"></param>
-      /// <param name="args"></param>
-      private void AsbSearch_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
-      {
-         // Have a reference to go to ready
-         BibleReference reference = BrowserTab.Selected.Reference;
-         if (reference == null)
-            reference = new BibleReference(BibleLoader.DefaultVersion, BibleBook.Gn);
-
-         // Separate the query into book name and verse
-         List<string> queryElements = args.QueryText.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
-         int bookNumeral = 0;
-         string bookName = null;
-         int chapter = 0;
-         
-         // There must only be a book name
-         if(queryElements.Count == 1)
-         {
-            bookName = BibleSearch.ClosestBookName(reference.Version, queryElements[0]);
-         }
-         else
-         {
-            int[] numberMatrix = new int[queryElements.Count]; // Where numbers are in the query elements
-
-            // Determine where the numbers are in the query elements
-            int number = 0;
-            for(int i = 0; i < queryElements.Count; i++)
-            {
-               int.TryParse(queryElements[i], out number); // A fault here is that Roman numerals won't work, and the book name is assigned to the numeral TODO
-               if (number != 0)
-                  numberMatrix[i] = Math.Abs(number);
-               else
-                  numberMatrix[i] = 0;
-            }
-
-            // Assign book number, book name, and chapter in sequence
-            for(int i = 0; i < queryElements.Count; i++)
-            {
-               // Book numeral
-               if(bookName == null && bookNumeral == 0 && numberMatrix[i] != 0)
-               {
-                  bookNumeral = numberMatrix[i];
-                  Debug.WriteLine("Book numeral entered as " + bookNumeral);
-                  continue;
-               }
-               // Book Name
-               else if(bookName == null && numberMatrix[i] == 0)
-               {
-                  bookName = queryElements[i];
-                  continue;
-               }
-               // Chapter
-               else if(chapter == 0 && numberMatrix[i] != 0)
-               {
-                  chapter = numberMatrix[i];
-                  break; // Stop here
-               }
-            }
-
-            // Add the book numeral to the book name
-            if(bookNumeral != 0)
-            {
-               bookName = bookNumeral + " " + bookName;
-            }
-            Debug.WriteLine("The user entered " + bookName + " " + chapter);
-         }
-         
-         // Display the reference and contents
-         if(bookName == null)
-         {
-            if(chapter == 0)
-            {
-               // Don't change anything
-            }
-            else
-            {
-               reference = new BibleReference(reference.Version, reference.Book, chapter);
-               BrowserTab.Selected.GoToReference(ref reference, BrowserTab.NavigationMode.Add);
-            }
-         }
-         else
-         {
-            // Convert the book to the closest valid book
-            bookName = BibleSearch.ClosestBookName(reference.Version, bookName);
-            if (chapter == 0)
-            {
-               reference = new BibleReference(reference.Version, BibleReference.StringToBook(bookName, reference.Version));
-               BrowserTab.Selected.GoToReference(ref reference, BrowserTab.NavigationMode.Add);
-            }
-            else
-            {
-               reference = new BibleReference(reference.Version, BibleReference.StringToBook(bookName, reference.Version), chapter);
-               BrowserTab.Selected.GoToReference(ref reference, BrowserTab.NavigationMode.Add);
-            }
-         }
-         PrintChapter(reference);
-         asbSearch.Text = string.Empty;
-         DropdownVisibilityAndText();
-      }
       #endregion
 
       private void AsbSearch_GotFocus(object sender, RoutedEventArgs e)
       {
-         DropdownVisibilityAndText();
+         HideAllDropdowns();
       }
 
-      /// <summary>
-      /// Set version, book, and chapter selection box visibility and content.
-      /// </summary>
-      private void DropdownVisibilityAndText()
+      private void AsbSearch_LostFocus(object sender, RoutedEventArgs e)
       {
-         BibleReference reference = BrowserTab.Selected.Reference;
-         if(reference == null)
-         {
-            HideAllDropdowns();
-         }
-         else
-         {
-            if(asbSearch.Text == null)
-            {
-               HideAllDropdowns();
-            }
-            else
-            {
-               ddbVersion.Content = reference.Version;
-               ddbBook.Content = reference.BookName;
-               ddbChapter.Content = reference.Chapter;
-               ShowAllDropdowns();
-            }
-         }
+         ShowAllDropdowns();
       }
-      
+
+      ///// <summary>
+      ///// Set version, book, and chapter selection box visibility and content.
+      ///// </summary>
+      //private void DropdownVisibilityAndText()
+      //{
+      //   BibleReference reference = BrowserTab.Selected.Reference;
+      //   if(reference == null)
+      //   {
+      //      HideAllDropdowns();
+      //   }
+      //   else
+      //   {
+
+      //      // Decide whether to show or hide dropdown buttons
+      //      if(asbSearch.Text == null && (asbSearch.FocusState == FocusState.Pointer || asbSearch.FocusState == FocusState.Keyboard))
+      //      {
+      //         HideAllDropdowns();
+      //      }
+      //      else
+      //      {
+      //         ShowAllDropdowns();
+      //      }
+      //   }
+      //}
+
 
       /// <summary>
       /// Set version, book, and chapter selection boxes to be hidden.
       /// </summary>
       private void HideAllDropdowns()
       {
+         BibleReference reference = BrowserTab.Selected.Reference;
+         if(reference == null)
+         {
+            asbSearch.PlaceholderText = "Search or enter reference";
+         }
+         else
+         {
+            asbSearch.Text = reference.Version + ": " + reference.ToString();
+            asbSearch.SelectAll();
+         }
+
          ddbVersion.Visibility = Visibility.Collapsed;
          ddbBook.Visibility = Visibility.Collapsed;
          ddbChapter.Visibility = Visibility.Collapsed;
@@ -522,6 +432,20 @@ namespace BibleBrowserUWP
       /// </summary>
       private void ShowAllDropdowns()
       {
+         BibleReference reference = BrowserTab.Selected.Reference;
+
+         // Fill dropdowns with content
+         gvVersions.ItemsSource = BibleLoader.Bibles;
+         gvBooks.ItemsSource = reference.Version.BookNames;
+         gvChapters.ItemsSource = reference.Chapters;
+
+         asbSearch.Text = string.Empty;
+         asbSearch.PlaceholderText = string.Empty;
+         
+         ddbVersion.Content = reference.Version;
+         ddbBook.Content = reference.BookName;
+         ddbChapter.Content = reference.Chapter;
+
          ddbVersion.Visibility = Visibility.Visible;
          ddbBook.Visibility = Visibility.Visible;
          ddbChapter.Visibility = Visibility.Visible;
@@ -530,6 +454,183 @@ namespace BibleBrowserUWP
       private async void Home_Click(object sender, RoutedEventArgs e)
       {
          await BrowserTab.SaveOpenTabs();
+      }
+
+      private void AsbSearch_KeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+      {
+         if(e.Key == Windows.System.VirtualKey.Enter)
+         {
+            // Have a reference to go to ready
+            BibleReference reference = BrowserTab.Selected.Reference;
+            if (reference == null)
+               reference = new BibleReference(BibleLoader.DefaultVersion, BibleBook.Gn);
+
+            // Separate the query into book name and verse
+            List<string> queryElements = ((TextBox)sender).Text.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
+            int bookNumeral = 0;
+            string bookName = null;
+            int chapter = 0;
+
+            // There must only be a book name
+            if (queryElements.Count == 1)
+            {
+               bookName = BibleSearch.ClosestBookName(reference.Version, queryElements[0]);
+            }
+            else
+            {
+               int[] numberMatrix = new int[queryElements.Count]; // Where numbers are in the query elements
+
+               // Determine where the numbers are in the query elements
+               int number = 0;
+               for (int i = 0; i < queryElements.Count; i++)
+               {
+                  int.TryParse(queryElements[i], out number); // A fault here is that Roman numerals won't work, and the book name is assigned to the numeral TODO
+                  if (number != 0)
+                     numberMatrix[i] = Math.Abs(number);
+                  else
+                     numberMatrix[i] = 0;
+               }
+
+               // Assign book number, book name, and chapter in sequence
+               for (int i = 0; i < queryElements.Count; i++)
+               {
+                  // Book numeral
+                  if (bookName == null && bookNumeral == 0 && numberMatrix[i] != 0)
+                  {
+                     bookNumeral = numberMatrix[i];
+                     Debug.WriteLine("Book numeral entered as " + bookNumeral);
+                     continue;
+                  }
+                  // Book Name
+                  else if (bookName == null && numberMatrix[i] == 0)
+                  {
+                     bookName = queryElements[i];
+                     continue;
+                  }
+                  // Chapter
+                  else if (chapter == 0 && numberMatrix[i] != 0)
+                  {
+                     chapter = numberMatrix[i];
+                     break; // Stop here
+                  }
+               }
+
+               // Add the book numeral to the book name
+               if (bookNumeral != 0)
+               {
+                  bookName = bookNumeral + " " + bookName;
+               }
+               Debug.WriteLine("The user entered " + bookName + " " + chapter);
+            }
+
+            // Display the reference and contents
+            if (bookName == null)
+            {
+               if (chapter == 0)
+               {
+                  // Don't change anything
+               }
+               else
+               {
+                  reference = new BibleReference(reference.Version, reference.Book, chapter);
+                  BrowserTab.Selected.GoToReference(ref reference, BrowserTab.NavigationMode.Add);
+               }
+            }
+            else
+            {
+               // Convert the book to the closest valid book
+               bookName = BibleSearch.ClosestBookName(reference.Version, bookName);
+               if (chapter == 0)
+               {
+                  reference = new BibleReference(reference.Version, BibleReference.StringToBook(bookName, reference.Version));
+                  BrowserTab.Selected.GoToReference(ref reference, BrowserTab.NavigationMode.Add);
+               }
+               else
+               {
+                  reference = new BibleReference(reference.Version, BibleReference.StringToBook(bookName, reference.Version), chapter);
+                  BrowserTab.Selected.GoToReference(ref reference, BrowserTab.NavigationMode.Add);
+               }
+            }
+            ShowAllDropdowns();
+            PrintChapter(reference);            
+         }
+      }
+
+      private void MfiAddBible_Click(object sender, RoutedEventArgs e)
+      {
+         PickNewBibleAsync();
+      }
+
+      private async void PickNewBibleAsync()
+      {
+         var picker = new Windows.Storage.Pickers.FileOpenPicker();
+         picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.List;
+         picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.DocumentsLibrary;
+         picker.FileTypeFilter.Add(".xml");
+
+         StorageFile file = await picker.PickSingleFileAsync();
+         if (file != null)
+         {
+            // Save the file to the app directory
+
+         }
+         else
+         {
+            // Cancelled
+         }
+      }
+
+
+      /// <summary>
+      /// Go to the version the user clicks and show the books flyout.
+      /// </summary>
+      private void GvVersions_ItemClick(object sender, ItemClickEventArgs e)
+      {
+         // Get the version the user clicked
+         BibleVersion version = (BibleVersion)e.ClickedItem;
+
+         // Go to the version in the present reference
+         BibleReference oldReference = BrowserTab.Selected.Reference;
+         BibleReference newReference = new BibleReference(version, oldReference.Book, oldReference.Chapter);
+         BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
+
+         flyVersion.Hide();
+         flyBook.ShowAt(ddbBook);
+      }
+
+
+      /// <summary>
+      /// Go to the book the user clicks and show the chapters flyout.
+      /// </summary>
+      private void GvBooks_ItemClick(object sender, ItemClickEventArgs e)
+      {
+         // Get the name of the book the user clicked
+         string book = (string)e.ClickedItem;
+
+         // Go to the book in the present reference
+         BibleVersion version = BrowserTab.Selected.Reference.Version;
+         BibleReference reference = new BibleReference(version, BibleReference.StringToBook(book, version));
+         BrowserTab.Selected.GoToReference(ref reference, BrowserTab.NavigationMode.Add);
+         
+         flyBook.Hide();
+         flyChapter.ShowAt(ddbChapter);
+      }
+
+
+      /// <summary>
+      /// Go to the chapter the user clicks and hide the flyout.
+      /// </summary>
+      private void GvChapters_ItemClick(object sender, ItemClickEventArgs e)
+      {
+         // Get the chapter number the user clicked
+         int chapter = (int)e.ClickedItem;
+
+         // Go to the book in the present reference
+         BibleReference oldReference = BrowserTab.Selected.Reference;
+         BibleReference newReference = new BibleReference(oldReference.Version, oldReference.Book, chapter);
+         BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
+
+         flyChapter.Hide();
       }
    }
 }

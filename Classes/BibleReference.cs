@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using Windows.UI;
 using Windows.UI.Xaml;
@@ -41,6 +42,16 @@ namespace BibleBrowser
       public string BookName { get => Version.BookNames[(int)Book]; }
       public int Chapter { get; private set; }
       public int Verse { get; private set; }
+      public List<int> Chapters {
+         get {
+            List<int> chapters = new List<int>();
+            for(int i = 0; i < Version.GetChapterCount(this); i++)
+            {
+               chapters.Add(i + 1);
+            }
+            return chapters;
+         }
+      }
 
       #endregion
 
