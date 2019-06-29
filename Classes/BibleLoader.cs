@@ -43,14 +43,6 @@ namespace BibleBrowser
       /// </summary>
       public const string BIBLE_PATH = "Bibles";
 
-      /// <summary>
-      /// Return the default Bible version.
-      /// TODO return it from app memory that changes according to settings.
-      /// </summary>
-      public static BibleVersion DefaultVersion {
-         get { return LoadedBibles.ElementAt(0).Value; }
-      }
-
       #endregion
 
 

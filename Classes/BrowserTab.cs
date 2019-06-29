@@ -207,7 +207,7 @@ namespace BibleBrowser
       {
          // Default view before the previous tabs are restored from memory
          // We do this because it's impossible to call an async operation (read stored XML) from a static method.
-         Tabs.Add(new BrowserTab());
+         //Tabs.Add(new BrowserTab());
          //Task.Run(() => LoadSavedTabs()).Wait();
       }
 
@@ -287,7 +287,7 @@ namespace BibleBrowser
       /// Initialize the tabs to when the browser was previously open.
       /// Assign the tabs to the loaded data.
       /// </summary>
-      public static async Task LoadSavedTabs()
+      public static async void LoadSavedTabs()
       {
          // There may not be a saved document
          try

@@ -63,7 +63,7 @@ namespace BibleBrowser
       /// If the chapter or verse are set too high, they will be clamped to the maximum chapter or verse.
       /// If the chapter or verse are set too low, an <c>ArgumentOutOfRangeException</c> is thrown.
       /// </summary>
-      public BibleReference(BibleVersion version, BibleBook book, int chapter = 1, int verse = 1)
+      public BibleReference(BibleVersion version, BibleBook book = BibleBook.Gn, int chapter = 1, int verse = 1)
       {
          Version = version ?? throw new ArgumentNullException("A BibleReference cannot be created with a null BibleVersion");
          Book = book;

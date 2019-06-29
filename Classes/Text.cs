@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace BibleBrowser
 {
+   /// <summary>
+   /// Converts simple text to a better typographical standard by smartquoting and adding em-dashes.
+   /// </summary>
    static class Text
    {
       private static char[] m_quoteCharacters = new char[] { '`', '\'', '"' };
@@ -16,20 +19,31 @@ namespace BibleBrowser
 
       /// <summary>
       /// Remove double spacing, standardize m-dashes, and use smart quotes.
+      /// Formats simplified text to a literary and graphic design standard.
       /// </summary>
       public static string FormatTypographically(this string text)
       {
          StringBuilder builder = new StringBuilder();
          for(int i = 0; i < text.Length; i++)
          {
-            // Ignore words
-            if (char.IsLetterOrDigit(text[i]) || char.IsPunctuation(text[i]))
+            // Words, numbers, punctuation, dashes, quotes, and apostrophes
+            if (char.IsLetterOrDigit(text[i]) || char.IsPunctuation(text[i]) || m_quoteCharacters.Contains(text[i]))
             {
-               // Mdash
+               // Mdashes
                if (text[i] == '-')
                {
+                  if (i > 0 && text[i - 1] == '-')
+                  {
+                     continue;
+                  }
+                  // Hyphen
+                  else if(i - 1 > 0 && i + 1 < text.Length && (char.IsLetterOrDigit(text[i - 1]) || char.IsLetterOrDigit(text[i + 1])))
+                  {
+                     builder.Append(text[i]);
+                     continue;
+                  }
                   // --
-                  if (i + 1 < text.Length && text[i] == '-' && (text[i + 1] == '-' || char.IsWhiteSpace(text[i + 1])))
+                  else if (i + 1 < text.Length && text[i] == '-' && (text[i + 1] == '-' || char.IsWhiteSpace(text[i + 1])))
                   {
                      builder.Append('—');
                      continue;
@@ -41,10 +55,39 @@ namespace BibleBrowser
                      continue;
                   }
                }
-               builder.Append(text[i]);
-               continue;
+
+               // Quotes and apostrophes
+               else if (m_quoteCharacters.Contains(text[i]))
+               {
+                  // Quote character between text (apostrophe)
+                  if (i > 0 && i < text.Length - 1 && m_quoteCharacters.Contains(text[i]) && char.IsLetterOrDigit(text[i - 1]) && char.IsLetterOrDigit(text[i + 1]))
+                  {
+                     builder.Append(m_rightQuotes['\'']); // Apostrophe
+                     continue;
+                  }
+                  // Quote character before text (left quote)
+                  else if (i < text.Length - 1 && m_quoteCharacters.Contains(text[i]) && char.IsLetterOrDigit(text[i + 1]))
+                  {
+                     builder.Append(m_leftQuotes[text[i]]);
+                     continue;
+                  }
+                  // Quote character after text (right quote)
+                  else if (i > 1 && m_quoteCharacters.Contains(text[i]) && (char.IsLetterOrDigit(text[i - 1]) || char.IsPunctuation(text[i - 1])))
+                  {
+                     builder.Append(m_rightQuotes[text[i]]);
+                     continue;
+                  }
+               }
+
+               // Letters, numbers, general punctuation
+               else
+               {
+                  builder.Append(text[i]);
+                  continue;
+               }
             }
-            // Only include whitespace between two characters
+
+            // Whitespace (only between two characters)
             else if (char.IsWhiteSpace(text[i]))
             {
                // The last character is whitespace
@@ -58,45 +101,20 @@ namespace BibleBrowser
                   continue;
                }
                // Before an mdash
-               else if(i + 1 < text.Length && text[i + 1] == '-')
+               else if (i + 1 < text.Length && text[i + 1] == '-')
                {
                   continue;
                }
-               //// Previous m-dash
-               //else if (i - 2 > 0 && (text[i - 1] == '-' && text[i - 2] == '-') || (text[i - 1] == '-' && char.IsWhiteSpace(text[i - 2])))
-               //{
-               //   continue;
-               //}
-               //// An m-dash
-               //else if (i + 2 < text.Length && (text[i + 1] == '-' && text[i + 2] == '-') || (text[i + 1] == '-' && char.IsWhiteSpace(text[i + 2])))
-               //{
-               //   builder.Append('—');
-               //   continue;
-               //}
-               // Valid space
+               // After an mdash
+               else if (i - 1 >= 0 && text[i - 1] == '-')
+               {
+                  continue;
+               }
                else
                {
                   builder.Append(text[i]);
                   continue;
                }
-            }
-            // Quote character between text (apostrophe)
-            else if (i > 0 && i < text.Length - 1 && m_quoteCharacters.Contains(text[i]) && char.IsLetterOrDigit(text[i - 1]) && char.IsLetterOrDigit(text[i + 1]))
-            {
-               builder.Append(m_rightQuotes['\'']); // Apostrophe
-               continue;
-            }
-            // Quote character before text (left quote)
-            else if (i < text.Length - 1 && m_quoteCharacters.Contains(text[i]) && char.IsLetterOrDigit(text[i + 1]))
-            {
-               builder.Append(m_leftQuotes[text[i]]);
-               continue;
-            }
-            // Quote character after text (right quote)
-            else if (i > 1 && m_quoteCharacters.Contains(text[i]) && char.IsLetterOrDigit(text[i - 1]))
-            {
-               builder.Append(m_rightQuotes[text[i]]);
-               continue;
             }
          }
 

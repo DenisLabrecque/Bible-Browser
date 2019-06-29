@@ -50,6 +50,16 @@ namespace BibleBrowser
          }
       }
 
+      /// <summary>
+      /// Return the default Bible version.
+      /// TODO return it from app memory that changes according to settings.
+      /// </summary>
+      public static BibleVersion DefaultVersion {
+         get {
+            return BibleLoader.LoadedBibles.FirstOrDefault().Value;
+         }
+      }
+
       #endregion
 
 
