@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -66,6 +67,78 @@ namespace BibleBrowserUWP
          this.SizeChanged += MainPage_SizeChanged;
          // Save tabs when the app closes
          Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
+         // Handle keyboard shortcuts
+         root.KeyDown += Root_KeyDown;
+      }
+
+      /// <summary>
+      /// Handle keyboard shortcuts not tied to a specific element but the page root.
+      /// </summary>
+      private void Root_KeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+      {
+         switch(e.Key)
+         {
+            case Windows.System.VirtualKey.Left:
+               PreviousChapter();
+               break;
+            case Windows.System.VirtualKey.Right:
+               NextChapter();
+               break;
+            default:
+               break;
+         }
+      }
+
+      /// <summary>
+      /// Display the chapter previous to the current one.
+      /// </summary>
+      private void PreviousChapter()
+      {
+         BibleReference oldReference = BrowserTab.Selected.Reference;
+         if (oldReference != null) // Not a new tab
+         {
+            int chapter = oldReference.Chapter;
+            BibleBook book = oldReference.Book;
+
+            chapter--;
+            if (chapter < 1)
+            {
+               int bookIndex = (int)book;
+               bookIndex = Math.Clamp(bookIndex - 1, 0, Enum.GetNames(typeof(BibleBook)).Length - 1);
+               book = (BibleBook)bookIndex;
+               chapter = int.MaxValue; // Because this gets clamped later
+            }
+
+            BibleReference newReference = new BibleReference(oldReference.Version, book, chapter);
+            BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
+            PrintChapter(newReference);
+         }
+      }
+
+      /// <summary>
+      /// Display the chapter next to the current one.
+      /// </summary>
+      private void NextChapter()
+      {
+         BibleReference oldReference = BrowserTab.Selected.Reference;
+         if (oldReference != null) // Not a new tab
+         {
+            int chapter = oldReference.Chapter;
+            BibleBook book = oldReference.Book;
+
+            chapter++;
+            if (chapter > oldReference.Chapters.Count)
+            {
+               int bookIndex = (int)book;
+               bookIndex = Math.Clamp(bookIndex + 1, 0, Enum.GetNames(typeof(BibleBook)).Length - 1);
+               book = (BibleBook)bookIndex;
+               chapter = 1;
+            }
+
+            BibleReference newReference = new BibleReference(oldReference.Version, book, chapter);
+            BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
+            PrintChapter(newReference);
+         }
       }
 
 
@@ -213,14 +286,12 @@ namespace BibleBrowserUWP
          else
          {
             BibleReference reference = BrowserTab.Selected.Reference;
+            string languageCode = reference.Version.Language;
 
             // Detect the voice for the language
             try
-            {
-               string language = reference.Version.Language;
-               Debug.WriteLine("The following language was indicated: " + language);
-               
-               m_synth.Voice = SpeechSynthesizer.AllVoices.Where(p => p.Language.Contains(language)).First();
+            {               
+               m_synth.Voice = SpeechSynthesizer.AllVoices.Where(p => p.Language.Contains(languageCode)).First();
 
                // Generate the audio stream from plain text.
                SpeechSynthesisStream stream = await m_synth.SynthesizeTextToStreamAsync(reference.GetChapterPlainText());
@@ -230,15 +301,11 @@ namespace BibleBrowserUWP
                m_mediaElement.Play();
                m_isPlaybackStarted = true;
             }
-            catch (Exception e)
+            // The computer doesn't have the language
+            catch (InvalidOperationException e)
             {
                // Show an error message
-               string languages = string.Empty;
-               foreach(var voice in SpeechSynthesizer.AllVoices)
-               {
-                  languages += voice.Language + ", ";
-               }
-               var messageDialog = new MessageDialog(e.Message + "Please install the language pack for this language (" + reference.Version.Language + ").\n" + languages);
+               var messageDialog = new MessageDialog("Please install the language pack for this language (" + new CultureInfo(languageCode)  + ").");
                messageDialog.Commands.Add(new UICommand("Close"));
                messageDialog.DefaultCommandIndex = 0;
                messageDialog.CancelCommandIndex = 0;

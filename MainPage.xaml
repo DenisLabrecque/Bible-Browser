@@ -7,7 +7,8 @@
    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
    xmlns:local1="using:BibleBrowser"
    mc:Ignorable="d"
-   Background="{ThemeResource SystemControlAccentAcrylicWindowAccentMediumHighBrush }" FontFamily="Segoe MDL2 Assets">
+   Background="{ThemeResource SystemControlAccentAcrylicWindowAccentMediumHighBrush }" FontFamily="Segoe MDL2 Assets"
+   Name="root">
 
    <Page.Resources>
       <Style x:Key="CommandButton" TargetType="Button" BasedOn="{StaticResource ButtonRevealStyle}">
