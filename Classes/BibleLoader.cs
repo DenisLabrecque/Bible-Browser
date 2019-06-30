@@ -106,7 +106,7 @@ namespace BibleBrowser
 
          foreach(KeyValuePair<string, BibleVersion> bible in LoadedBibles)
          {
-            info = bible.Value.Language + ", " + bible.Value.VersionAbbreviation + ", " + bible.Value.VersionName;
+            info = bible.Value.Language + ", " + bible.Value.Abbreviation + ", " + bible.Value.Title;
          }
 
          return info;

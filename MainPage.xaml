@@ -493,6 +493,11 @@
                                         SelectionMode="None"
                                         IsItemClickEnabled="True"
                                         ItemClick="GvVersions_ItemClick">
+                                 <GridView.ItemTemplate>
+                                    <DataTemplate x:DataType="local1:BibleVersion">
+                                       <TextBlock Text="{x:Bind Title}"/>
+                                    </DataTemplate>
+                                 </GridView.ItemTemplate>
                               </GridView>
                            </Flyout>
                         </Button.Flyout>

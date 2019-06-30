@@ -37,7 +37,7 @@ namespace BibleBrowser
 
 
       /// <summary>
-      /// Return the Bible book name that most resembles the query according to Levenshtein distance.
+      /// Return the Bible book name that most resembles the query according to Levenshtein distance (ignoring diacritics).
       /// </summary>
       public static string ClosestBookName(BibleVersion version, string query)
       {
@@ -46,7 +46,7 @@ namespace BibleBrowser
 
          foreach (string bookName in version.BookNames)
          {
-            float similarity = LevenshteinSimilarity(query.ToLower(), bookName.ToLower());
+            float similarity = LevenshteinSimilarity(query.ToLower().RemoveDiacritics(), bookName.ToLower().RemoveDiacritics());
             if (similarity == 1.0f)
                return bookName;
             else
@@ -66,7 +66,7 @@ namespace BibleBrowser
       {
          foreach (BibleVersion version in BibleLoader.Bibles)
          {
-            if (query.ToLower() == version.VersionAbbreviation.ToLower())
+            if (query.ToLower() == version.Abbreviation.ToLower())
             {
                return version;
             }

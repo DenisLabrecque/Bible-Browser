@@ -28,8 +28,8 @@ namespace BibleBrowser
       #region Properties
 
       public string Language { get; }
-      public string VersionName { get; }
-      public string VersionAbbreviation { get; }
+      public string Title { get; }
+      public string Abbreviation { get; }
       public List<string> BookNames { get; } = new List<string>();
       public List<string> BookAbbreviations { get; } = new List<string>();
       public List<int> BookNumbers { get; } = new List<int>();
@@ -76,8 +76,8 @@ namespace BibleBrowser
 
          // Set information from XML
          Language = XDocument.Root.Element(Zefania.NDE_INFO).Element(Zefania.NDE_LANG).Value;
-         VersionName = XDocument.Root.Attribute(Zefania.ATTR_BIBLENAME).Value;
-         VersionAbbreviation = XDocument.Root.Element(Zefania.NDE_INFO).Element(Zefania.VERSION_ABBR).Value;
+         Title = XDocument.Root.Element(Zefania.NDE_INFO).Element(Zefania.NDE_TITLE).Value;
+         Abbreviation = XDocument.Root.Element(Zefania.NDE_INFO).Element(Zefania.VERSION_ABBR).Value;
 
          // Find the book names in XML
          foreach(XElement element in XDocument.Descendants(Zefania.NDE_BIBLEBOOK))
@@ -151,7 +151,7 @@ namespace BibleBrowser
       /// <returns>The version's abbreviation. For the full version name, use the property.</returns>
       public override string ToString()
       {
-         return VersionAbbreviation;
+         return Abbreviation;
       }
 
       #endregion

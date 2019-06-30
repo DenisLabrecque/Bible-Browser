@@ -14,6 +14,7 @@ namespace BibleBrowser
       public static string NDE_BIBLEBOOK = "BIBLEBOOK";
       public static string NDE_LANG = "language";
       public static string NDE_INFO = "INFORMATION";
+      public static string NDE_TITLE = "title";
       public static string ATTR_BOOKNAME = "bname";
       public static string ATTR_BOOKSHORTNAME = "bsname";
       public static string ATTR_BOOKNUM = "bnumber";

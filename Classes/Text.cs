@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +17,30 @@ namespace BibleBrowser
       private static Dictionary<char, char> m_leftQuotes = new Dictionary<char, char>() { { '`', '‘' }, { '\'', '‘' }, { '"', '“' } };
       private static Dictionary<char, char> m_rightQuotes = new Dictionary<char, char>() { { '`', '’' }, { '\'', '’' }, { '"', '”' } };
       private const string MDASH = "—";
+
+      /// <summary>
+      /// Extension method that replaces accented characters with their unaccented equivalents.
+      /// How do I remove diacritics (accents) from a string in .NET?
+      /// Blair Conrad's answer
+      /// </summary>
+      /// <param name="text"></param>
+      /// <returns></returns>
+      public static string RemoveDiacritics(this string text)
+      {
+         var normalizedString = text.Normalize(NormalizationForm.FormD);
+         var stringBuilder = new StringBuilder();
+
+         foreach (var c in normalizedString)
+         {
+            var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+            if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+            {
+               stringBuilder.Append(c);
+            }
+         }
+
+         return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
+      }
 
       /// <summary>
       /// Remove double spacing, standardize m-dashes, and use smart quotes.

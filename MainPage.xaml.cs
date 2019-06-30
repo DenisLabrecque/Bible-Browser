@@ -10,6 +10,7 @@ using Windows.ApplicationModel.Core;
 using Windows.Media.SpeechSynthesis;
 using Windows.Storage;
 using Windows.UI;
+using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -32,12 +33,15 @@ namespace BibleBrowserUWP
 
 
       #region Member Variables
+
       // The media object for controlling and playing audio.
       MediaElement m_mediaElement = new MediaElement();
 
       // The object for controlling the speech synthesis engine (voice).
       SpeechSynthesizer m_synth = new SpeechSynthesizer();
       bool m_isPlaybackStarted = false;
+      bool m_areTabsLoaded = false;
+
       #endregion
 
 
@@ -89,11 +93,14 @@ namespace BibleBrowserUWP
       async void App_LeavingBackground(Object sender, LeavingBackgroundEventArgs e)
       {
          Debug.WriteLine("App leaving background!");
-         await BrowserTab.LoadSavedTabs();
-         Debug.WriteLine("Tabs supposedly loaded!");
+         if (m_areTabsLoaded == false)
+         {
+            await BrowserTab.LoadSavedTabs();
+            m_areTabsLoaded = true;
 
-         // Open the tab that was active before the app was last closed
-         lvTabs.SelectedItem = BrowserTab.Selected;
+            // Open the tab that was active before the app was last closed
+            lvTabs.SelectedItem = BrowserTab.Selected;
+         }
       }
 
 
@@ -205,13 +212,38 @@ namespace BibleBrowserUWP
          }
          else
          {
-            // Generate the audio stream from plain text.
-            SpeechSynthesisStream stream = await m_synth.SynthesizeTextToStreamAsync(BrowserTab.Selected.Reference.GetChapterPlainText());
+            BibleReference reference = BrowserTab.Selected.Reference;
 
-            // Send the stream to the media object.
-            m_mediaElement.SetSource(stream, stream.ContentType);
-            m_mediaElement.Play();
-            m_isPlaybackStarted = true;
+            // Detect the voice for the language
+            try
+            {
+               string language = reference.Version.Language;
+               Debug.WriteLine("The following language was indicated: " + language);
+               
+               m_synth.Voice = SpeechSynthesizer.AllVoices.Where(p => p.Language.Contains(language)).First();
+
+               // Generate the audio stream from plain text.
+               SpeechSynthesisStream stream = await m_synth.SynthesizeTextToStreamAsync(reference.GetChapterPlainText());
+
+               // Send the stream to the media object
+               m_mediaElement.SetSource(stream, stream.ContentType);
+               m_mediaElement.Play();
+               m_isPlaybackStarted = true;
+            }
+            catch (Exception e)
+            {
+               // Show an error message
+               string languages = string.Empty;
+               foreach(var voice in SpeechSynthesizer.AllVoices)
+               {
+                  languages += voice.Language + ", ";
+               }
+               var messageDialog = new MessageDialog(e.Message + "Please install the language pack for this language (" + reference.Version.Language + ").\n" + languages);
+               messageDialog.Commands.Add(new UICommand("Close"));
+               messageDialog.DefaultCommandIndex = 0;
+               messageDialog.CancelCommandIndex = 0;
+               await messageDialog.ShowAsync();
+            }
          }
       }
 
@@ -574,7 +606,7 @@ namespace BibleBrowserUWP
             // There must only be a book name
             if (queryElements.Count == 1)
             {
-               bookName = BibleSearch.ClosestBookName(reference.Version, queryElements[0]);
+               bookName = BibleSearch.ClosestBookName(version, queryElements[0]);
             }
             else
             {
