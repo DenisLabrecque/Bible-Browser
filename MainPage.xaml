@@ -358,9 +358,9 @@
                                            FontSize="12"
                                            VerticalAlignment="Center"/>
                         <Button Style="{StaticResource TabCloseButton}"
-                                        Name="btnCloseTab"
-                                        Tag="{x:Bind Guid}"
-                                        Click="BtnCloseTab_Click">
+                                Name="btnCloseTab"
+                                Tag="{x:Bind Guid}"
+                                Click="BtnCloseTab_Click">
                            <FontIcon FontSize="10" Glyph="&#xE711;"/>
                         </Button>
                      </StackPanel>
@@ -370,9 +370,13 @@
 
             <!-- New Tab Button -->
             <Button Name="btnNewTab"
-                        Style="{StaticResource TabBarButton}"
-                        Click="BtnNewTab_Click">
+                    Style="{StaticResource TabBarButton}"
+                    ToolTipService.ToolTip="New tab (Ctrl+T)"
+                    Click="BtnNewTab_Click">
                <FontIcon FontSize="15" Glyph="&#xE710;"/>
+               <Button.KeyboardAccelerators>
+                  <KeyboardAccelerator Modifiers="Control" Key="T"/>
+               </Button.KeyboardAccelerators>
             </Button>
          </StackPanel>
       </Grid>
@@ -436,15 +440,22 @@
                <!-- Back -->
                <Button Style="{StaticResource CommandButton}"
                        Name="btnPrevious"
+                       ToolTipService.ToolTip="Back (Ctrl+Left Arrow)"
                        Click="BtnPrevious_Click">
+                  <Button.KeyboardAccelerators>
+                     <KeyboardAccelerator Modifiers="Control" Key="Left"/>
+                  </Button.KeyboardAccelerators>
                   <FontIcon FontSize="15" Glyph="&#xE72B;"/>
                </Button>
 
                <!-- Next -->
                <Button Style="{StaticResource CommandButton}"
-                            Name="btnNext"
-                            AccessKey="LeftArrow" Click="BtnNext_Click"
-                       >
+                       Name="btnNext"
+                       ToolTipService.ToolTip="Forward (Ctrl+Right Arrow)"
+                       Click="BtnNext_Click">
+                  <Button.KeyboardAccelerators>
+                     <KeyboardAccelerator Modifiers="Control" Key="Right"/>
+                  </Button.KeyboardAccelerators>
                   <FontIcon FontSize="15" Glyph="&#xE72A;"/>
                </Button>
             </StackPanel>
@@ -551,19 +562,25 @@
                         FlowDirection="RightToLeft"
                         Background="{StaticResource AppBarBackgroundThemeBrush}">
 
-               <!-- More -->
+               <!-- More hamburger menu -->
                <Button Name="btnMore"
                        Style="{StaticResource CommandButton}"
+                       ToolTipService.ToolTip="Menu (Ctrl+M)"
                        FontFamily="Segoe MDL2 Assets">
+                  <Button.KeyboardAccelerators>
+                     <KeyboardAccelerator Modifiers="Control" Key="M"/>
+                  </Button.KeyboardAccelerators>
                   <FontIcon FontSize="15" Glyph="&#xE712;" FontFamily="Segoe MDL2 Assets"/>
                   <Button.Flyout>
                      <MenuFlyout Placement="Bottom">
+                        
                         <!-- Load from file -->
                         <MenuFlyoutItem Name="mfiAddBible" Text="Add Bible File" Click="MfiAddBible_Click">
                            <MenuFlyoutItem.Icon>
                               <FontIcon Glyph="&#xE8E5;"/><!--OpenFile-->
                            </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
+                        
                         <!--About and Credits-->
                         <MenuFlyoutItem Text="About">
                            <MenuFlyoutItem.Icon>
@@ -577,14 +594,22 @@
                <!-- Play (read out loud) -->
                <Button Name="btnPlay"
                             Style="{StaticResource CommandButton}"
-                            AutomationProperties.AcceleratorKey="p"
+                            ToolTipService.ToolTip="Read aloud (Ctrl+P)"
                             Click="BtnPlay_Click">
+                  <Button.KeyboardAccelerators>
+                     <KeyboardAccelerator Modifiers="Control" Key="P"/>
+                  </Button.KeyboardAccelerators>
                   <FontIcon FontSize="15" Glyph="&#xE768;"/>
                </Button>
                <!-- Pause (read out loud) -->
                <Button Name="btnPause"
-                            Style="{StaticResource CommandButton}"
-                            Visibility="Collapsed" Click="BtnPause_Click">
+                       Style="{StaticResource CommandButton}"
+                       Visibility="Collapsed"
+                       ToolTipService.ToolTip="Pause reading (Space)"
+                       Click="BtnPause_Click">
+                  <Button.KeyboardAccelerators>
+                     <KeyboardAccelerator Modifiers="None" Key="Space"/>
+                  </Button.KeyboardAccelerators>
                   <FontIcon FontSize="15" Glyph="&#xE769;"/>
                </Button>
             </StackPanel>
