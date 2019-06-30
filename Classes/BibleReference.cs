@@ -199,7 +199,7 @@ namespace BibleBrowser
                number.Foreground = new SolidColorBrush((Color)Application.Current.Resources["SystemAccentColor"]);
                number.FontSize = 12;
                number.CharacterSpacing = 20;
-               number.Text = " " + (i + 1).ToString() + " ";
+               number.Text = " " + (i + 1).ToString() + Chars.NBSPACE;
                paragraph.Inlines.Add(number);
             }
 
@@ -213,7 +213,7 @@ namespace BibleBrowser
 
 
       /// <summary>
-      /// Get text for the audio reador.
+      /// Get text for the audio reader.
       /// </summary>
       /// <returns>Plain text that is readable out loud. Each verse has a line return.</returns>
       public string GetChapterPlainText()

@@ -23,18 +23,21 @@ namespace BibleBrowserUWP
    /// </summary>
    public sealed partial class MainPage : Page
    {
-      #region Member Variables and Constants
+      #region Constants
 
+      const int MINMARGIN = 90;
+      const int MAXTEXTWIDTH = 600;
+
+      #endregion
+
+
+      #region Member Variables
       // The media object for controlling and playing audio.
       MediaElement m_mediaElement = new MediaElement();
 
       // The object for controlling the speech synthesis engine (voice).
       SpeechSynthesizer m_synth = new SpeechSynthesizer();
       bool m_isPlaybackStarted = false;
-
-      const int MINMARGIN = 90;
-      const int MAXTEXTWIDTH = 600;
-
       #endregion
 
 
@@ -44,24 +47,22 @@ namespace BibleBrowserUWP
 
       #endregion
 
+
+      #region Page Initialization and Events
+
       public MainPage()
       {
          this.InitializeComponent();
+         HideAllDropdowns();
+         // Load previous tabs when the app opens
+         Application.Current.LeavingBackground += new LeavingBackgroundEventHandler(App_LeavingBackground);
          StyleTitleBar();
-
-         BrowserTab.LoadSavedTabs();
-
-         // Open the tab that was active before the app was last closed
-         lvTabs.SelectedItem = BrowserTab.Selected;
 
          // Ensure the text remains within the window size
          this.SizeChanged += MainPage_SizeChanged;
-         // Load previous tabs when the app opens
-         Application.Current.LeavingBackground += new LeavingBackgroundEventHandler(App_LeavingBackground);
          // Save tabs when the app closes
          Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
       }
-
 
 
       /// <summary>
@@ -88,7 +89,11 @@ namespace BibleBrowserUWP
       async void App_LeavingBackground(Object sender, LeavingBackgroundEventArgs e)
       {
          Debug.WriteLine("App leaving background!");
-         BrowserTab.LoadSavedTabs();
+         await BrowserTab.LoadSavedTabs();
+         Debug.WriteLine("Tabs supposedly loaded!");
+
+         // Open the tab that was active before the app was last closed
+         lvTabs.SelectedItem = BrowserTab.Selected;
       }
 
 
@@ -98,13 +103,99 @@ namespace BibleBrowserUWP
       /// </summary>
       async void App_Suspending(Object sender, SuspendingEventArgs e)
       {
+         SuspendingDeferral defer = e.SuspendingOperation.GetDeferral(); // Wait while we asynchronously create the xml document
          await BrowserTab.SaveOpenTabs();
          Debug.WriteLine("The app is suspending!");
+         defer.Complete();
       }
 
 
+      private void CoreTitleBar_IsVisibleChanged(CoreApplicationViewTitleBar sender, object args)
+      {
+         if (sender.IsVisible)
+         {
+            grdTitleBar.Visibility = Visibility.Visible;
+         }
+         else
+         {
+            grdTitleBar.Visibility = Visibility.Collapsed;
+         }
+      }
+
+      private void CoreTitleBar_LayoutMetricsChanged(CoreApplicationViewTitleBar sender, object args)
+      {
+         UpdateTitleBarLayout(sender);
+      }
+
+      #endregion
+
+
+      #region Methods
+
       /// <summary>
-      /// Get the main text and begin reading it asynchroniously.
+      /// Set version, book, and chapter selection boxes to be hidden.
+      /// </summary>
+      private void HideAllDropdowns()
+      {
+         if (BrowserTab.Selected != null)
+         {
+            BibleReference reference = BrowserTab.Selected.Reference;
+            if (reference == null)
+            {
+               asbSearch.PlaceholderText = "Search or enter reference";
+            }
+            else
+            {
+               asbSearch.Text = reference.Version + ": " + reference.ToString();
+               asbSearch.SelectAll();
+            }
+         }
+
+         ddbVersion.Visibility = Visibility.Collapsed;
+         ddbBook.Visibility = Visibility.Collapsed;
+         ddbChapter.Visibility = Visibility.Collapsed;
+      }
+
+      /// <summary>
+      /// Set version, book, and chapter selection boxes to be visible.
+      /// </summary>
+      private void ShowAllDropdowns()
+      {
+         if (BrowserTab.Selected != null)
+         {
+            BibleReference reference = BrowserTab.Selected.Reference;
+
+            if (reference == null)
+            {
+               ddbVersion.Visibility = Visibility.Collapsed;
+               ddbBook.Visibility = Visibility.Collapsed;
+               ddbChapter.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+               // Fill dropdowns with content
+               gvVersions.ItemsSource = BibleLoader.Bibles;
+               gvBooks.ItemsSource = reference.Version.BookNames;
+               gvChapters.ItemsSource = reference.Chapters;
+
+               asbSearch.Text = string.Empty;
+               asbSearch.PlaceholderText = string.Empty;
+
+               ddbVersion.Content = reference.Version;
+               ddbBook.Content = reference.BookName;
+               ddbChapter.Content = reference.Chapter;
+
+               ddbVersion.Visibility = Visibility.Visible;
+               ddbBook.Visibility = Visibility.Visible;
+               ddbChapter.Visibility = Visibility.Visible;
+
+               rtbVerses.Focus(FocusState.Programmatic); // Focus away from the search box
+            }
+         }
+      }
+
+      /// <summary>
+      /// Get the main text and begin reading it asynchronously.
       /// </summary>
       async private void ReadMainTextAloud()
       {
@@ -123,7 +214,6 @@ namespace BibleBrowserUWP
             m_isPlaybackStarted = true;
          }
       }
-
 
       /// <summary>
       /// Hide the default title bar to create a custom look instead.
@@ -152,7 +242,6 @@ namespace BibleBrowserUWP
          titleBar.IsVisibleChanged += CoreTitleBar_IsVisibleChanged;
       }
 
-
       /// <summary>
       /// Get the size of the caption controls area and back button 
       /// (returned in logical pixels), and move content around as necessary.
@@ -167,20 +256,89 @@ namespace BibleBrowserUWP
          grdTitleBar.Height = coreTitleBar.Height;
       }
 
-      private void CoreTitleBar_IsVisibleChanged(CoreApplicationViewTitleBar sender, object args)
+      /// <summary>
+      /// Based on the current tab, decide whether the Previous, Next, and Play commands should be clickable.
+      /// </summary>
+      private void ActivateButtons()
       {
-         if(sender.IsVisible)
+         // New tab: no button should be clickable
+         if (BrowserTab.Selected.Reference == null)
          {
-               grdTitleBar.Visibility = Visibility.Visible;
+            btnPrevious.IsEnabled = false;
+            btnNext.IsEnabled = false;
+            btnPlay.IsEnabled = false;
          }
+         // There is text already displayed: check whether there is history
          else
          {
-               grdTitleBar.Visibility = Visibility.Collapsed;
+            btnPlay.IsEnabled = true;
+
+            // There is a history of references
+            if (BrowserTab.Selected.History.Count >= 2)
+            {
+               if (BrowserTab.Selected.Next == null)
+                  btnNext.IsEnabled = false;
+               else
+                  btnNext.IsEnabled = true;
+
+               if (BrowserTab.Selected.Previous == null)
+                  btnPrevious.IsEnabled = false;
+               else
+                  btnPrevious.IsEnabled = true;
+            }
+            // There is no history
+            else
+            {
+               btnPrevious.IsEnabled = false;
+               btnNext.IsEnabled = false;
+            }
          }
       }
 
+      /// <summary>
+      /// Print a chapter of the Bible to the app page according to the reference sent.
+      /// </summary>
+      /// <param name="reference">The chapter to print.</param>
+      private void PrintChapter(BibleReference reference)
+      {
+         // Remove previous contents
+         rtbVerses.Blocks.Clear();
 
-      #region Events
+         // New tab, leave blank
+         if (BrowserTab.Selected.Reference == null)
+            return;
+         else
+            rtbVerses.Blocks.Add(reference.GetChapterTextFormatted());
+      }
+
+      private async void PickNewBibleAsync()
+      {
+         var picker = new Windows.Storage.Pickers.FileOpenPicker();
+         picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.List;
+         picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.DocumentsLibrary;
+         picker.FileTypeFilter.Add(".xml");
+
+         StorageFile file = await picker.PickSingleFileAsync();
+         if (file != null)
+         {
+            // Save the file to the app directory
+
+         }
+         else
+         {
+            // Cancelled
+         }
+      }
+
+      #endregion
+
+
+      #region Button Events
+
+      private async void Home_Click(object sender, RoutedEventArgs e)
+      {
+         await BrowserTab.SaveOpenTabs();
+      }
 
       private void BtnPlay_Click(object sender, RoutedEventArgs e)
       {
@@ -196,7 +354,6 @@ namespace BibleBrowserUWP
          btnPlay.Visibility = Visibility.Visible;
       }
 
-
       /// <summary>
       /// Go to the previous reference in the current tab's history.
       /// </summary>
@@ -207,7 +364,6 @@ namespace BibleBrowserUWP
          PrintChapter(reference);
          ActivateButtons();
       }
-
 
       /// <summary>
       /// Go to the next reference in the current tab's history.
@@ -220,11 +376,57 @@ namespace BibleBrowserUWP
          ActivateButtons();
       }
 
-      private void CoreTitleBar_LayoutMetricsChanged(CoreApplicationViewTitleBar sender, object args)
+      /// <summary>
+      /// Open a new tab.
+      /// </summary>
+      private void BtnNewTab_Click(object sender, RoutedEventArgs e)
       {
-         UpdateTitleBarLayout(sender);
+         Tabs.Add(new BrowserTab());
+         lvTabs.SelectedIndex = Tabs.Count - 1;
+         asbSearch.Text = string.Empty;
+         ActivateButtons();
+         asbSearch.Focus(FocusState.Programmatic);
       }
 
+      private void MfiAddBible_Click(object sender, RoutedEventArgs e)
+      {
+         PickNewBibleAsync();
+      }
+
+      /// <summary>
+      /// Close a tab.
+      /// </summary>
+      private void BtnCloseTab_Click(object sender, RoutedEventArgs e)
+      {
+         // There is still another tab to show when one is removed
+         if (lvTabs.Items.Count >= 2)
+         {
+            Guid tabGuid = ((Guid)((Button)sender).Tag);
+            BrowserTab removeTab = Tabs.Single(p => p.Guid == tabGuid);
+            int removeIndex = Tabs.IndexOf(removeTab);
+
+            // The selected tab is being removed
+            if (removeIndex == lvTabs.SelectedIndex)
+            {
+               if (removeIndex == Tabs.Count - 1)
+                  lvTabs.SelectedIndex = Tabs.Count - 2;
+               else if (removeIndex == 0)
+                  lvTabs.SelectedIndex = 1;
+               else
+                  lvTabs.SelectedIndex = removeIndex + 1;
+            }
+
+            Tabs.RemoveAt(removeIndex);
+         }
+         // There is no new tab to show; close the app
+         else
+         {
+            CoreApplication.Exit();
+         }
+
+         asbSearch.Focus(FocusState.Keyboard);
+         ActivateButtons();
+      }
 
       /// <summary>
       /// A new tab was selected; track this in app memory.
@@ -271,113 +473,61 @@ namespace BibleBrowserUWP
 
          ActivateButtons();
       }
-      
 
       /// <summary>
-      /// Based on the current tab, decide whether the Previous, Next, and Play commands should be clickable.
+      /// Go to the version the user clicks and show the books flyout.
       /// </summary>
-      private void ActivateButtons()
+      private void GvVersions_ItemClick(object sender, ItemClickEventArgs e)
       {
-         // New tab: no button should be clickable
-         if (BrowserTab.Selected.Reference == null)
-         {
-            btnPrevious.IsEnabled = false;
-            btnNext.IsEnabled = false;
-            btnPlay.IsEnabled = false;
-         }
-         // There is text already displayed: check whether there is history
-         else
-         {
-            btnPlay.IsEnabled = true;
+         // Get the version the user clicked
+         BibleVersion version = (BibleVersion)e.ClickedItem;
 
-            // There is a history of references
-            if (BrowserTab.Selected.History.Count >= 2)
-            {
-               if (BrowserTab.Selected.Next == null)
-                  btnNext.IsEnabled = false;
-               else
-                  btnNext.IsEnabled = true;
+         // Go to the version in the present reference
+         BibleReference oldReference = BrowserTab.Selected.Reference;
+         BibleReference newReference = new BibleReference(version, oldReference.Book, oldReference.Chapter);
+         BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
 
-               if (BrowserTab.Selected.Previous == null)
-                  btnPrevious.IsEnabled = false;
-               else
-                  btnPrevious.IsEnabled = true;
-            }
-            // There is no history
-            else
-            {
-               btnPrevious.IsEnabled = false;
-               btnNext.IsEnabled = false;
-            }
-         }
+         flyVersion.Hide();
+         flyBook.ShowAt(ddbBook);
       }
-
 
       /// <summary>
-      /// Print a chapter of the Bible to the app page according to the reference sent.
+      /// Go to the book the user clicks and show the chapters flyout.
       /// </summary>
-      /// <param name="reference">The chapter to print.</param>
-      private void PrintChapter(BibleReference reference)
+      private void GvBooks_ItemClick(object sender, ItemClickEventArgs e)
       {
-         // Remove previous contents
-         rtbVerses.Blocks.Clear();
+         // Get the name of the book the user clicked
+         string book = (string)e.ClickedItem;
 
-         // New tab, leave blank
-         if (BrowserTab.Selected.Reference == null)
-            return;
-         else
-            rtbVerses.Blocks.Add(reference.GetChapterTextFormatted());
+         // Go to the book in the present reference
+         BibleVersion version = BrowserTab.Selected.Reference.Version;
+         BibleReference reference = new BibleReference(version, BibleReference.StringToBook(book, version));
+         BrowserTab.Selected.GoToReference(ref reference, BrowserTab.NavigationMode.Add);
+
+         flyBook.Hide();
+         flyChapter.ShowAt(ddbChapter);
       }
-
 
       /// <summary>
-      /// Close a tab.
+      /// Go to the chapter the user clicks and hide the flyout.
       /// </summary>
-      private void BtnCloseTab_Click(object sender, RoutedEventArgs e)
+      private void GvChapters_ItemClick(object sender, ItemClickEventArgs e)
       {
-         // There is still another tab to show when one is removed
-         if (lvTabs.Items.Count >= 2)
-         {
-            Guid tabGuid = ((Guid)((Button)sender).Tag);
-            BrowserTab removeTab = Tabs.Single(p => p.Guid == tabGuid);
-            int removeIndex = Tabs.IndexOf(removeTab);
+         // Get the chapter number the user clicked
+         int chapter = (int)e.ClickedItem;
 
-            // The selected tab is being removed
-            if (removeIndex == lvTabs.SelectedIndex)
-            {
-               if (removeIndex == Tabs.Count - 1)
-                  lvTabs.SelectedIndex = Tabs.Count - 2;
-               else if (removeIndex == 0)
-                  lvTabs.SelectedIndex = 1;
-               else
-                  lvTabs.SelectedIndex = removeIndex + 1;
-            }
+         // Go to the book in the present reference
+         BibleReference oldReference = BrowserTab.Selected.Reference;
+         BibleReference newReference = new BibleReference(oldReference.Version, oldReference.Book, chapter);
+         BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
 
-            Tabs.RemoveAt(removeIndex);
-         }
-         // There is no new tab to show; close the app
-         else
-         {
-            CoreApplication.Exit();
-         }
-
-         asbSearch.Focus(FocusState.Keyboard);
-         ActivateButtons();
+         flyChapter.Hide();
       }
 
-
-      /// <summary>
-      /// Open a new tab.
-      /// </summary>
-      private void BtnNewTab_Click(object sender, RoutedEventArgs e)
-      {
-         Tabs.Add(new BrowserTab());
-         lvTabs.SelectedIndex = Tabs.Count - 1;
-         asbSearch.Text = string.Empty;
-         ActivateButtons();
-         asbSearch.Focus(FocusState.Programmatic);
-      }
       #endregion
+
+
+      #region Search Box Events
 
       private void AsbSearch_GotFocus(object sender, RoutedEventArgs e)
       {
@@ -389,87 +539,37 @@ namespace BibleBrowserUWP
          ShowAllDropdowns();
       }
 
-
-      /// <summary>
-      /// Set version, book, and chapter selection boxes to be hidden.
-      /// </summary>
-      private void HideAllDropdowns()
-      {
-         if(BrowserTab.Selected != null)
-         {
-            BibleReference reference = BrowserTab.Selected.Reference;
-            if (reference == null)
-            {
-               asbSearch.PlaceholderText = "Search or enter reference";
-            }
-            else
-            {
-               asbSearch.Text = reference.Version + ": " + reference.ToString();
-               asbSearch.SelectAll();
-            }
-         }
-
-         ddbVersion.Visibility = Visibility.Collapsed;
-         ddbBook.Visibility = Visibility.Collapsed;
-         ddbChapter.Visibility = Visibility.Collapsed;
-      }
-
-
-      /// <summary>
-      /// Set version, book, and chapter selection boxes to be visible.
-      /// </summary>
-      private void ShowAllDropdowns()
-      {
-         if (BrowserTab.Selected != null)
-         {
-            BibleReference reference = BrowserTab.Selected.Reference;
-
-            if (reference == null)
-            {
-               ddbVersion.Visibility = Visibility.Collapsed;
-               ddbBook.Visibility = Visibility.Collapsed;
-               ddbChapter.Visibility = Visibility.Collapsed;
-            }
-            else
-            {
-               // Fill dropdowns with content
-               gvVersions.ItemsSource = BibleLoader.Bibles;
-               gvBooks.ItemsSource = reference.Version.BookNames;
-               gvChapters.ItemsSource = reference.Chapters;
-
-               asbSearch.Text = string.Empty;
-               asbSearch.PlaceholderText = string.Empty;
-
-               ddbVersion.Content = reference.Version;
-               ddbBook.Content = reference.BookName;
-               ddbChapter.Content = reference.Chapter;
-
-               ddbVersion.Visibility = Visibility.Visible;
-               ddbBook.Visibility = Visibility.Visible;
-               ddbChapter.Visibility = Visibility.Visible;
-            }
-         }
-      }
-
-      private async void Home_Click(object sender, RoutedEventArgs e)
-      {
-         await BrowserTab.SaveOpenTabs();
-      }
-
       private void AsbSearch_KeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
       {
          if(e.Key == Windows.System.VirtualKey.Enter)
          {
             // Have a reference to go to ready
             BibleReference reference = BrowserTab.Selected.Reference;
-            if (reference == null)
+            if (reference == null) {
                reference = new BibleReference(BibleVersion.DefaultVersion);
+            }
 
-            // Separate the query into book name and verse
-            List<string> queryElements = ((TextBox)sender).Text.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
+            BibleVersion version = null;
             int bookNumeral = 0;
             string bookName = null;
             int chapter = 0;
+
+            List<string> queryElements = new List<string>();
+            string query = ((TextBox)sender).Text;
+
+            // Separate the query into version and reference
+            if (query.Contains(':'))
+            {
+               queryElements = query.Split(':', StringSplitOptions.RemoveEmptyEntries).ToList();
+               version = BibleSearch.VersionByAbbreviation(queryElements[0]);
+               if(version == null)
+               {
+                  version = reference.Version;
+               }
+            }
+            
+            // Separate the query into book name and verse
+            queryElements = queryElements[1].Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
 
             // There must only be a book name
             if (queryElements.Count == 1)
@@ -532,105 +632,50 @@ namespace BibleBrowserUWP
                }
                else
                {
-                  reference = new BibleReference(reference.Version, reference.Book, chapter);
+                  reference = new BibleReference(version, reference.Book, chapter);
                   BrowserTab.Selected.GoToReference(ref reference, BrowserTab.NavigationMode.Add);
                }
             }
             else
             {
                // Convert the book to the closest valid book
-               bookName = BibleSearch.ClosestBookName(reference.Version, bookName);
+               bookName = BibleSearch.ClosestBookName(version, bookName);
                if (chapter == 0)
                {
-                  reference = new BibleReference(reference.Version, BibleReference.StringToBook(bookName, reference.Version));
+                  reference = new BibleReference(version, BibleReference.StringToBook(bookName, version));
                   BrowserTab.Selected.GoToReference(ref reference, BrowserTab.NavigationMode.Add);
                }
                else
                {
-                  reference = new BibleReference(reference.Version, BibleReference.StringToBook(bookName, reference.Version), chapter);
+                  reference = new BibleReference(version, BibleReference.StringToBook(bookName, version), chapter);
                   BrowserTab.Selected.GoToReference(ref reference, BrowserTab.NavigationMode.Add);
                }
             }
             ShowAllDropdowns();
             PrintChapter(reference);            
          }
-      }
-
-      private void MfiAddBible_Click(object sender, RoutedEventArgs e)
-      {
-         PickNewBibleAsync();
-      }
-
-      private async void PickNewBibleAsync()
-      {
-         var picker = new Windows.Storage.Pickers.FileOpenPicker();
-         picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.List;
-         picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.DocumentsLibrary;
-         picker.FileTypeFilter.Add(".xml");
-
-         StorageFile file = await picker.PickSingleFileAsync();
-         if (file != null)
-         {
-            // Save the file to the app directory
-
-         }
+         // Autosuggest
          else
          {
-            // Cancelled
+            //string query = asbSearch.Text.Trim();
+
+            //// Autosuggest a version
+            //if (!query.Contains(':'))
+            //{
+            //   foreach(BibleVersion version in BibleLoader.Bibles)
+            //   {
+            //      if(version.VersionAbbreviation.Length >= query.Length &&
+            //         version.VersionAbbreviation.Substring(0, query.Length) == query)
+            //      {
+            //         // Autosuggest the rest of the version name TODO
+            //         asbSearch.Text = version.VersionAbbreviation + ": ";
+            //         asbSearch.Select(query.Length, asbSearch.Text.Length - 1);
+            //      }
+            //   }
+            //}
          }
       }
 
-
-      /// <summary>
-      /// Go to the version the user clicks and show the books flyout.
-      /// </summary>
-      private void GvVersions_ItemClick(object sender, ItemClickEventArgs e)
-      {
-         // Get the version the user clicked
-         BibleVersion version = (BibleVersion)e.ClickedItem;
-
-         // Go to the version in the present reference
-         BibleReference oldReference = BrowserTab.Selected.Reference;
-         BibleReference newReference = new BibleReference(version, oldReference.Book, oldReference.Chapter);
-         BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
-
-         flyVersion.Hide();
-         flyBook.ShowAt(ddbBook);
-      }
-
-
-      /// <summary>
-      /// Go to the book the user clicks and show the chapters flyout.
-      /// </summary>
-      private void GvBooks_ItemClick(object sender, ItemClickEventArgs e)
-      {
-         // Get the name of the book the user clicked
-         string book = (string)e.ClickedItem;
-
-         // Go to the book in the present reference
-         BibleVersion version = BrowserTab.Selected.Reference.Version;
-         BibleReference reference = new BibleReference(version, BibleReference.StringToBook(book, version));
-         BrowserTab.Selected.GoToReference(ref reference, BrowserTab.NavigationMode.Add);
-         
-         flyBook.Hide();
-         flyChapter.ShowAt(ddbChapter);
-      }
-
-
-      /// <summary>
-      /// Go to the chapter the user clicks and hide the flyout.
-      /// </summary>
-      private void GvChapters_ItemClick(object sender, ItemClickEventArgs e)
-      {
-         // Get the chapter number the user clicked
-         int chapter = (int)e.ClickedItem;
-
-         // Go to the book in the present reference
-         BibleReference oldReference = BrowserTab.Selected.Reference;
-         BibleReference newReference = new BibleReference(oldReference.Version, oldReference.Book, chapter);
-         BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
-
-         flyChapter.Hide();
-      }
+      #endregion
    }
 }

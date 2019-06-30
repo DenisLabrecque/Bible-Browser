@@ -20,4 +20,9 @@ namespace BibleBrowser
       public static string ATTR_BIBLENAME = "biblename";
       public static string VERSION_ABBR = "identifier";
    }
+
+   public static class Chars
+   {
+      public static string NBSPACE = " ";
+   }
 }

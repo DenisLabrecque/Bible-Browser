@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -54,6 +55,24 @@ namespace BibleBrowser
             
 
          return results.Last().Value;
+      }
+
+      /// <summary>
+      /// Return a <c>BibleVersion</c> if the query matches a bible version abbreviation exactly.
+      /// Return <c>null</c> if not.
+      /// </summary>
+      /// <param name="query">The text that is a version abbreviation (eg. "KJV")</param>
+      public static BibleVersion VersionByAbbreviation(string query)
+      {
+         foreach (BibleVersion version in BibleLoader.Bibles)
+         {
+            if (query.ToLower() == version.VersionAbbreviation.ToLower())
+            {
+               return version;
+            }
+         }
+
+         return null;
       }
 
 
