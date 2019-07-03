@@ -36,6 +36,8 @@ namespace BibleBrowser
       /// A list of all the local files that contain Bibles we want to read from.
       /// </summary>
       public static readonly List<string> m_BibleFileNames = new List<string>() {
+         "dby.xml",
+         "kjv.xml",
          "ylt.xml",
          "lsg.xml"
       };

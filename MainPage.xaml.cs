@@ -308,11 +308,11 @@ namespace BibleBrowserUWP
          else
          {
             BibleReference reference = BrowserTab.Selected.Reference;
-            string languageCode = reference.Version.Language;
+            string languageCode = reference.Version.Language.ToLower();
 
             // Detect the voice for the language
             try
-            {               
+            {
                m_synth.Voice = SpeechSynthesizer.AllVoices.Where(p => p.Language.Contains(languageCode)).First();
 
                // Generate the audio stream from plain text.
@@ -829,6 +829,12 @@ namespace BibleBrowserUWP
       private void KeyboardAccelerator_NextChapter(Windows.UI.Xaml.Input.KeyboardAccelerator sender, Windows.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args)
       {
          PreviousChapter();
+         args.Handled = true;
+      }
+
+      private void KeyboardAccelerator_Search(Windows.UI.Xaml.Input.KeyboardAccelerator sender, Windows.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args)
+      {
+         asbSearch.Focus(FocusState.Keyboard);
          args.Handled = true;
       }
 

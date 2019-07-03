@@ -15,6 +15,7 @@
       <!-- HACK: prevents the tooltip from displaying a keyboard shortcut -->
       <KeyboardAccelerator Modifiers="None" Key="Left" Invoked="KeyboardAccelerator_PreviousChapter"/>
       <KeyboardAccelerator Modifiers="None" Key="Right" Invoked="KeyboardAccelerator_NextChapter"/>
+      <KeyboardAccelerator Modifiers="Control" Key="S" Invoked="KeyboardAccelerator_Search"/>
    </Page.KeyboardAccelerators>
 
    <Page.Resources>

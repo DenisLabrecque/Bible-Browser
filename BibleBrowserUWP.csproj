@@ -130,6 +130,8 @@
     <PRIResource Include="Strings\en-CA\Resources.resw" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Bibles\dby.xml" />
+    <Content Include="Bibles\kjv.xml" />
     <Content Include="Bibles\lsg.xml" />
     <Content Include="Bibles\ylt.xml">
       <SubType>Designer</SubType>
