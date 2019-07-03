@@ -127,6 +127,7 @@
     <Content Include="Assets\Fonts\Roboto-Regular.ttf" />
     <Content Include="Assets\Fonts\Roboto-Thin.ttf" />
     <Content Include="Assets\Fonts\Roboto-ThinItalic.ttf" />
+    <PRIResource Include="Strings\en-CA\Resources.resw" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Bibles\lsg.xml" />

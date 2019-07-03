@@ -10,7 +10,15 @@
    Background="{ThemeResource SystemControlAccentAcrylicWindowAccentMediumHighBrush }" FontFamily="Segoe MDL2 Assets"
    Name="root">
 
+   <Page.KeyboardAccelerators>
+      <KeyboardAccelerator Modifiers="None" Key="None"/>
+      <!-- HACK: prevents the tooltip from displaying a keyboard shortcut -->
+      <KeyboardAccelerator Modifiers="None" Key="Left" Invoked="KeyboardAccelerator_PreviousChapter"/>
+      <KeyboardAccelerator Modifiers="None" Key="Right" Invoked="KeyboardAccelerator_NextChapter"/>
+   </Page.KeyboardAccelerators>
+
    <Page.Resources>
+
       <Style x:Key="CommandButton" TargetType="Button" BasedOn="{StaticResource ButtonRevealStyle}">
          <Setter Property="BorderThickness" Value="1"/>
          <Setter Property="Margin" Value="1"/>
@@ -18,6 +26,64 @@
          <Setter Property="FontSize" Value="15"/>
          <Setter Property="Height" Value="38"/>
          <Setter Property="Width" Value="40"/>
+         <Setter Property="Template">
+            <Setter.Value>
+               <ControlTemplate TargetType="Button">
+                  <Grid x:Name="RootGrid" Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}">
+
+                     <VisualStateManager.VisualStateGroups>
+                        <VisualStateGroup x:Name="CommonStates">
+                           <VisualState x:Name="Normal">
+
+                              <Storyboard>
+                                 <PointerUpThemeAnimation Storyboard.TargetName="RootGrid" />
+                              </Storyboard>
+                           </VisualState>
+
+                           <VisualState x:Name="PointerOver">
+                              <VisualState.Setters>
+                                 <Setter Target="RootGrid.(RevealBrush.State)" Value="PointerOver" />
+                                 <Setter Target="RootGrid.Background" Value="{ThemeResource ButtonRevealBackgroundPointerOver}" />
+                                 <Setter Target="ContentPresenter.BorderBrush" Value="{ThemeResource ButtonRevealBorderBrushPointerOver}" />
+                                 <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource ButtonForegroundPointerOver}" />
+                              </VisualState.Setters>
+
+                              <Storyboard>
+                                 <PointerUpThemeAnimation Storyboard.TargetName="RootGrid" />
+                              </Storyboard>
+                           </VisualState>
+
+                           <VisualState x:Name="Pressed">
+                              <VisualState.Setters>
+                                 <Setter Target="RootGrid.(RevealBrush.State)" Value="Pressed" />
+                                 <Setter Target="RootGrid.Background" Value="{ThemeResource ButtonRevealBackgroundPressed}" />
+                                 <Setter Target="ContentPresenter.BorderBrush" Value="{ThemeResource ButtonRevealBorderBrushPressed}" />
+                                 <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource ButtonForegroundPressed}" />
+                              </VisualState.Setters>
+
+                              <Storyboard>
+                                 <PointerDownThemeAnimation Storyboard.TargetName="RootGrid" />
+                              </Storyboard>
+                           </VisualState>
+
+                           <VisualState x:Name="Disabled">
+                              <VisualState.Setters>
+                                 <Setter Target="RootGrid.Background" Value="Transparent" />
+                                 <Setter Target="ContentPresenter.BorderBrush" Value="{ThemeResource ButtonRevealBorderBrushDisabled}" />
+                                 <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource ButtonForegroundDisabled}" />
+                              </VisualState.Setters>
+                           </VisualState>
+
+                        </VisualStateGroup>
+
+                     </VisualStateManager.VisualStateGroups>
+                     <ContentPresenter x:Name="ContentPresenter" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}" Content="{TemplateBinding Content}" ContentTransitions="{TemplateBinding ContentTransitions}" ContentTemplate="{TemplateBinding ContentTemplate}" Padding="{TemplateBinding Padding}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" AutomationProperties.AccessibilityView="Raw" />
+
+                  </Grid>
+
+               </ControlTemplate>
+            </Setter.Value>
+         </Setter>
       </Style>
 
       <Style x:Key="TabBarButton" TargetType="Button" BasedOn="{StaticResource CommandButton}">
@@ -296,12 +362,13 @@
 
    <Grid Background="Transparent">
       <Grid.RowDefinitions>
-         <RowDefinition Height="Auto"/>
-         <RowDefinition />
+         <RowDefinition Height="Auto"/><!-- Title bar -->
+         <RowDefinition /><!-- Main content -->
       </Grid.RowDefinitions>
 
 
       <!-- Official title bar (must be defined in code for the custom title bar) -->
+      <!-- Any child of this won't be clickable, so I don't use it (it would be good for styling the background if wanted) -->
       <Grid x:Name="grdTitleBar"
             Background="Transparent">
          <!-- Width of the padding columns is set in LayoutMetricsChanged handler. -->
@@ -314,50 +381,57 @@
          </Grid.ColumnDefinitions>
       </Grid>
 
-
       <!-- Actual tabbed interface -->
       <Grid>
          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition x:Name="cdLeftPadding" Width="0"/>
+            <ColumnDefinition Width="Auto"/><!-- Width of the tabs and buttons -->
+            <ColumnDefinition Width="1*"/><!-- Stretch area -->
+            <ColumnDefinition x:Name="cdRightPadding" Width="0"/>
          </Grid.ColumnDefinitions>
+         
+         <!-- Left padding -->
+         <StackPanel Orientation="Horizontal"
+                     Grid.Column="0"/>
 
          <!-- Tabs -->
-         <StackPanel Orientation="Horizontal"
-                        Background="Transparent">
+         <StackPanel Name="spTabArea"
+                     Orientation="Horizontal"
+                     Background="Transparent"
+                     Grid.Column="1">
 
             <!-- Home Button -->
-            <Button Style="{StaticResource TabBarButton}"
+            <!--<Button Style="{StaticResource TabBarButton}"
                     Name="Home" Click="Home_Click"
                     >
                <FontIcon FontSize="15" Glyph="&#xE80F;"/>
-            </Button>
+            </Button>-->
 
             <!-- Tab List -->
-            <ListView ItemContainerStyle="{StaticResource TabListViewItemContainer}" x:Name="lvTabs"
-                          ItemsSource="{x:Bind Tabs}"
-                          Height="Auto"
-                          Background="Transparent"
-                          SelectionChanged="LvTabs_SelectionChanged"
-                          >
+            <ListView ItemContainerStyle="{StaticResource TabListViewItemContainer}"
+                      x:Name="lvTabs"
+                      ItemsSource="{x:Bind Tabs}"
+                      Height="Auto"
+                      Background="Transparent"
+                      SelectionChanged="LvTabs_SelectionChanged">
                <ListView.ItemsPanel>
                   <ItemsPanelTemplate>
-                     <StackPanel Orientation="Horizontal" MinWidth="100" />
+                     <StackPanel Orientation="Horizontal"/>
                   </ItemsPanelTemplate>
                </ListView.ItemsPanel>
                <ListView.ItemTemplate>
                   <DataTemplate x:DataType="local1:BrowserTab">
                      <StackPanel Orientation="Horizontal"
-                                        Height="30"
-                                        Padding="10,0,2,0">
+                                 Height="30"
+                                 Padding="10,0,2,0">
                         <TextBlock Text="{x:Bind Reference.Version}"
-                                           FontSize="12"
-                                           Margin="0,0,4,0"
-                                           VerticalAlignment="Center"/>
+                                   FontSize="12"
+                                   Margin="0,0,4,0"
+                                   VerticalAlignment="Center"/>
                         <TextBlock Text="{x:Bind Reference}"
-                                           FontWeight="Bold"
-                                           FontSize="12"
-                                           VerticalAlignment="Center"/>
+                                   FontWeight="Bold"
+                                   FontSize="12"
+                                   VerticalAlignment="Center"/>
                         <Button Style="{StaticResource TabCloseButton}"
                                 Name="btnCloseTab"
                                 Tag="{x:Bind Guid}"
@@ -380,6 +454,10 @@
                </Button.KeyboardAccelerators>
             </Button>
          </StackPanel>
+
+         <!-- Right padding -->
+         <StackPanel Orientation="Horizontal"
+                     Grid.Column="3"/>
       </Grid>
 
 
@@ -411,8 +489,8 @@
                               FontFamily="/Assets/Fonts/Roboto.ttf#Roboto Slab"
                               FontSize="16"
                               LineHeight="25"
-                           TextWrapping="WrapWholeWords"
-                           TextAlignment="Left"
+                              TextWrapping="WrapWholeWords"
+                              TextAlignment="Left"
                               HorizontalAlignment="Stretch"
                               VerticalAlignment="Stretch">
                   <Paragraph>Quisque diam erat, suscipit at purus non, bibendum molestie urna. Mauris pulvinar mauris lectus, vel pellentesque orci ultrices quis. Nam aliquam, libero in pharetra rhoncus, arcu orci vestibulum sapien, sit amet cursus nisi lectus vitae turpis. Pellentesque tempus ligula non metus maximus, ac feugiat felis facilisis. Sed ut lorem ligula. In hac habitasse platea dictumst. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Phasellus nec tristique neque. Maecenas eu tincidunt arcu. Sed tempor, nibh sit amet vehicula finibus, elit ligula ultrices dui, nec tincidunt eros erat sit amet lorem. Donec posuere sagittis velit. Nulla facilisi. Donec tempor, velit ac pulvinar convallis, dui erat ultricies odio, non imperdiet diam magna vitae ex. Quisque auctor hendrerit elementum. Quisque quis eros finibus leo commodo sodales id ut tellus. Donec suscipit eget felis sed sodales.</Paragraph>
@@ -426,7 +504,10 @@
          <!-- Command Bar -->
          <Grid Height="40"
                VerticalAlignment="Top"
-               Background="Transparent">
+               Background="Transparent"
+               BorderBrush="LightGray"
+               BorderThickness="0,0,0,1"
+               Grid.Row="0">
             <Grid.ColumnDefinitions>
                <ColumnDefinition Width="90"/>
                <ColumnDefinition Width="1*"/>
@@ -441,7 +522,7 @@
                <!-- Back -->
                <Button Style="{StaticResource CommandButton}"
                        Name="btnPrevious"
-                       ToolTipService.ToolTip="Back (Ctrl+Left Arrow)"
+                       ToolTipService.ToolTip="Previous"
                        Click="BtnPrevious_Click">
                   <Button.KeyboardAccelerators>
                      <KeyboardAccelerator Modifiers="Control" Key="Left"/>
@@ -452,7 +533,7 @@
                <!-- Next -->
                <Button Style="{StaticResource CommandButton}"
                        Name="btnNext"
-                       ToolTipService.ToolTip="Forward (Ctrl+Right Arrow)"
+                       ToolTipService.ToolTip="Next"
                        Click="BtnNext_Click">
                   <Button.KeyboardAccelerators>
                      <KeyboardAccelerator Modifiers="Control" Key="Right"/>
@@ -463,9 +544,9 @@
 
             <!-- Search -->
             <StackPanel Grid.Column="1"
-                            BorderThickness="5"
-                            BorderBrush="{StaticResource AppBarBackgroundThemeBrush}">
-               <Grid BorderBrush="Gray"
+                        BorderThickness="3"
+                        BorderBrush="{StaticResource AppBarBackgroundThemeBrush}">
+               <Grid BorderBrush="{StaticResource SystemControlAcrylicElementBrush}"
                      BorderThickness="1"
                      Background="White">
                   <Grid.ColumnDefinitions>
@@ -475,7 +556,7 @@
 
                   <!-- Select version, book name, and chapter -->
                   <StackPanel Orientation="Horizontal">
-                     
+
                      <!-- Select version -->
                      <Button Name="ddbVersion"
                              Style="{StaticResource TextBlockButtonStyle}"
@@ -488,18 +569,19 @@
                                     <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
                                     <Setter Property="IsTabStop" Value="False"/>
                                     <Setter Property="ScrollViewer.VerticalScrollMode" Value="Auto"/>
+                                    <Setter Property="Padding" Value="0,5"/>
                                  </Style>
                               </Flyout.FlyoutPresenterStyle>
-                              <GridView Name="gvVersions"
+                              <ListView Name="gvVersions"
                                         SelectionMode="None"
                                         IsItemClickEnabled="True"
                                         ItemClick="GvVersions_ItemClick">
-                                 <GridView.ItemTemplate>
+                                 <ListView.ItemTemplate>
                                     <DataTemplate x:DataType="local1:BibleVersion">
                                        <TextBlock Text="{x:Bind Title}"/>
                                     </DataTemplate>
-                                 </GridView.ItemTemplate>
-                              </GridView>
+                                 </ListView.ItemTemplate>
+                              </ListView>
                            </Flyout>
                         </Button.Flyout>
                      </Button>
@@ -516,13 +598,14 @@
                                     <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
                                     <Setter Property="IsTabStop" Value="False"/>
                                     <Setter Property="ScrollViewer.VerticalScrollMode" Value="Auto"/>
+                                    <Setter Property="Padding" Value="0,5"/>
                                  </Style>
                               </Flyout.FlyoutPresenterStyle>
-                              <GridView Name="gvBooks"
+                              <ListView Name="gvBooks"
                                         SelectionMode="None"
                                         IsItemClickEnabled="True"
                                         ItemClick="GvBooks_ItemClick">
-                              </GridView>
+                              </ListView>
                            </Flyout>
                         </Button.Flyout>
                      </Button>
@@ -577,23 +660,47 @@
                      <KeyboardAccelerator Modifiers="Control" Key="M"/>
                   </Button.KeyboardAccelerators>
                   <FontIcon FontSize="15" Glyph="&#xE712;" FontFamily="Segoe MDL2 Assets"/>
+                  
+                  <!-- Settings menu -->
                   <Button.Flyout>
-                     <MenuFlyout Placement="Bottom">
-                        
-                        <!-- Load from file -->
-                        <MenuFlyoutItem Name="mfiAddBible" Text="Add Bible File" Click="MfiAddBible_Click">
-                           <MenuFlyoutItem.Icon>
-                              <FontIcon Glyph="&#xE8E5;"/><!--OpenFile-->
-                           </MenuFlyoutItem.Icon>
-                        </MenuFlyoutItem>
-                        
-                        <!--About and Credits-->
-                        <MenuFlyoutItem Text="About">
-                           <MenuFlyoutItem.Icon>
-                              <FontIcon Glyph="&#xE946;"/><!--Info-->
-                           </MenuFlyoutItem.Icon>
-                        </MenuFlyoutItem>
-                     </MenuFlyout>
+                     <Flyout x:Name="spMainMenu">
+                        <Flyout.FlyoutPresenterStyle>
+                           <Style TargetType="FlyoutPresenter">
+                              <Setter Property="ScrollViewer.HorizontalScrollMode" Value="Disabled"/>
+                              <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+                              <Setter Property="IsTabStop" Value="True"/>
+                              <Setter Property="TabNavigation" Value="Cycle"/>
+                              <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                              <!--<Setter Property="ScrollViewer.HorizontalAlignment" Value="Left"/>-->
+                              <!--<Setter Property="ScrollViewer.HorizontalContentAlignment" Value="Left"/>-->
+                           </Style>
+                        </Flyout.FlyoutPresenterStyle>
+                        <StackPanel HorizontalAlignment="Left">
+                           <TextBlock HorizontalAlignment="Left" HorizontalTextAlignment="Left" Margin="0,0"
+                                      Style="{StaticResource TitleTextBlockStyle}">Settings</TextBlock>
+                           <ComboBox Name="cbDefaultVersion"
+                                     Header="Default version"
+                                     ItemsSource="{x:Bind Bibles}"
+                                     HorizontalAlignment="Left"
+                                     SelectionChanged="CbDefaultVersion_SelectionChanged">
+                              <ComboBox.ItemTemplate>
+                                 <DataTemplate x:DataType="local1:BibleVersion">
+                                    <TextBlock Text="{x:Bind Title}"/>
+                                 </DataTemplate>
+                              </ComboBox.ItemTemplate>
+                           </ComboBox>
+
+                           <!--<ToggleSwitch Header="Toggle work" OffContent="Do work" OnContent="Working" IsOn="True" />-->
+
+                           <TextBlock Style="{StaticResource TitleTextBlockStyle}">Credits</TextBlock>
+                           <RichTextBlock LineHeight="18">
+                              <Paragraph Margin="0, 5">App programmed by
+                                 <Hyperlink NavigateUri="http://denislabrecque.ca">Denis Labrecque</Hyperlink> , 2019.
+                              </Paragraph>
+                              <Paragraph Margin="0, 5">The Bible versions used in this application have expired their copyright and are therefore free to use.</Paragraph>
+                           </RichTextBlock>
+                        </StackPanel>
+                     </Flyout>
                   </Button.Flyout>
                </Button>
 

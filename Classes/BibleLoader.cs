@@ -25,7 +25,9 @@ namespace BibleBrowser
          get {
             List<BibleVersion> bibles = new List<BibleVersion>();
             foreach (var bible in LoadedBibles)
+            {
                bibles.Add(bible.Value);
+            }
             return bibles;
          }
       }

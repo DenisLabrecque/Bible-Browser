@@ -21,6 +21,9 @@ namespace BibleBrowser
 
       string m_filePath;
       XDocument m_xDocument = null;
+      static Windows.Storage.ApplicationDataContainer m_localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+
+      const string INDX_DEFAULTVERSION = "default_version";
 
       #endregion
 
@@ -52,11 +55,20 @@ namespace BibleBrowser
 
       /// <summary>
       /// Return the default Bible version.
-      /// TODO return it from app memory that changes according to settings.
       /// </summary>
       public static BibleVersion DefaultVersion {
          get {
-            return BibleLoader.LoadedBibles.FirstOrDefault().Value;
+            if(m_localSettings.Values[INDX_DEFAULTVERSION] == null)
+            {
+               BibleVersion version = BibleLoader.LoadedBibles.FirstOrDefault().Value;
+               SetDefaultVersion(version.FileName);
+               return BibleLoader.LoadedBibles.FirstOrDefault().Value;
+            }
+            else
+            {
+               string filename = (string)m_localSettings.Values[INDX_DEFAULTVERSION];
+               return BibleLoader.LoadedBibles[filename];
+            }
          }
       }
 
@@ -96,6 +108,29 @@ namespace BibleBrowser
 
 
       #region Methods
+
+      /// <summary>
+      /// Set the default version in app setting memory.
+      /// </summary>
+      /// <param name="fileName">The file name + file extension of an xml Bible</param>
+      public static void SetDefaultVersion(string fileName)
+      {
+         if (fileName == null)
+         {
+            throw new ArgumentNullException("Cannot set the default Bible version to a null value.");
+         }
+         else
+         {
+            if (BibleLoader.LoadedBibles.ContainsKey(fileName))
+            {
+               m_localSettings.Values[INDX_DEFAULTVERSION] = fileName;
+            }
+            else
+            {
+               throw new ArgumentException("The file name " + fileName + " is not a loaded Bible version, so it cannot be set as a default.");
+            }
+         }
+      }
 
       /// <summary>
       /// Get every verse in a chapter by <c>BibleReference</c>.

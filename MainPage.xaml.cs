@@ -15,6 +15,7 @@ using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -40,6 +41,7 @@ namespace BibleBrowserUWP
 
       // The object for controlling the speech synthesis engine (voice).
       SpeechSynthesizer m_synth = new SpeechSynthesizer();
+
       bool m_isPlaybackStarted = false;
       bool m_areTabsLoaded = false;
 
@@ -49,6 +51,7 @@ namespace BibleBrowserUWP
       #region Properties
 
       TrulyObservableCollection<BrowserTab> Tabs { get => BrowserTab.Tabs; }
+      List<BibleVersion> Bibles { get => BibleLoader.Bibles; } // TODO change to observable collection
 
       #endregion
 
@@ -58,89 +61,20 @@ namespace BibleBrowserUWP
       public MainPage()
       {
          this.InitializeComponent();
-         HideAllDropdowns();
+         EraseText();
+         HideAllDropdowns(); // Don't show Genesis 1
+         
          // Load previous tabs when the app opens
          Application.Current.LeavingBackground += new LeavingBackgroundEventHandler(App_LeavingBackground);
-         StyleTitleBar();
 
+         StyleTitleBar();
+         cbDefaultVersion.SelectedItem = BibleVersion.DefaultVersion; // TODO not working...
          // Ensure the text remains within the window size
          this.SizeChanged += MainPage_SizeChanged;
+
          // Save tabs when the app closes
          Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
-         // Handle keyboard shortcuts
-         root.KeyDown += Root_KeyDown;
       }
-
-      /// <summary>
-      /// Handle keyboard shortcuts not tied to a specific element but the page root.
-      /// </summary>
-      private void Root_KeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
-      {
-         switch(e.Key)
-         {
-            case Windows.System.VirtualKey.Left:
-               PreviousChapter();
-               break;
-            case Windows.System.VirtualKey.Right:
-               NextChapter();
-               break;
-            default:
-               break;
-         }
-      }
-
-      /// <summary>
-      /// Display the chapter previous to the current one.
-      /// </summary>
-      private void PreviousChapter()
-      {
-         BibleReference oldReference = BrowserTab.Selected.Reference;
-         if (oldReference != null) // Not a new tab
-         {
-            int chapter = oldReference.Chapter;
-            BibleBook book = oldReference.Book;
-
-            chapter--;
-            if (chapter < 1)
-            {
-               int bookIndex = (int)book;
-               bookIndex = Math.Clamp(bookIndex - 1, 0, Enum.GetNames(typeof(BibleBook)).Length - 1);
-               book = (BibleBook)bookIndex;
-               chapter = int.MaxValue; // Because this gets clamped later
-            }
-
-            BibleReference newReference = new BibleReference(oldReference.Version, book, chapter);
-            BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
-            PrintChapter(newReference);
-         }
-      }
-
-      /// <summary>
-      /// Display the chapter next to the current one.
-      /// </summary>
-      private void NextChapter()
-      {
-         BibleReference oldReference = BrowserTab.Selected.Reference;
-         if (oldReference != null) // Not a new tab
-         {
-            int chapter = oldReference.Chapter;
-            BibleBook book = oldReference.Book;
-
-            chapter++;
-            if (chapter > oldReference.Chapters.Count)
-            {
-               int bookIndex = (int)book;
-               bookIndex = Math.Clamp(bookIndex + 1, 0, Enum.GetNames(typeof(BibleBook)).Length - 1);
-               book = (BibleBook)bookIndex;
-               chapter = 1;
-            }
-
-            BibleReference newReference = new BibleReference(oldReference.Version, book, chapter);
-            BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
-            PrintChapter(newReference);
-         }
-      }
-
 
       /// <summary>
       /// Fires when the window size is changed by dragging, snapping, or pixel density.
@@ -157,8 +91,12 @@ namespace BibleBrowserUWP
          {
             rtbVerses.Width = MAXTEXTWIDTH;
          }
-      }
 
+         // Set the maximum width of the tab area
+         CoreApplicationViewTitleBar titleBar = CoreApplication.GetCurrentView().TitleBar;
+         //((StackPanel)lvTabs.ItemsPanelRoot).MaxWidth = e.NewSize.Width - (titleBar.SystemOverlayLeftInset + titleBar.SystemOverlayRightInset);
+         spTabArea.MaxWidth = e.NewSize.Width - (titleBar.SystemOverlayLeftInset + titleBar.SystemOverlayRightInset);
+      }
 
       /// <summary>
       /// Fires when the app is opened, and when the app gets re-selected.
@@ -175,7 +113,6 @@ namespace BibleBrowserUWP
             lvTabs.SelectedItem = BrowserTab.Selected;
          }
       }
-
 
       /// <summary>
       /// Fires whenever the user switches to another app, the desktop, or the Start screen
@@ -211,6 +148,91 @@ namespace BibleBrowserUWP
 
 
       #region Methods
+
+      /// <summary>
+      /// Go to the previous reference in the current tab's history.
+      /// </summary>
+      private void PreviousReference()
+      {
+         if (BrowserTab.Selected.Previous != null)
+         {
+            Debug.WriteLine("Previous reference called!");
+            BibleReference reference = BrowserTab.Selected.Reference;
+            BrowserTab.Selected.GoToReference(ref reference, BrowserTab.NavigationMode.Previous);
+            PrintChapter(reference);
+            ActivateButtons();
+         }
+      }
+
+      /// <summary>
+      /// Go to the next reference in the current tab's history.
+      /// </summary>
+      private void NextReference()
+      {
+         if (BrowserTab.Selected.Next != null)
+         {
+            Debug.WriteLine("Next reference called!");
+            BibleReference reference = BrowserTab.Selected.Reference;
+            BrowserTab.Selected.GoToReference(ref reference, BrowserTab.NavigationMode.Next);
+            PrintChapter(reference);
+            ActivateButtons();
+         }
+      }
+
+      /// <summary>
+      /// Display the chapter previous to the current one.
+      /// </summary>
+      private void PreviousChapter()
+      {
+         BibleReference oldReference = BrowserTab.Selected.Reference;
+
+         if(oldReference != null) // Not a new tab
+         {
+            int chapter = oldReference.Chapter;
+            BibleBook book = oldReference.Book;
+
+            chapter--;
+            if (chapter < 1)
+            {
+               int bookIndex = (int)book;
+               bookIndex = Math.Clamp(bookIndex - 1, 0, Enum.GetNames(typeof(BibleBook)).Length - 1);
+               book = (BibleBook)bookIndex;
+               chapter = int.MaxValue; // Because this gets clamped later
+            }
+
+            BibleReference newReference = new BibleReference(oldReference.Version, book, chapter);
+            BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
+            PrintChapter(newReference);
+
+            Debug.WriteLine("Previous chapter called! " + newReference + " gone to from " + oldReference);
+         }
+      }
+
+      /// <summary>
+      /// Display the chapter next to the current one.
+      /// </summary>
+      private void NextChapter()
+      {
+         BibleReference oldReference = BrowserTab.Selected.Reference;
+         if (oldReference != null) // Not a new tab
+         {
+            int chapter = oldReference.Chapter;
+            BibleBook book = oldReference.Book;
+
+            chapter++;
+            if (chapter > oldReference.Chapters.Count)
+            {
+               int bookIndex = (int)book;
+               bookIndex = Math.Clamp(bookIndex + 1, 0, Enum.GetNames(typeof(BibleBook)).Length - 1);
+               book = (BibleBook)bookIndex;
+               chapter = 1;
+            }
+
+            BibleReference newReference = new BibleReference(oldReference.Version, book, chapter);
+            BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
+            PrintChapter(newReference);
+         }
+      }
 
       /// <summary>
       /// Set version, book, and chapter selection boxes to be hidden.
@@ -351,6 +373,9 @@ namespace BibleBrowserUWP
          LeftPaddingColumn.Width = new GridLength(coreTitleBar.SystemOverlayLeftInset);
          RightPaddingColumn.Width = new GridLength(coreTitleBar.SystemOverlayRightInset);
 
+         cdLeftPadding.Width = new GridLength(coreTitleBar.SystemOverlayLeftInset);
+         cdRightPadding.Width = new GridLength(coreTitleBar.SystemOverlayRightInset);
+
          // Update title bar control size as needed to account for system size changes.
          grdTitleBar.Height = coreTitleBar.Height;
       }
@@ -397,11 +422,10 @@ namespace BibleBrowserUWP
       /// <summary>
       /// Print a chapter of the Bible to the app page according to the reference sent.
       /// </summary>
-      /// <param name="reference">The chapter to print.</param>
+      /// <param name="reference">The chapter to print. If null, this will simply erase page contents.</param>
       private void PrintChapter(BibleReference reference)
       {
-         // Remove previous contents
-         rtbVerses.Blocks.Clear();
+         EraseText();
 
          // New tab, leave blank
          if (BrowserTab.Selected.Reference == null)
@@ -410,7 +434,7 @@ namespace BibleBrowserUWP
             rtbVerses.Blocks.Add(reference.GetChapterTextFormatted());
       }
 
-      private async void PickNewBibleAsync()
+      private async void PickNewBibleAsync() // TODO
       {
          var picker = new Windows.Storage.Pickers.FileOpenPicker();
          picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.List;
@@ -427,6 +451,14 @@ namespace BibleBrowserUWP
          {
             // Cancelled
          }
+      }
+
+      /// <summary>
+      /// Remove the previous chapter contents.
+      /// </summary>
+      private void EraseText()
+      {
+         rtbVerses.Blocks.Clear();
       }
 
       #endregion
@@ -458,10 +490,7 @@ namespace BibleBrowserUWP
       /// </summary>
       private void BtnPrevious_Click(object sender, RoutedEventArgs e)
       {
-         BibleReference reference = BrowserTab.Selected.Reference;
-         BrowserTab.Selected.GoToReference(ref reference, BrowserTab.NavigationMode.Previous);
-         PrintChapter(reference);
-         ActivateButtons();
+         PreviousReference();
       }
 
       /// <summary>
@@ -469,10 +498,7 @@ namespace BibleBrowserUWP
       /// </summary>
       private void BtnNext_Click(object sender, RoutedEventArgs e)
       {
-         BibleReference reference = BrowserTab.Selected.Reference;
-         BrowserTab.Selected.GoToReference(ref reference, BrowserTab.NavigationMode.Next);
-         PrintChapter(reference);
-         ActivateButtons();
+         NextReference();
       }
 
       /// <summary>
@@ -523,7 +549,6 @@ namespace BibleBrowserUWP
             CoreApplication.Exit();
          }
 
-         asbSearch.Focus(FocusState.Keyboard);
          ActivateButtons();
       }
 
@@ -562,6 +587,7 @@ namespace BibleBrowserUWP
             if(reference == null)
             {
                asbSearch.Focus(FocusState.Programmatic); // Focus autohides all dropdowns
+               PrintChapter(null);
             }
             else
             {
@@ -652,6 +678,7 @@ namespace BibleBrowserUWP
             int bookNumeral = 0;
             string bookName = null;
             int chapter = 0;
+            bool foundVersion = false;
 
             List<string> queryElements = new List<string>();
             string query = ((TextBox)sender).Text;
@@ -659,16 +686,29 @@ namespace BibleBrowserUWP
             // Separate the query into version and reference
             if (query.Contains(':'))
             {
+               foundVersion = true;
                queryElements = query.Split(':', StringSplitOptions.RemoveEmptyEntries).ToList();
                version = BibleSearch.VersionByAbbreviation(queryElements[0]);
                if(version == null)
                {
                   version = reference.Version;
+                  if(version == null)
+                  {
+                     version = BibleVersion.DefaultVersion;
+                  }
                }
             }
-            
+
             // Separate the query into book name and verse
-            queryElements = queryElements[1].Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
+            if (foundVersion == true)
+            {
+               queryElements = queryElements[1].Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
+            }
+            else
+            {
+               version = BibleVersion.DefaultVersion;
+               queryElements = query.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
+            }
 
             // There must only be a book name
             if (queryElements.Count == 1)
@@ -776,5 +816,29 @@ namespace BibleBrowserUWP
       }
 
       #endregion
+
+
+      #region Accelerators
+
+      private void KeyboardAccelerator_PreviousChapter(Windows.UI.Xaml.Input.KeyboardAccelerator sender, Windows.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args)
+      {
+         PreviousChapter();
+         args.Handled = true;
+      }
+
+      private void KeyboardAccelerator_NextChapter(Windows.UI.Xaml.Input.KeyboardAccelerator sender, Windows.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args)
+      {
+         PreviousChapter();
+         args.Handled = true;
+      }
+
+      #endregion
+
+      private void CbDefaultVersion_SelectionChanged(object sender, SelectionChangedEventArgs e)
+      {
+         BibleVersion version = (BibleVersion)e.AddedItems.FirstOrDefault();
+         BibleVersion.SetDefaultVersion(version.FileName);
+         Debug.WriteLine("Default version setting being set to " + version.FileName);
+      }
    }
 }
