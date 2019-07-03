@@ -194,8 +194,11 @@ namespace BibleBrowserUWP
             chapter--;
             if (chapter < 1)
             {
-               int bookIndex = (int)book;
-               bookIndex = Math.Clamp(bookIndex - 1, 0, Enum.GetNames(typeof(BibleBook)).Length - 1);
+               int bookIndex = (int)book - 1; // Go to the previous book
+               if(bookIndex < 0) // First book wraps to last
+               {
+                  bookIndex = Enum.GetNames(typeof(BibleBook)).Length - 1;
+               }
                book = (BibleBook)bookIndex;
                chapter = int.MaxValue; // Because this gets clamped later
             }
@@ -222,8 +225,11 @@ namespace BibleBrowserUWP
             chapter++;
             if (chapter > oldReference.Chapters.Count)
             {
-               int bookIndex = (int)book;
-               bookIndex = Math.Clamp(bookIndex + 1, 0, Enum.GetNames(typeof(BibleBook)).Length - 1);
+               int bookIndex = (int)book + 1; // Go to the next book
+               if(bookIndex > Enum.GetNames(typeof(BibleBook)).Length - 1) // Last book loops back to first
+               {
+                  bookIndex = 0;
+               }
                book = (BibleBook)bookIndex;
                chapter = 1;
             }
@@ -827,7 +833,7 @@ namespace BibleBrowserUWP
 
       private void KeyboardAccelerator_NextChapter(Windows.UI.Xaml.Input.KeyboardAccelerator sender, Windows.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args)
       {
-         PreviousChapter();
+         NextChapter();
          args.Handled = true;
       }
 

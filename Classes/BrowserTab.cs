@@ -331,6 +331,12 @@ namespace BibleBrowser
          {
             Debug.WriteLine("A resource was not loaded correctly; this may be a missing bible version :");
             Debug.WriteLine(fileNotFoundE.Message);
+
+            // Avoid loading no tabs at first startup
+            if(Tabs.Count == 0)
+            {
+               Tabs.Add(new BrowserTab());
+            }
          }
          catch (System.Xml.XmlException xmlE) // Parse error
          {

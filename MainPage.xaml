@@ -729,16 +729,41 @@
                         Width="90"
                         HorizontalAlignment="Right">
 
+               <!-- Play (read out loud) -->
+               <Button Name="btnPlay"
+                       Style="{StaticResource CommandButton}"
+                       ToolTipService.ToolTip="Read aloud (Ctrl+P)"
+                       Click="BtnPlay_Click"
+                       Margin="7,0,0,0">
+                  <Button.KeyboardAccelerators>
+                     <KeyboardAccelerator Modifiers="Control" Key="P"/>
+                  </Button.KeyboardAccelerators>
+                  <FontIcon FontSize="15" Glyph="&#xE768;"/>
+               </Button>
+               <!-- Pause (read out loud) -->
+               <Button Name="btnPause"
+                       Style="{StaticResource CommandButton}"
+                       Visibility="Collapsed"
+                       ToolTipService.ToolTip="Pause reading (Space)"
+                       Click="BtnPause_Click"
+                       Margin="7,0,0,0">
+                  <Button.KeyboardAccelerators>
+                     <KeyboardAccelerator Modifiers="None" Key="Space"/>
+                  </Button.KeyboardAccelerators>
+                  <FontIcon FontSize="15" Glyph="&#xE769;"/>
+               </Button>
+
                <!-- More hamburger menu -->
                <Button Name="btnMore"
                        Style="{StaticResource CommandButton}"
                        ToolTipService.ToolTip="Menu (Ctrl+M)"
-                       FontFamily="Segoe MDL2 Assets">
+                       FontFamily="Segoe MDL2 Assets"
+                       HorizontalAlignment="Right">
                   <Button.KeyboardAccelerators>
                      <KeyboardAccelerator Modifiers="Control" Key="M"/>
                   </Button.KeyboardAccelerators>
                   <FontIcon FontSize="15" Glyph="&#xE712;" FontFamily="Segoe MDL2 Assets"/>
-                  
+
                   <!-- Settings menu -->
                   <Button.Flyout>
                      <Flyout x:Name="spMainMenu">
@@ -773,35 +798,13 @@
                            <TextBlock Style="{StaticResource TitleTextBlockStyle}">Credits</TextBlock>
                            <RichTextBlock LineHeight="18">
                               <Paragraph Margin="0, 5">App programmed by
-                                 <Hyperlink NavigateUri="http://denislabrecque.ca">Denis Labrecque</Hyperlink> , 2019.
+                                 <Hyperlink NavigateUri="http://denislabrecque.ca">Denis Labrecque</Hyperlink>, 2019.
                               </Paragraph>
                               <Paragraph Margin="0, 5">The Bible versions used in this application have expired their copyright and are therefore free to use.</Paragraph>
                            </RichTextBlock>
                         </StackPanel>
                      </Flyout>
                   </Button.Flyout>
-               </Button>
-
-               <!-- Play (read out loud) -->
-               <Button Name="btnPlay"
-                            Style="{StaticResource CommandButton}"
-                            ToolTipService.ToolTip="Read aloud (Ctrl+P)"
-                            Click="BtnPlay_Click">
-                  <Button.KeyboardAccelerators>
-                     <KeyboardAccelerator Modifiers="Control" Key="P"/>
-                  </Button.KeyboardAccelerators>
-                  <FontIcon FontSize="15" Glyph="&#xE768;"/>
-               </Button>
-               <!-- Pause (read out loud) -->
-               <Button Name="btnPause"
-                       Style="{StaticResource CommandButton}"
-                       Visibility="Collapsed"
-                       ToolTipService.ToolTip="Pause reading (Space)"
-                       Click="BtnPause_Click">
-                  <Button.KeyboardAccelerators>
-                     <KeyboardAccelerator Modifiers="None" Key="Space"/>
-                  </Button.KeyboardAccelerators>
-                  <FontIcon FontSize="15" Glyph="&#xE769;"/>
                </Button>
             </StackPanel>
          </Grid>
