@@ -51,7 +51,7 @@ namespace BibleBrowserUWP
       #region Properties
 
       TrulyObservableCollection<BrowserTab> Tabs { get => BrowserTab.Tabs; }
-      List<BibleVersion> Bibles { get => BibleLoader.Bibles; } // TODO change to observable collection
+      List<BibleVersion> Bibles { get => BibleLoader.Bibles; } // TODO change to observable collection?
 
       #endregion
 
@@ -68,7 +68,7 @@ namespace BibleBrowserUWP
          Application.Current.LeavingBackground += new LeavingBackgroundEventHandler(App_LeavingBackground);
 
          StyleTitleBar();
-         cbDefaultVersion.SelectedItem = BibleVersion.DefaultVersion; // TODO not working...
+         cbDefaultVersion.SelectedItem = BibleVersion.DefaultVersion;
          // Ensure the text remains within the window size
          this.SizeChanged += MainPage_SizeChanged;
 
@@ -324,7 +324,7 @@ namespace BibleBrowserUWP
                m_isPlaybackStarted = true;
             }
             // The computer doesn't have the language
-            catch (InvalidOperationException e)
+            catch (InvalidOperationException)
             {
                // Show an error message
                var messageDialog = new MessageDialog("Please install the language pack for this language (" + new CultureInfo(languageCode)  + ").");
@@ -613,7 +613,6 @@ namespace BibleBrowserUWP
          BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
 
          flyVersion.Hide();
-         flyBook.ShowAt(ddbBook);
       }
 
       /// <summary>
