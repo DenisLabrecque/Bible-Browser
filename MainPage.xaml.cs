@@ -217,9 +217,6 @@ namespace BibleBrowserUWP
 
             BibleReference newReference = new BibleReference(oldReference.Version, book, chapter);
             BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
-            PrintChapter(newReference);
-
-            Debug.WriteLine("Previous chapter called! " + newReference + " gone to from " + oldReference);
          }
       }
 
@@ -248,7 +245,6 @@ namespace BibleBrowserUWP
 
             BibleReference newReference = new BibleReference(oldReference.Version, book, chapter);
             BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
-            PrintChapter(newReference);
          }
       }
 
@@ -363,8 +359,7 @@ namespace BibleBrowserUWP
          ApplicationViewTitleBar appBar = ApplicationView.GetForCurrentView().TitleBar;
          titleBar.ExtendViewIntoTitleBar = true;
          appBar.ButtonBackgroundColor = Colors.Transparent;
-         //appBar.ButtonHoverBackgroundColor = Colors.Transparent;
-         //appBar.ButtonPressedBackgroundColor = Colors.Transparent;
+         appBar.ButtonForegroundColor = Colors.White;
          appBar.ButtonInactiveBackgroundColor = Colors.Transparent;
          UpdateTitleBarLayout(titleBar);
 
@@ -622,6 +617,20 @@ namespace BibleBrowserUWP
       }
 
       /// <summary>
+      /// When a version is selected from the "compare to" flyout.
+      /// </summary>
+      private void LvCompareVersions_ItemClicked(object sender, ItemClickEventArgs e)
+      {
+         BibleVersion compareVersion = (BibleVersion)e.ClickedItem;
+         BibleReference oldReference = BrowserTab.Selected.Reference;
+         BibleReference newReference = new BibleReference(oldReference.Version, oldReference.Book, oldReference.Chapter, oldReference.Verse, compareVersion);
+         BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
+         Debug.WriteLine("Compare version added as " + newReference.ComparisonVersion);
+
+         flyCompare.Hide();
+      }
+
+      /// <summary>
       /// Go to the version the user clicks and show the books flyout.
       /// </summary>
       private void GvVersions_ItemClick(object sender, ItemClickEventArgs e)
@@ -863,16 +872,18 @@ namespace BibleBrowserUWP
 
       private void CbDefaultVersion_SelectionChanged(object sender, SelectionChangedEventArgs e)
       {
-         BibleVersion version = (BibleVersion)e.AddedItems.FirstOrDefault();
-         BibleVersion.SetDefaultVersion(version.FileName);
-         Debug.WriteLine("Default version setting being set to " + version.FileName);
+         BibleVersion defaultVersion = (BibleVersion)e.AddedItems.FirstOrDefault();
+         BibleVersion.SetDefaultVersion(defaultVersion.FileName);
+         Debug.WriteLine("Default version setting being set to " + defaultVersion.FileName);
       }
 
       private void DdbVersion_Click(object sender, RoutedEventArgs e)
       {
          // Refresh the list
-         gvVersions.ItemsSource = null;
-         gvVersions.ItemsSource = Bibles;
+         //gvVersions.ItemsSource = null;
+         //gvVersions.ItemsSource = Bibles;
       }
+
+
    }
 }

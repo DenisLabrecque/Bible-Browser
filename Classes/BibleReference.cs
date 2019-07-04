@@ -31,6 +31,7 @@ namespace BibleBrowser
       #region Properties
 
       public BibleVersion Version { get; private set; }
+      public BibleVersion ComparisonVersion { get; private set; }
       public BookNumeral Numeral { get; private set; }
       public BibleBook Book { get; private set; }
       public string SimplifiedReference { get => BookName + " " + Chapter; } // Book name and chapter
@@ -63,10 +64,11 @@ namespace BibleBrowser
       /// If the chapter or verse are set too high, they will be clamped to the maximum chapter or verse.
       /// If the chapter or verse are set too low, an <c>ArgumentOutOfRangeException</c> is thrown.
       /// </summary>
-      public BibleReference(BibleVersion version, BibleBook book = BibleBook.Gn, int chapter = 1, int verse = 1)
+      public BibleReference(BibleVersion version, BibleBook book = BibleBook.Gn, int chapter = 1, int verse = 1, BibleVersion compare = null)
       {
          Version = version ?? throw new ArgumentNullException("A BibleReference cannot be created with a null BibleVersion");
          Book = book;
+         ComparisonVersion = compare;
 
          if (chapter < 1)
             throw new ArgumentOutOfRangeException("A chapter cannot be set to less than 1");
@@ -188,12 +190,37 @@ namespace BibleBrowser
       /// <returns>A formatted paragrpah with verse numbers.</returns>
       public Paragraph GetChapterTextFormatted()
       {
-         List<string> verses = Version.GetChapterVerses(this);
-
-         Paragraph paragraph = new Paragraph();
-         for (int i = 0; i < verses.Count; i++)
+         if (this.ComparisonVersion == null)
          {
-            if (i > 0) // Don't number verse 1
+            List<string> verses = Version.GetChapterVerses(this);
+
+            Paragraph paragraph = new Paragraph();
+            for (int i = 0; i < verses.Count; i++)
+            {
+               if (i > 0) // Don't number verse 1
+               {
+                  Run number = new Run();
+                  number.Foreground = new SolidColorBrush((Color)Application.Current.Resources["SystemAccentColor"]);
+                  number.FontSize = 12;
+                  number.CharacterSpacing = 20;
+                  number.Text = " " + (i + 1).ToString() + Chars.NBSPACE;
+                  paragraph.Inlines.Add(number);
+               }
+
+               Run verse = new Run();
+               verse.Text = verses[i];
+               paragraph.Inlines.Add(verse);
+            }
+
+            return paragraph;
+         }
+         else
+         {
+            List<string> versesThis = Version.GetChapterVerses(this);
+            List<string> versesOther = ComparisonVersion.GetChapterVerses(this);
+
+            Paragraph paragraph = new Paragraph();
+            for (int i = 0; i < versesThis.Count; i++)
             {
                Run number = new Run();
                number.Foreground = new SolidColorBrush((Color)Application.Current.Resources["SystemAccentColor"]);
@@ -201,14 +228,14 @@ namespace BibleBrowser
                number.CharacterSpacing = 20;
                number.Text = " " + (i + 1).ToString() + Chars.NBSPACE;
                paragraph.Inlines.Add(number);
+
+               Run verse = new Run();
+               verse.Text = versesThis[i] + " " + versesOther[i];
+               paragraph.Inlines.Add(verse);
             }
 
-            Run verse = new Run();
-            verse.Text = verses[i];
-            paragraph.Inlines.Add(verse);
+            return paragraph;
          }
-
-         return paragraph;
       }
 
 

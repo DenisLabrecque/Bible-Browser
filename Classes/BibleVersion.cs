@@ -133,7 +133,7 @@ namespace BibleBrowser
       }
 
       /// <summary>
-      /// Get every verse in a chapter by <c>BibleReference</c>.
+      /// Get every verse in a chapter by <code>BibleReference</code>.
       /// </summary>
       /// <param name="reference">The chapter to look up</param>
       /// <returns>A list of strings that are the contents of each verse in the Bible's chapter.</returns>

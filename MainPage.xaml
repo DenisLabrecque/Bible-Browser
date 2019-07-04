@@ -700,7 +700,9 @@
                         </Flyout.FlyoutPresenterStyle>
                         <ListView Name="lvCompareVersions"
                                   SelectionMode="None"
-                                  IsItemClickEnabled="True">
+                                  ItemsSource="{x:Bind Bibles}"
+                                  IsItemClickEnabled="True"
+                                  ItemClick="LvCompareVersions_ItemClicked">
                            <ListView.ItemTemplate>
                               <DataTemplate x:DataType="local1:BibleVersion">
                                  <TextBlock Text="{x:Bind Title}"/>
