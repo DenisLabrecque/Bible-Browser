@@ -31,6 +31,8 @@ namespace BibleBrowserUWP
 
       const int MINMARGIN = 90;
       const int MAXTEXTWIDTH = 600;
+      const string INDX_COLOURMODE = "appColourMode";
+      static readonly ApplicationDataContainer LOCALSETTINGS = ApplicationData.Current.LocalSettings;
 
       #endregion
 
@@ -65,6 +67,58 @@ namespace BibleBrowserUWP
          }
       }
 
+      /// <summary>
+      /// Gets or sets the current app colour setting from memory (light or dark mode).
+      /// </summary>
+      ElementTheme Theme {
+         get {
+            // Never set: default to light mode
+            if(LOCALSETTINGS.Values[INDX_COLOURMODE] == null)
+            {
+               LOCALSETTINGS.Values[INDX_COLOURMODE] = (int)ElementTheme.Light;
+               return ElementTheme.Light;
+            }
+            // Previously set to light mode
+            else if((int)LOCALSETTINGS.Values[INDX_COLOURMODE] == (int)ElementTheme.Light)
+               return ElementTheme.Light;
+            // Previously set to dark mode
+            else
+               return ElementTheme.Dark;
+         }
+
+         set {
+            // Error check
+            if (value == ElementTheme.Default)
+               throw new Exception("Only set the theme to light or dark mode!");
+            // No change
+            else if((int)value == (int)LOCALSETTINGS.Values[INDX_COLOURMODE])
+               return;
+            // Change
+            else
+            {
+               if (Window.Current.Content is FrameworkElement frameworkElement)
+               {
+                  Debug.WriteLine("APP THEME CHANGED: " + value.ToString());
+                  // Change and store the new setting
+                  frameworkElement.RequestedTheme = value;
+                  LOCALSETTINGS.Values[INDX_COLOURMODE] = (int)value;
+
+                  // Update the toggle
+                  if (value == ElementTheme.Light)
+                  {
+                     if (tglAppTheme.IsOn)
+                        tglAppTheme.IsOn = false;
+                  }
+                  else
+                  {
+                     if (tglAppTheme.IsOn == false)
+                        tglAppTheme.IsOn = true;
+                  }
+               }
+            }
+         }
+      }
+
       #endregion
 
 
@@ -75,6 +129,7 @@ namespace BibleBrowserUWP
          this.InitializeComponent();
          EraseText();
          HideAllDropdowns(); // Don't show Genesis 1
+         Theme = Theme;
          
          // Load previous tabs when the app opens
          Application.Current.LeavingBackground += new LeavingBackgroundEventHandler(App_LeavingBackground);
@@ -885,5 +940,15 @@ namespace BibleBrowserUWP
       }
 
 
+      /// <summary>
+      /// Switch the app's theme between light mode and dark mode.
+      /// </summary>
+      private void ToggleSwitch_Toggled(object sender, RoutedEventArgs e)
+      {
+         if (((ToggleSwitch)sender).IsOn)
+            Theme = ElementTheme.Dark;
+         else
+            Theme = ElementTheme.Light;
+      }
    }
 }

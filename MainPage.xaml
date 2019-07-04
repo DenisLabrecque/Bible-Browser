@@ -20,6 +20,16 @@
 
    <Page.Resources>
 
+      <Style x:Key="Flyout" TargetType="FlyoutPresenter">
+         <Setter Property="ScrollViewer.HorizontalScrollMode" Value="Disabled"/>
+         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+         <Setter Property="IsTabStop" Value="False"/>
+         <Setter Property="ScrollViewer.VerticalScrollMode" Value="Auto"/>
+         <Setter Property="Padding" Value="0,5"/>
+         <Setter Property="Background" Value="{ThemeResource ReceptusAcrylicMutedElement}"/>
+         <Setter Property="BorderBrush" Value="{ThemeResource ReceptusGrey}"/>
+      </Style>
+
       <Style x:Key="CommandButton" TargetType="Button" BasedOn="{StaticResource ButtonRevealStyle}">
          <Setter Property="BorderThickness" Value="1"/>
          <Setter Property="Margin" Value="1"/>
@@ -161,7 +171,7 @@
       </Style>
 
       <Style x:Key="VerseNumber" TargetType="Run">
-         <Setter Property="Foreground" Value="{StaticResource SystemColorHighlightTextBrush}"/>
+         <Setter Property="Foreground" Value="{ThemeResource SystemColorHighlightTextBrush}"/>
          <Setter Property="FontSize" Value="16"/>
          <Setter Property="CharacterSpacing" Value="20"/>
       </Style>
@@ -424,7 +434,7 @@
       <!-- Link Buttons -->
       <Style x:Key="TextBlockButtonStyle" TargetType="ButtonBase">
          <Setter Property="Background" Value="Transparent" />
-         <Setter Property="Foreground" Value="{StaticResource ReceptusGrey}" />
+         <Setter Property="Foreground" Value="{ThemeResource ReceptusGrey}" />
          <Setter Property="MinWidth" Value="0" />
          <Setter Property="MinHeight" Value="0" />
          <Setter Property="UseSystemFocusVisuals" Value="{StaticResource UseSystemFocusVisuals}" />
@@ -602,7 +612,7 @@
       <!-- Main Content -->
       <Grid Grid.Column="1"
             Grid.Row="1"
-            Background="{StaticResource ReceptusLight}">
+            Background="{ThemeResource ReceptusLight}">
          <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
          </Grid.RowDefinitions>
@@ -655,7 +665,7 @@
             <!-- Previous and Next buttons -->
             <StackPanel Grid.Column="0"
                         Orientation="Horizontal"
-                        Background="{StaticResource AppBarBackgroundThemeBrush}">
+                        Background="{ThemeResource AppBarBackgroundThemeBrush}">
 
                <!-- Back -->
                <Button Style="{StaticResource CommandButton}"
@@ -688,16 +698,7 @@
                   </Button.KeyboardAccelerators>
                   <FontIcon FontSize="15" Glyph="&#xF164;"/><!-- Explore content single -->
                   <Button.Flyout>
-                     <Flyout x:Name="flyCompare">
-                        <Flyout.FlyoutPresenterStyle>
-                           <Style TargetType="FlyoutPresenter">
-                              <Setter Property="ScrollViewer.HorizontalScrollMode" Value="Disabled"/>
-                              <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
-                              <Setter Property="IsTabStop" Value="False"/>
-                              <Setter Property="ScrollViewer.VerticalScrollMode" Value="Auto"/>
-                              <Setter Property="Padding" Value="0,5"/>
-                           </Style>
-                        </Flyout.FlyoutPresenterStyle>
+                     <Flyout x:Name="flyCompare" FlyoutPresenterStyle="{StaticResource Flyout}">
                         <ListView Name="lvCompareVersions"
                                   SelectionMode="None"
                                   ItemsSource="{x:Bind Bibles}"
@@ -717,7 +718,7 @@
             <!-- Search -->
             <StackPanel Grid.Column="1"
                         BorderThickness="3"
-                        BorderBrush="{StaticResource AppBarBackgroundThemeBrush}">
+                        BorderBrush="{ThemeResource AppBarBackgroundThemeBrush}">
                <Grid BorderBrush="{ThemeResource ReceptusGrey}"
                      BorderThickness="1"
                      Background="{ThemeResource ReceptusLightAcrylicElement}">
@@ -735,16 +736,7 @@
                              Content="YLT"
                              Click="DdbVersion_Click">
                         <Button.Flyout>
-                           <Flyout x:Name="flyVersion">
-                              <Flyout.FlyoutPresenterStyle>
-                                 <Style TargetType="FlyoutPresenter">
-                                    <Setter Property="ScrollViewer.HorizontalScrollMode" Value="Disabled"/>
-                                    <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
-                                    <Setter Property="IsTabStop" Value="False"/>
-                                    <Setter Property="ScrollViewer.VerticalScrollMode" Value="Auto"/>
-                                    <Setter Property="Padding" Value="0,5"/>
-                                 </Style>
-                              </Flyout.FlyoutPresenterStyle>
+                           <Flyout x:Name="flyVersion" FlyoutPresenterStyle="{StaticResource Flyout}">
                               <ListView Name="gvVersions"
                                         SelectionMode="None"
                                         ItemsSource="{x:Bind Bibles}"
@@ -765,16 +757,7 @@
                              Style="{StaticResource TextBlockButtonStyle}"
                              Content="Genesis">
                         <Button.Flyout>
-                           <Flyout x:Name="flyBook">
-                              <Flyout.FlyoutPresenterStyle>
-                                 <Style TargetType="FlyoutPresenter">
-                                    <Setter Property="ScrollViewer.HorizontalScrollMode" Value="Disabled"/>
-                                    <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
-                                    <Setter Property="IsTabStop" Value="False"/>
-                                    <Setter Property="ScrollViewer.VerticalScrollMode" Value="Auto"/>
-                                    <Setter Property="Padding" Value="0,5"/>
-                                 </Style>
-                              </Flyout.FlyoutPresenterStyle>
+                           <Flyout x:Name="flyBook" FlyoutPresenterStyle="{StaticResource Flyout}">
                               <ListView Name="gvBooks"
                                         SelectionMode="None"
                                         IsItemClickEnabled="True"
@@ -789,15 +772,7 @@
                              Style="{StaticResource TextBlockButtonStyle}"
                              Content="1">
                         <Button.Flyout>
-                           <Flyout x:Name="flyChapter">
-                              <Flyout.FlyoutPresenterStyle>
-                                 <Style TargetType="FlyoutPresenter">
-                                    <Setter Property="ScrollViewer.HorizontalScrollMode" Value="Disabled"/>
-                                    <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
-                                    <Setter Property="IsTabStop" Value="False"/>
-                                    <Setter Property="ScrollViewer.VerticalScrollMode" Value="Auto"/>
-                                 </Style>
-                              </Flyout.FlyoutPresenterStyle>
+                           <Flyout x:Name="flyChapter" FlyoutPresenterStyle="{StaticResource Flyout}">
                               <GridView Name="gvChapters"
                                         SelectionMode="None"
                                         IsItemClickEnabled="True"
@@ -824,7 +799,7 @@
             <!-- Options -->
             <StackPanel Grid.Column="2"
                         Orientation="Horizontal"
-                        Background="{StaticResource AppBarBackgroundThemeBrush}"
+                        Background="{ThemeResource AppBarBackgroundThemeBrush}"
                         Width="90"
                         HorizontalAlignment="Right">
 
@@ -865,24 +840,14 @@
 
                   <!-- Settings menu -->
                   <Button.Flyout>
-                     <Flyout x:Name="spMainMenu">
-                        <Flyout.FlyoutPresenterStyle>
-                           <Style TargetType="FlyoutPresenter">
-                              <Setter Property="ScrollViewer.HorizontalScrollMode" Value="Disabled"/>
-                              <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
-                              <Setter Property="IsTabStop" Value="True"/>
-                              <Setter Property="TabNavigation" Value="Cycle"/>
-                              <Setter Property="HorizontalContentAlignment" Value="Left"/>
-                              <!--<Setter Property="ScrollViewer.HorizontalAlignment" Value="Left"/>-->
-                              <!--<Setter Property="ScrollViewer.HorizontalContentAlignment" Value="Left"/>-->
-                           </Style>
-                        </Flyout.FlyoutPresenterStyle>
-                        <StackPanel HorizontalAlignment="Left">
+                     <Flyout x:Name="spMainMenu" FlyoutPresenterStyle="{StaticResource Flyout}">
+                        <StackPanel HorizontalAlignment="Left" Padding="20,5">
                            <TextBlock HorizontalAlignment="Left" HorizontalTextAlignment="Left" Margin="0,0"
-                                      Style="{StaticResource TitleTextBlockStyle}">Settings</TextBlock>
+                                      Style="{ThemeResource TitleTextBlockStyle}">Settings</TextBlock>
                            <ComboBox Name="cbDefaultVersion"
                                      Header="Default version"
                                      HorizontalAlignment="Left"
+                                     ItemsSource="{x:Bind Bibles}"
                                      SelectionChanged="CbDefaultVersion_SelectionChanged">
                               <ComboBox.ItemTemplate>
                                  <DataTemplate x:DataType="local1:BibleVersion">
@@ -891,9 +856,10 @@
                               </ComboBox.ItemTemplate>
                            </ComboBox>
 
-                           <!--<ToggleSwitch Header="Toggle work" OffContent="Do work" OnContent="Working" IsOn="True" />-->
+                           <!-- Light/dark theme switch -->
+                           <ToggleSwitch Name="tglAppTheme" Header="Theme" OffContent="Light" OnContent="Dark" IsOn="False" Toggled="ToggleSwitch_Toggled" />
 
-                           <TextBlock Style="{StaticResource TitleTextBlockStyle}">Credits</TextBlock>
+                           <TextBlock Style="{ThemeResource TitleTextBlockStyle}">Credits</TextBlock>
                            <RichTextBlock LineHeight="18">
                               <Paragraph Margin="0, 5">App programmed by
                                  <Hyperlink NavigateUri="http://denislabrecque.ca">Denis Labrecque</Hyperlink>, 2019.
