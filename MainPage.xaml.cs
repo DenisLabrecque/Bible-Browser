@@ -1,6 +1,7 @@
 ﻿using BibleBrowser;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -51,7 +52,18 @@ namespace BibleBrowserUWP
       #region Properties
 
       TrulyObservableCollection<BrowserTab> Tabs { get => BrowserTab.Tabs; }
-      List<BibleVersion> Bibles { get => BibleLoader.Bibles; } // TODO change to observable collection?
+
+      // Gets all available Bibles, minus the one already selected, if there is one.
+      ObservableCollection<BibleVersion> Bibles {
+         get {
+            if (BrowserTab.Selected == null || BrowserTab.Selected.Reference == null)
+            {
+               return BibleLoader.Bibles;
+            }
+            else
+               return BrowserTab.Selected.OtherVersions;
+         }
+      }
 
       #endregion
 
@@ -282,7 +294,6 @@ namespace BibleBrowserUWP
             else
             {
                // Fill dropdowns with content
-               gvVersions.ItemsSource = BibleLoader.Bibles;
                gvBooks.ItemsSource = reference.Version.BookNames;
                gvChapters.ItemsSource = reference.Chapters;
 
@@ -475,6 +486,11 @@ namespace BibleBrowserUWP
       private async void Home_Click(object sender, RoutedEventArgs e)
       {
          await BrowserTab.SaveOpenTabs();
+      }
+
+      private void BtnCompare_Click(object sender, RoutedEventArgs e)
+      {
+         /// TODO add text to compare
       }
 
       private void BtnPlay_Click(object sender, RoutedEventArgs e)
@@ -850,6 +866,13 @@ namespace BibleBrowserUWP
          BibleVersion version = (BibleVersion)e.AddedItems.FirstOrDefault();
          BibleVersion.SetDefaultVersion(version.FileName);
          Debug.WriteLine("Default version setting being set to " + version.FileName);
+      }
+
+      private void DdbVersion_Click(object sender, RoutedEventArgs e)
+      {
+         // Refresh the list
+         gvVersions.ItemsSource = null;
+         gvVersions.ItemsSource = Bibles;
       }
    }
 }

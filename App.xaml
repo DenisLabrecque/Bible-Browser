@@ -4,4 +4,90 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:BibleBrowserUWP">
 
+   <Application.Resources>
+      <ResourceDictionary>
+         <!-- Override the accent colour -->
+         <Color x:Key="SystemAccentColor">#E23F47</Color>
+         <Color x:Key="AppBarBackgroundThemeBrush">#D3DBDE</Color>
+
+         <ResourceDictionary.MergedDictionaries>
+            <!--<ResourceDictionary Source="LightColours.xaml"/>-->
+         </ResourceDictionary.MergedDictionaries>
+
+         <ResourceDictionary.ThemeDictionaries>
+
+
+
+            <!-- LIGHT THEME -->
+            <ResourceDictionary x:Key="Light">
+               <SolidColorBrush x:Key="ReceptusRed" Color="#E23F47"/>
+               <SolidColorBrush x:Key="ReceptusGrey" Color="#7FA1AB"/>
+               <SolidColorBrush x:Key="ReceptusLight" Color="#F2F2F2"/>
+               <SolidColorBrush x:Key="ReceptusLighGrey" Color="#D3DBDE"/>
+               
+               <AcrylicBrush x:Key="ReceptusAcrylicMutedWindow"
+                             BackgroundSource="HostBackdrop"
+                             TintColor="#7FA1AB"
+                             TintOpacity="0.4"
+                             FallbackColor="#7FA1AB"/>
+               <AcrylicBrush x:Key="ReceptusAcrylicAccentWindow"
+                             BackgroundSource="HostBackdrop"
+                             TintColor="#E23F47"
+                             TintOpacity="0.8"
+                             FallbackColor="#E23F47"/>
+               <AcrylicBrush x:Key="ReceptusLightAcrylicElement"
+                             BackgroundSource="Backdrop"
+                             TintColor="#F2F2F2"
+                             TintOpacity="0.4"
+                             FallbackColor="#F2F2F2"/>
+            </ResourceDictionary>
+
+
+
+
+            <!-- DARK THEME -->
+            <ResourceDictionary x:Key="Dark">
+               <SolidColorBrush x:Key="ReceptusRed" Color="#F2F2F2"/>
+               <SolidColorBrush x:Key="ReceptusGrey" Color="#F2F2F2"/>
+               <SolidColorBrush x:Key="ReceptusLight" Color="#F2F2F2"/>
+               <SolidColorBrush x:Key="ReceptusLighGrey" Color="#D3DBDE"/>
+               
+               <AcrylicBrush x:Key="ReceptusAcrylicMutedWindow"
+                             BackgroundSource="HostBackdrop"
+                             TintColor="#7FA1AB"
+                             TintOpacity="0.4"
+                             FallbackColor="#7FA1AB"/>
+               <AcrylicBrush x:Key="ReceptusAcrylicAccentWindow"
+                             BackgroundSource="HostBackdrop"
+                             TintColor="#E23F47"
+                             TintOpacity="0.8"
+                             FallbackColor="#E23F47"/>
+               <AcrylicBrush x:Key="ReceptusLightAcrylicElement"
+                             BackgroundSource="Backdrop"
+                             TintColor="#7FA1AB"
+                             TintOpacity="0.4"
+                             FallbackColor="#7FA1AB"/>
+            </ResourceDictionary>
+
+
+
+
+            <!-- HIGH CONTRAST THEME-->
+            <ResourceDictionary x:Key="HighContrast">
+               <SolidColorBrush x:Key="ReceptusRed" Color="#F2F2F2"/>
+               <SolidColorBrush x:Key="ReceptusGrey" Color="#F2F2F2"/>
+               <SolidColorBrush x:Key="ReceptusLight" Color="#F2F2F2"/>
+               <SolidColorBrush x:Key="ReceptusLighGrey" Color="#D3DBDE"/>
+               
+               <SolidColorBrush x:Key="ReceptusAcrylicMuted"
+                                Color="{ThemeResource SystemColorWindowColor}"/>
+               <SolidColorBrush x:Key="ReceptusAcrylicAccentWindow"
+                                Color="{ThemeResource SystemColorWindowColor}"/>
+               <SolidColorBrush x:Key="ReceptusLightAcrylicElement"
+                                Color="{ThemeResource SystemBaseHighColor}"/>
+            </ResourceDictionary>
+         </ResourceDictionary.ThemeDictionaries>
+      </ResourceDictionary>
+   </Application.Resources>
+
 </Application>

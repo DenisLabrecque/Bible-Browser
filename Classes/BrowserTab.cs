@@ -113,6 +113,17 @@ namespace BibleBrowser
          }
       }
 
+      /// <summary>
+      /// All available versions except the present one.
+      /// </summary>
+      public ObservableCollection<BibleVersion> OtherVersions {
+         get {
+            ObservableCollection<BibleVersion> versions = BibleLoader.Bibles;
+            versions.Remove(Reference.Version);
+            return versions;
+         }
+      }
+
       #endregion
 
 
@@ -185,7 +196,6 @@ namespace BibleBrowser
                   NotifyPropertyChanged();
                   return;
             }
-
          }
       }
 
@@ -342,11 +352,23 @@ namespace BibleBrowser
          {
             Debug.WriteLine("Reading the saved tabs xml file choked :");
             Debug.WriteLine(xmlE.Message);
+
+            // Avoid loading no tabs
+            if (Tabs.Count == 0)
+            {
+               Tabs.Add(new BrowserTab());
+            }
          }
          catch (Exception e)
          {
             Debug.WriteLine("Loading saved tabs was interrupted :");
             Debug.WriteLine(e.Message);
+
+            // Avoid loading no tabs
+            if (Tabs.Count == 0)
+            {
+               Tabs.Add(new BrowserTab());
+            }
          }
       }
 

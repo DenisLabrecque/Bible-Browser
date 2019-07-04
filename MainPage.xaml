@@ -7,7 +7,7 @@
    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
    xmlns:local1="using:BibleBrowser"
    mc:Ignorable="d"
-   Background="{ThemeResource SystemControlAccentAcrylicWindowAccentMediumHighBrush }" FontFamily="Segoe MDL2 Assets"
+   Background="{ThemeResource ReceptusAcrylicAccentWindow}" FontFamily="Segoe MDL2 Assets"
    Name="root">
 
    <Page.KeyboardAccelerators>
@@ -87,9 +87,68 @@
          </Setter>
       </Style>
 
+      <!-- More Button -->
       <Style x:Key="TabBarButton" TargetType="Button" BasedOn="{StaticResource CommandButton}">
          <Setter Property="Height" Value="30"/>
          <Setter Property="Width" Value="35"/>
+         <Setter Property="Foreground" Value="{ThemeResource ReceptusLighGrey}"/>
+         <Setter Property="Template">
+            <Setter.Value>
+               <ControlTemplate TargetType="Button">
+                  <Grid x:Name="RootGrid" Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}">
+
+                     <VisualStateManager.VisualStateGroups>
+                        <VisualStateGroup x:Name="CommonStates">
+                           <VisualState x:Name="Normal">
+                              <Storyboard>
+                                 <PointerUpThemeAnimation Storyboard.TargetName="RootGrid" />
+                              </Storyboard>
+                           </VisualState>
+
+                           <VisualState x:Name="PointerOver">
+                              <VisualState.Setters>
+                                 <Setter Target="RootGrid.(RevealBrush.State)" Value="PointerOver" />
+                                 <Setter Target="RootGrid.Background" Value="{ThemeResource ButtonRevealBackgroundPointerOver}" />
+                                 <Setter Target="ContentPresenter.BorderBrush" Value="{ThemeResource ButtonRevealBorderBrushPointerOver}" />
+                                 <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource ReceptusLight}" />
+                              </VisualState.Setters>
+
+                              <Storyboard>
+                                 <PointerUpThemeAnimation Storyboard.TargetName="RootGrid" />
+                              </Storyboard>
+                           </VisualState>
+
+                           <VisualState x:Name="Pressed">
+                              <VisualState.Setters>
+                                 <Setter Target="RootGrid.(RevealBrush.State)" Value="Pressed" />
+                                 <Setter Target="RootGrid.Background" Value="{ThemeResource ButtonRevealBackgroundPressed}" />
+                                 <Setter Target="ContentPresenter.BorderBrush" Value="{ThemeResource ButtonRevealBorderBrushPressed}" />
+                                 <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource ReceptusLight}" />
+                              </VisualState.Setters>
+
+                              <Storyboard>
+                                 <PointerDownThemeAnimation Storyboard.TargetName="RootGrid" />
+                              </Storyboard>
+                           </VisualState>
+
+                           <VisualState x:Name="Disabled">
+                              <VisualState.Setters>
+                                 <Setter Target="RootGrid.Background" Value="Transparent" />
+                                 <Setter Target="ContentPresenter.BorderBrush" Value="{ThemeResource ButtonRevealBorderBrushDisabled}" />
+                                 <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource ButtonForegroundDisabled}" />
+                              </VisualState.Setters>
+                           </VisualState>
+
+                        </VisualStateGroup>
+
+                     </VisualStateManager.VisualStateGroups>
+                     <ContentPresenter x:Name="ContentPresenter" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}" Content="{TemplateBinding Content}" ContentTransitions="{TemplateBinding ContentTransitions}" ContentTemplate="{TemplateBinding ContentTemplate}" Padding="{TemplateBinding Padding}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" AutomationProperties.AccessibilityView="Raw" />
+
+                  </Grid>
+
+               </ControlTemplate>
+            </Setter.Value>
+         </Setter>
       </Style>
 
       <Style x:Key="TabCloseButton" TargetType="Button">
@@ -98,6 +157,7 @@
          <Setter Property="Margin" Value="1"/>
          <Setter Property="BorderThickness" Value="0"/>
          <Setter Property="Background" Value="Transparent"/>
+         <Setter Property="Foreground" Value="{ThemeResource ReceptusGrey}"/>
       </Style>
 
       <Style x:Key="VerseNumber" TargetType="Run">
@@ -106,12 +166,12 @@
          <Setter Property="CharacterSpacing" Value="20"/>
       </Style>
 
-      <!-- A tab container -->
+      <!-- A tab -->
       <Style x:Key="ListViewItemRevealStyle" TargetType="ListViewItem">
          <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}"/>
          <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}"/>
          <Setter Property="Background" Value="{ThemeResource ListViewItemBackground}"/>
-         <Setter Property="Foreground" Value="{ThemeResource ListViewItemForeground}"/>
+         <Setter Property="Foreground" Value="{ThemeResource ReceptusLighGrey}"/>
          <Setter Property="TabNavigation" Value="Local"/>
          <Setter Property="IsHoldingEnabled" Value="True"/>
          <Setter Property="HorizontalContentAlignment" Value="Left"/>
@@ -141,7 +201,7 @@
                                                Control.IsTemplateFocusTarget="True"
                                                PressedBackground="{ThemeResource ListViewItemBackgroundPressed}"
                                                PlaceholderBackground="{ThemeResource ListViewItemPlaceholderBackground}"
-                                               PointerOverForeground="{ThemeResource ListViewItemForegroundPointerOver}"
+                                               PointerOverForeground="{ThemeResource ReceptusLight}"
                                                PointerOverBackground="{ThemeResource ListViewItemBackgroundPointerOver}"
                                                RevealBorderThickness="1,0"
                                                ReorderHintOffset="{ThemeResource ListViewItemReorderHintThemeOffset}"
@@ -203,6 +263,7 @@
          </Setter>
       </Style>
       <Style x:Key="TabListViewItemContainer" BasedOn="{StaticResource ListViewItemRevealStyle}" TargetType="ListViewItem"/>
+      
       <Style x:Key="BrowserSearchTextBox" TargetType="TextBox">
          <Setter Property="Foreground" Value="{ThemeResource TextControlForeground}"/>
          <Setter Property="Background" Value="Transparent"/>
@@ -363,7 +424,7 @@
       <!-- Link Buttons -->
       <Style x:Key="TextBlockButtonStyle" TargetType="ButtonBase">
          <Setter Property="Background" Value="Transparent" />
-         <Setter Property="Foreground" Value="{ThemeResource HyperlinkButtonForeground}" />
+         <Setter Property="Foreground" Value="{StaticResource ReceptusGrey}" />
          <Setter Property="MinWidth" Value="0" />
          <Setter Property="MinHeight" Value="0" />
          <Setter Property="UseSystemFocusVisuals" Value="{StaticResource UseSystemFocusVisuals}" />
@@ -541,7 +602,7 @@
       <!-- Main Content -->
       <Grid Grid.Column="1"
             Grid.Row="1"
-            Background="White">
+            Background="{StaticResource ReceptusLight}">
          <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
          </Grid.RowDefinitions>
@@ -582,11 +643,11 @@
          <Grid Height="40"
                VerticalAlignment="Top"
                Background="Transparent"
-               BorderBrush="LightGray"
+               BorderBrush="{ThemeResource ReceptusGrey}"
                BorderThickness="0,0,0,1"
                Grid.Row="0">
             <Grid.ColumnDefinitions>
-               <ColumnDefinition Width="90"/>
+               <ColumnDefinition Width="130"/>
                <ColumnDefinition Width="1*"/>
                <ColumnDefinition Width="90"/>
             </Grid.ColumnDefinitions>
@@ -617,15 +678,47 @@
                   </Button.KeyboardAccelerators>
                   <FontIcon FontSize="15" Glyph="&#xE72A;"/>
                </Button>
+
+               <!-- Compare to -->
+               <Button Style="{StaticResource CommandButton}"
+                       Name="btnCompare"
+                       ToolTipService.ToolTip="Compare to"
+                       Click="BtnCompare_Click">
+                  <Button.KeyboardAccelerators>
+                  </Button.KeyboardAccelerators>
+                  <FontIcon FontSize="15" Glyph="&#xF164;"/><!-- Explore content single -->
+                  <Button.Flyout>
+                     <Flyout x:Name="flyCompare">
+                        <Flyout.FlyoutPresenterStyle>
+                           <Style TargetType="FlyoutPresenter">
+                              <Setter Property="ScrollViewer.HorizontalScrollMode" Value="Disabled"/>
+                              <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+                              <Setter Property="IsTabStop" Value="False"/>
+                              <Setter Property="ScrollViewer.VerticalScrollMode" Value="Auto"/>
+                              <Setter Property="Padding" Value="0,5"/>
+                           </Style>
+                        </Flyout.FlyoutPresenterStyle>
+                        <ListView Name="lvCompareVersions"
+                                  SelectionMode="None"
+                                  IsItemClickEnabled="True">
+                           <ListView.ItemTemplate>
+                              <DataTemplate x:DataType="local1:BibleVersion">
+                                 <TextBlock Text="{x:Bind Title}"/>
+                              </DataTemplate>
+                           </ListView.ItemTemplate>
+                        </ListView>
+                     </Flyout>
+                  </Button.Flyout>
+               </Button>
             </StackPanel>
 
             <!-- Search -->
             <StackPanel Grid.Column="1"
                         BorderThickness="3"
                         BorderBrush="{StaticResource AppBarBackgroundThemeBrush}">
-               <Grid BorderBrush="{StaticResource SystemControlAcrylicElementBrush}"
+               <Grid BorderBrush="{ThemeResource ReceptusGrey}"
                      BorderThickness="1"
-                     Background="White">
+                     Background="{ThemeResource ReceptusLightAcrylicElement}">
                   <Grid.ColumnDefinitions>
                      <ColumnDefinition Width="Auto"/>
                      <ColumnDefinition Width="1*"/>
@@ -637,7 +730,8 @@
                      <!-- Select version -->
                      <Button Name="ddbVersion"
                              Style="{StaticResource TextBlockButtonStyle}"
-                             Content="YLT">
+                             Content="YLT"
+                             Click="DdbVersion_Click">
                         <Button.Flyout>
                            <Flyout x:Name="flyVersion">
                               <Flyout.FlyoutPresenterStyle>
@@ -651,6 +745,7 @@
                               </Flyout.FlyoutPresenterStyle>
                               <ListView Name="gvVersions"
                                         SelectionMode="None"
+                                        ItemsSource="{x:Bind Bibles}"
                                         IsItemClickEnabled="True"
                                         ItemClick="GvVersions_ItemClick">
                                  <ListView.ItemTemplate>
@@ -711,12 +806,14 @@
                      </Button>
                   </StackPanel>
 
-                  <TextBox Style="{StaticResource BrowserSearchTextBox}" Name="asbSearch"
+                  <TextBox Style="{StaticResource BrowserSearchTextBox}"
+                           Name="asbSearch"
                            TabIndex="0"
                            Grid.Column="1"
                            PlaceholderText="Reference or word search"
                            GotFocus="AsbSearch_GotFocus"
-                           KeyDown="AsbSearch_KeyDown" LostFocus="AsbSearch_LostFocus">
+                           KeyDown="AsbSearch_KeyDown"
+                           LostFocus="AsbSearch_LostFocus">
                   </TextBox>
                </Grid>
             </StackPanel>
@@ -783,7 +880,6 @@
                                       Style="{StaticResource TitleTextBlockStyle}">Settings</TextBlock>
                            <ComboBox Name="cbDefaultVersion"
                                      Header="Default version"
-                                     ItemsSource="{x:Bind Bibles}"
                                      HorizontalAlignment="Left"
                                      SelectionChanged="CbDefaultVersion_SelectionChanged">
                               <ComboBox.ItemTemplate>

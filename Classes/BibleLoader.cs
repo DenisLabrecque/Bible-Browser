@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -21,9 +22,9 @@ namespace BibleBrowser
       /// <summary>
       /// The <c>BibleVersion</c>s available to read from.
       /// </summary>
-      public static List<BibleVersion> Bibles {
+      public static ObservableCollection<BibleVersion> Bibles {
          get {
-            List<BibleVersion> bibles = new List<BibleVersion>();
+            ObservableCollection<BibleVersion> bibles = new ObservableCollection<BibleVersion>();
             foreach (var bible in LoadedBibles)
             {
                bibles.Add(bible.Value);
