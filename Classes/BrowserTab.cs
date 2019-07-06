@@ -337,39 +337,41 @@ namespace BibleBrowserUWP
             {
                Tabs.Add(tab);
             }
+
+            RequireNewTab();
          }
          catch(System.IO.FileNotFoundException fileNotFoundE)
          {
             Debug.WriteLine("A resource was not loaded correctly; this may be a missing bible version :");
             Debug.WriteLine(fileNotFoundE.Message);
 
-            // Avoid loading no tabs at first startup
-            if(Tabs.Count == 0)
-            {
-               Tabs.Add(new BrowserTab());
-            }
+            RequireNewTab();
          }
          catch (System.Xml.XmlException xmlE) // Parse error
          {
             Debug.WriteLine("Reading the saved tabs xml file choked :");
             Debug.WriteLine(xmlE.Message);
 
-            // Avoid loading no tabs
-            if (Tabs.Count == 0)
-            {
-               Tabs.Add(new BrowserTab());
-            }
+            RequireNewTab();
          }
          catch (Exception e)
          {
             Debug.WriteLine("Loading saved tabs was interrupted :");
             Debug.WriteLine(e.Message);
 
-            // Avoid loading no tabs
-            if (Tabs.Count == 0)
-            {
-               Tabs.Add(new BrowserTab());
-            }
+            RequireNewTab();
+         }
+      }
+
+      /// <summary>
+      /// Ensure that there is at least one tab open, even when none existed in app memory.
+      /// </summary>
+      private static void RequireNewTab()
+      {
+         // Avoid loading no tabs at first startup
+         if (Tabs.Count == 0)
+         {
+            Tabs.Add(new BrowserTab());
          }
       }
 
