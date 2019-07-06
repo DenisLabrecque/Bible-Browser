@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BibleBrowser
+namespace BibleBrowserUWP
 {
    /// <summary>
    /// Verse text in the Bible.
@@ -30,16 +30,37 @@ namespace BibleBrowser
 
       #region Properties
 
-      string Text { get; set; }
+      public string Text { get {
+            if (Text == null)
+               return string.Empty;
+            else
+               return Text;
+         }
+         set {
+            Text = value;
+         }
+      }
+      public string ComparisonText {
+         get {
+            if (ComparisonText == null)
+               return string.Empty;
+            else
+               return ComparisonText;
+         }
+         set {
+            ComparisonText = value;
+         }
+      }
 
       #endregion
 
 
       #region Constructors
 
-      public Verse(string plainText)
+      public Verse(string plainText, string comparisonText = null)
       {
          Text = plainText;
+         ComparisonText = comparisonText;
       }
 
       #endregion

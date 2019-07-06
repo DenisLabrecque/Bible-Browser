@@ -7,7 +7,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Media;
 
-namespace BibleBrowser
+namespace BibleBrowserUWP
 {
    enum BibleBook { Gn, Ex, Lv, Nb, Dt, Jos, Jg, Rt, iS, iiS, iK, iiK, iCh, iiCh, Esr, Ne, Est, Jb, Ps, Pr, Ecc, Sng, Is, Jr, Lm, Ez, Dn, Hos, Jl, Am, Ob, Jon, Mi, Na, Ha, Zep, Hag, Za, Mal, Mt, Mc, Lc, Jn, Ac, Rm, iCo, iiCo, Ga, Ep, Ph, Col, iTh, iiTh, iTm, iiTm, Tt, Phm, He, Jc, iP, iiP, iJn, iiJn, iiiJn, Jude, Rev }
 
@@ -31,10 +31,43 @@ namespace BibleBrowser
       #region Properties
 
       public BibleVersion Version { get; private set; }
-      public BibleVersion ComparisonVersion { get; private set; }
+      public BibleVersion ComparisonVersion { get; private set; } // Null by default
       public BookNumeral Numeral { get; private set; }
       public BibleBook Book { get; private set; }
       public string SimplifiedReference { get => BookName + " " + Chapter; } // Book name and chapter
+
+      /// <summary>
+      /// This chapter's verses.
+      /// </summary>
+      public List<Verse> Verses {
+         get {
+            List<Verse> verses = new List<Verse>();
+            List<string> versesI = Version.GetChapterVerses(this);
+            List<string> versesJ = Version.GetChapterVerses(this);
+
+            if(versesI.Count > versesJ.Count)
+            {
+               for(int i = 0; i < versesI.Count; i++)
+               {
+                  if (i < versesJ.Count)
+                     verses.Add(new Verse(versesI[i], versesJ[i]));
+                  else
+                     verses.Add(new Verse(versesI[i]));
+               }
+            }
+            else
+            {
+               for (int i = 0; i < versesI.Count; i++)
+               {
+                  if (i < versesI.Count)
+                     verses.Add(new Verse(versesI[i], versesJ[i]));
+                  else
+                     verses.Add(new Verse(versesI[i]));
+               }
+            }
+            return verses;
+         }
+      }
 
       /// <summary>
       /// The book name indexed in this Bible version.
@@ -238,15 +271,18 @@ namespace BibleBrowser
          }
       }
 
-
       /// <summary>
       /// Get text for the audio reader.
       /// </summary>
       /// <returns>Plain text that is readable out loud. Each verse has a line return.</returns>
-      public string GetChapterPlainText()
+      public string GetChapterPlainText(bool isCompareVersion = false)
       {
          StringBuilder builder = new StringBuilder();
-         List<string> verses = Version.GetChapterVerses(this);
+         List<string> verses;
+         if (isCompareVersion)
+            verses = ComparisonVersion.GetChapterVerses(this);
+         else
+            verses = Version.GetChapterVerses(this);
 
          foreach(string verse in verses)
          {

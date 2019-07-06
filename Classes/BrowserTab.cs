@@ -9,8 +9,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Windows.Storage;
+using BibleBrowserUWP;
 
-namespace BibleBrowser
+namespace BibleBrowserUWP
 {
    /// <summary>
    /// A tab that has a Bible and reference open.

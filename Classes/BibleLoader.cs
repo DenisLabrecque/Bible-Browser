@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Xml.Linq;
 
-namespace BibleBrowser
+namespace BibleBrowserUWP
 {
    /// <summary>
    /// Represents XML Bible with all its metadata, and exposes the capacity to retrieve both meta information

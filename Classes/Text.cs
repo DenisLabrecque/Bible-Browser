@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BibleBrowser
+namespace BibleBrowserUWP
 {
    /// <summary>
    /// Converts simple text to a better typographical standard by smartquoting and adding em-dashes.

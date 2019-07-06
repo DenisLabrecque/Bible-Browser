@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 
-namespace BibleBrowser
+namespace BibleBrowserUWP
 {
    /// <summary>
    /// Implements an ObservableCollection that fires not only when an object is added or deleted, but also when certain properties change.

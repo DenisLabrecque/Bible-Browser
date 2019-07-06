@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BibleBrowser
+namespace BibleBrowserUWP
 {
    /// <summary>
    /// Class used to compare and print the chapter and verse element of a Bible reference, such as 2:31, or 3:32-34b.

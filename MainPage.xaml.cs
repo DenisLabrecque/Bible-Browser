@@ -1,5 +1,4 @@
-﻿using BibleBrowser;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -31,8 +30,6 @@ namespace BibleBrowserUWP
 
       const int MINMARGIN = 90;
       const int MAXTEXTWIDTH = 600;
-      const string INDX_COLOURMODE = "appColourMode";
-      static readonly ApplicationDataContainer LOCALSETTINGS = ApplicationData.Current.LocalSettings;
 
       #endregion
 
@@ -59,63 +56,18 @@ namespace BibleBrowserUWP
       ObservableCollection<BibleVersion> Bibles {
          get {
             if (BrowserTab.Selected == null || BrowserTab.Selected.Reference == null)
-            {
                return BibleLoader.Bibles;
-            }
             else
                return BrowserTab.Selected.OtherVersions;
          }
       }
 
-      /// <summary>
-      /// Gets or sets the current app colour setting from memory (light or dark mode).
-      /// </summary>
-      ElementTheme Theme {
+      List<Verse> Verses {
          get {
-            // Never set: default to light mode
-            if(LOCALSETTINGS.Values[INDX_COLOURMODE] == null)
-            {
-               LOCALSETTINGS.Values[INDX_COLOURMODE] = (int)ElementTheme.Light;
-               return ElementTheme.Light;
-            }
-            // Previously set to light mode
-            else if((int)LOCALSETTINGS.Values[INDX_COLOURMODE] == (int)ElementTheme.Light)
-               return ElementTheme.Light;
-            // Previously set to dark mode
+            if (BrowserTab.Selected == null || BrowserTab.Selected.Reference == null)
+               return null;
             else
-               return ElementTheme.Dark;
-         }
-
-         set {
-            // Error check
-            if (value == ElementTheme.Default)
-               throw new Exception("Only set the theme to light or dark mode!");
-            // No change
-            else if((int)value == (int)LOCALSETTINGS.Values[INDX_COLOURMODE])
-               return;
-            // Change
-            else
-            {
-               if (Window.Current.Content is FrameworkElement frameworkElement)
-               {
-                  Debug.WriteLine("APP THEME CHANGED: " + value.ToString());
-                  // Change and store the new setting
-                  frameworkElement.RequestedTheme = value;
-                  LOCALSETTINGS.Values[INDX_COLOURMODE] = (int)value;
-
-                  // Update the toggle
-                  if (value == ElementTheme.Light)
-                  {
-                     if (tglAppTheme.IsOn)
-                        tglAppTheme.IsOn = false;
-                  }
-                  else
-                  {
-                     if (tglAppTheme.IsOn == false)
-                        tglAppTheme.IsOn = true;
-                  }
-               }
-            }
+               return BrowserTab.Selected.Reference.Verses;
          }
       }
 
@@ -126,13 +78,12 @@ namespace BibleBrowserUWP
 
       public MainPage()
       {
+         // Load previous tabs when the app opens
+         Application.Current.LeavingBackground += new LeavingBackgroundEventHandler(App_LeavingBackground);
+
          this.InitializeComponent();
          EraseText();
          HideAllDropdowns(); // Don't show Genesis 1
-         Theme = Theme;
-         
-         // Load previous tabs when the app opens
-         Application.Current.LeavingBackground += new LeavingBackgroundEventHandler(App_LeavingBackground);
 
          StyleTitleBar();
          cbDefaultVersion.SelectedItem = BibleVersion.DefaultVersion;
@@ -313,6 +264,7 @@ namespace BibleBrowserUWP
             BibleReference reference = BrowserTab.Selected.Reference;
             if (reference == null)
             {
+               btnCompare.IsEnabled = false;
                asbSearch.PlaceholderText = "Search or enter reference";
             }
             else
@@ -338,6 +290,7 @@ namespace BibleBrowserUWP
 
             if (reference == null)
             {
+               btnCompare.IsEnabled = false;
                ddbVersion.Visibility = Visibility.Collapsed;
                ddbBook.Visibility = Visibility.Collapsed;
                ddbChapter.Visibility = Visibility.Collapsed;
@@ -359,6 +312,7 @@ namespace BibleBrowserUWP
                ddbBook.Visibility = Visibility.Visible;
                ddbChapter.Visibility = Visibility.Visible;
 
+               btnCompare.IsEnabled = true;
                rtbVerses.Focus(FocusState.Programmatic); // Focus away from the search box
             }
          }
@@ -497,8 +451,22 @@ namespace BibleBrowserUWP
          // New tab, leave blank
          if (BrowserTab.Selected.Reference == null)
             return;
-         else
+         // Single version
+         else if (reference.ComparisonVersion == null)
+         {
+            gvCompareVerses.Visibility = Visibility.Collapsed;
+            rtbVerses.Visibility = Visibility.Visible;
             rtbVerses.Blocks.Add(reference.GetChapterTextFormatted());
+         }
+         // With comparison version
+         else
+         {
+            //rtbVerses.Visibility = Visibility.Collapsed;
+            //gvCompareVerses.Visibility = Visibility.Visible;
+            //gvCompareVerses.ItemsSource = null;
+
+            //gvCompareVerses.ItemsSource = reference.Verses;
+         }
       }
 
       private async void PickNewBibleAsync() // TODO
@@ -579,6 +547,7 @@ namespace BibleBrowserUWP
       private void BtnNewTab_Click(object sender, RoutedEventArgs e)
       {
          Tabs.Add(new BrowserTab());
+         btnCompare.IsEnabled = false;
          lvTabs.SelectedIndex = Tabs.Count - 1;
          asbSearch.Text = string.Empty;
          ActivateButtons();
@@ -593,7 +562,7 @@ namespace BibleBrowserUWP
       /// <summary>
       /// Close a tab.
       /// </summary>
-      private void BtnCloseTab_Click(object sender, RoutedEventArgs e)
+      private async void BtnCloseTab_Click(object sender, RoutedEventArgs e)
       {
          // There is still another tab to show when one is removed
          if (lvTabs.Items.Count >= 2)
@@ -618,6 +587,7 @@ namespace BibleBrowserUWP
          // There is no new tab to show; close the app
          else
          {
+            await BrowserTab.SaveOpenTabs();
             CoreApplication.Exit();
          }
 
@@ -945,10 +915,20 @@ namespace BibleBrowserUWP
       /// </summary>
       private void ToggleSwitch_Toggled(object sender, RoutedEventArgs e)
       {
-         if (((ToggleSwitch)sender).IsOn)
-            Theme = ElementTheme.Dark;
-         else
-            Theme = ElementTheme.Light;
+         // Set theme for window root.
+         if (Window.Current.Content is FrameworkElement frameworkElement)
+         {
+            if (((ToggleSwitch)sender).IsOn)
+            {
+               AppSettings.Theme = ElementTheme.Dark;
+               frameworkElement.RequestedTheme = ElementTheme.Dark;
+            }
+            else
+            {
+               AppSettings.Theme = ElementTheme.Light;
+               frameworkElement.RequestedTheme = ElementTheme.Light;
+            }
+         }
       }
    }
 }

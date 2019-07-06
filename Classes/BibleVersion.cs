@@ -9,7 +9,7 @@ using System.Xml;
 using System.Xml.Linq;
 using Windows.ApplicationModel;
 
-namespace BibleBrowser
+namespace BibleBrowserUWP
 {
    /// <summary>
    /// A summary of metadata and the document representing an XML Bible document.
