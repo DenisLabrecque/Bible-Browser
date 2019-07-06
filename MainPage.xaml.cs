@@ -85,6 +85,11 @@ namespace BibleBrowserUWP
          EraseText();
          HideAllDropdowns(); // Don't show Genesis 1
 
+         // Set theme for window root.
+         FrameworkElement root = (FrameworkElement)Window.Current.Content;
+         root.RequestedTheme = AppSettings.Theme;
+         SetThemeToggle(AppSettings.Theme);
+
          StyleTitleBar();
          cbDefaultVersion.SelectedItem = BibleVersion.DefaultVersion;
          // Ensure the text remains within the window size
@@ -92,6 +97,17 @@ namespace BibleBrowserUWP
 
          // Save tabs when the app closes
          Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
+      }
+
+      /// <summary>
+      /// Set the theme toggle to the correct position (off for the default theme, and on for the non-default).
+      /// </summary>
+      private void SetThemeToggle(ElementTheme theme)
+      {
+         if (theme == AppSettings.DEFAULTTHEME)
+            tglAppTheme.IsOn = false;
+         else
+            tglAppTheme.IsOn = true;
       }
 
       /// <summary>
@@ -148,13 +164,9 @@ namespace BibleBrowserUWP
       private void CoreTitleBar_IsVisibleChanged(CoreApplicationViewTitleBar sender, object args)
       {
          if (sender.IsVisible)
-         {
             grdTitleBar.Visibility = Visibility.Visible;
-         }
          else
-         {
             grdTitleBar.Visibility = Visibility.Collapsed;
-         }
       }
 
       private void CoreTitleBar_LayoutMetricsChanged(CoreApplicationViewTitleBar sender, object args)
@@ -911,23 +923,21 @@ namespace BibleBrowserUWP
 
 
       /// <summary>
-      /// Switch the app's theme between light mode and dark mode.
+      /// Switch the app's theme between light mode and dark mode, and save that setting.
       /// </summary>
       private void ToggleSwitch_Toggled(object sender, RoutedEventArgs e)
       {
-         // Set theme for window root.
-         if (Window.Current.Content is FrameworkElement frameworkElement)
+         FrameworkElement window = (FrameworkElement)Window.Current.Content;
+
+         if (((ToggleSwitch)sender).IsOn)
          {
-            if (((ToggleSwitch)sender).IsOn)
-            {
-               AppSettings.Theme = ElementTheme.Dark;
-               frameworkElement.RequestedTheme = ElementTheme.Dark;
-            }
-            else
-            {
-               AppSettings.Theme = ElementTheme.Light;
-               frameworkElement.RequestedTheme = ElementTheme.Light;
-            }
+            AppSettings.Theme = AppSettings.NONDEFLTHEME;
+            window.RequestedTheme = AppSettings.NONDEFLTHEME;
+         }
+         else
+         {
+            AppSettings.Theme = AppSettings.DEFAULTTHEME;
+            window.RequestedTheme = AppSettings.DEFAULTTHEME;
          }
       }
    }

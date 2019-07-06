@@ -741,8 +741,7 @@
                <Button Style="{StaticResource CommandButton}"
                        Name="btnCompare"
                        ToolTipService.ToolTip="Compare view"
-                       Click="BtnCompare_Click"
-                       Visibility="Collapsed">
+                       Click="BtnCompare_Click">
                   <Button.KeyboardAccelerators>
                   </Button.KeyboardAccelerators>
                   <FontIcon FontSize="15" Glyph="&#xF164;"/><!-- Explore content single -->
