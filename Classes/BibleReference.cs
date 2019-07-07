@@ -50,9 +50,9 @@ namespace BibleBrowserUWP
                for(int i = 0; i < versesI.Count; i++)
                {
                   if (i < versesJ.Count)
-                     verses.Add(new Verse(versesI[i], versesJ[i]));
+                     verses.Add(new Verse(versesI[i], versesJ[i], i + 1));
                   else
-                     verses.Add(new Verse(versesI[i]));
+                     verses.Add(new Verse(versesI[i], i + 1));
                }
             }
             else
@@ -60,11 +60,12 @@ namespace BibleBrowserUWP
                for (int i = 0; i < versesI.Count; i++)
                {
                   if (i < versesI.Count)
-                     verses.Add(new Verse(versesI[i], versesJ[i]));
+                     verses.Add(new Verse(versesI[i], versesJ[i], i + 1));
                   else
-                     verses.Add(new Verse(versesI[i]));
+                     verses.Add(new Verse(versesI[i], i + 1));
                }
             }
+
             return verses;
          }
       }
@@ -233,9 +234,8 @@ namespace BibleBrowserUWP
                if (i > 0) // Don't number verse 1
                {
                   Run number = new Run();
-                  number.Foreground = new SolidColorBrush((Color)Application.Current.Resources["SystemAccentColor"]);
+                  //number.Foreground = new SolidColorBrush((Color)Application.Current.Resources["SystemAccentColor"]);
                   number.FontSize = 12;
-                  number.CharacterSpacing = 20;
                   number.Text = " " + (i + 1).ToString() + Chars.NBSPACE;
                   paragraph.Inlines.Add(number);
                }

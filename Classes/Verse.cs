@@ -1,4 +1,5 @@
 ﻿using System;
+using Windows.UI.Xaml;
 
 namespace BibleBrowserUWP
 {
@@ -29,8 +30,14 @@ namespace BibleBrowserUWP
          get { return m_number; }
       }
 
+      public GridLength Width {
+         get {
+            return new GridLength(MainPage.VerseWidth);
+         }
+      }
+
       #endregion
-      
+
 
       #region Constructors
 
@@ -38,6 +45,7 @@ namespace BibleBrowserUWP
       {
          if (text != null)
             m_text = text;
+         m_number = number;
       }
 
       public Verse(string text, string compare, int number = 0)
@@ -46,6 +54,7 @@ namespace BibleBrowserUWP
             m_text = text;
          if (compare != null)
             m_compare = compare;
+         m_number = number;
       }
 
       #endregion

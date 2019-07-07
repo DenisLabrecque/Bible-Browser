@@ -71,6 +71,12 @@ namespace BibleBrowserUWP
          }
       }
 
+      // Set the text width on the main page
+      public static double VerseWidth {
+         get;
+         private set;
+      }
+
       #endregion
 
 
@@ -117,13 +123,18 @@ namespace BibleBrowserUWP
       {
          // Reduce the main text to fit within margins
          if (e.NewSize.Width < (2 * MINMARGIN) + MAXTEXTWIDTH)
-         {
             rtbVerses.Width = e.NewSize.Width - (2 * MINMARGIN);
-         }
          // The margins must increase to center the text
          else
-         {
             rtbVerses.Width = MAXTEXTWIDTH;
+
+         // Do the same for the compare view
+         if (e.NewSize.Width < (2 * MINMARGIN) + (2 * MAXTEXTWIDTH))
+            gvCompareVerses.Width = e.NewSize.Width - (2 * MINMARGIN);
+         else
+         {
+            rtbVerses.Width = MAXTEXTWIDTH * 2;
+            VerseWidth = (rtbVerses.Width / 2) - 12; // Half the verse number width
          }
 
          // Set the maximum width of the tab area
@@ -465,22 +476,11 @@ namespace BibleBrowserUWP
             return;
          // Single version
          else if (reference.ComparisonVersion == null)
+
          {
             gvCompareVerses.Visibility = Visibility.Collapsed;
             rtbVerses.Visibility = Visibility.Visible;
             rtbVerses.Blocks.Add(reference.GetChapterTextFormatted());
-
-            //try
-            //{
-            //   List<Verse> test = new List<Verse>()
-            //{
-            //   new Verse("verse text 1", "verse text 2"),
-            //   new Verse("verse text 3", "verse text 4")
-            //};
-            //}
-            //catch (Exception e) {
-            //   Debug.WriteLine(e.Message);
-            //}
          }
          // With comparison version
          else
@@ -493,6 +493,9 @@ namespace BibleBrowserUWP
          }
       }
 
+      /// <summary>
+      /// 
+      /// </summary>
       private async void PickNewBibleAsync() // TODO
       {
          var picker = new Windows.Storage.Pickers.FileOpenPicker();
