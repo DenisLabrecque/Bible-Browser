@@ -1,66 +1,51 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BibleBrowserUWP
 {
    /// <summary>
    /// Verse text in the Bible.
    /// </summary>
-   class Verse : INotifyPropertyChanged
+   class Verse
    {
-      #region Property Changed Implementation
+      #region Members
 
-      public event PropertyChangedEventHandler PropertyChanged;
-
-      // This method is called by the Set accessor of each property.  
-      // The CallerMemberName attribute that is applied to the optional propertyName  
-      // parameter causes the property name of the caller to be substituted as an argument.  
-      private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-      {
-         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-      }
+      private int m_number;
+      private string m_text = string.Empty;
+      private string m_compare = string.Empty;
 
       #endregion
-
 
       #region Properties
 
-      public string Text { get {
-            if (Text == null)
-               return string.Empty;
-            else
-               return Text;
-         }
-         set {
-            Text = value;
-         }
+      public string MainText {
+         get { return m_text; }
       }
-      public string ComparisonText {
-         get {
-            if (ComparisonText == null)
-               return string.Empty;
-            else
-               return ComparisonText;
-         }
-         set {
-            ComparisonText = value;
-         }
+
+      public string SecondText {
+         get { return m_compare; }
+      }
+
+      public int Number {
+         get { return m_number; }
       }
 
       #endregion
-
+      
 
       #region Constructors
 
-      public Verse(string plainText, string comparisonText = null)
+      public Verse(string text, int number = 0)
       {
-         Text = plainText;
-         ComparisonText = comparisonText;
+         if (text != null)
+            m_text = text;
+      }
+
+      public Verse(string text, string compare, int number = 0)
+      {
+         if (text != null)
+            m_text = text;
+         if (compare != null)
+            m_compare = compare;
       }
 
       #endregion
@@ -71,7 +56,7 @@ namespace BibleBrowserUWP
       /// <returns>This verse in plain text format.</returns>
       public override string ToString()
       {
-         return Text;
+         return m_text;
       }
    }
 }

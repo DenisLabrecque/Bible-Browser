@@ -663,35 +663,21 @@
                               <ColumnDefinition Width="*"/>
                               <ColumnDefinition Width="*"/>
                            </Grid.ColumnDefinitions>
-                           
-                           <TextBlock Text="1" Grid.Column="0" Width="30"/>
+
+                           <TextBlock Text="{x:Bind Number}" Grid.Column="0" Width="30"/>
                            <RichTextBlock Grid.Column="1" Margin="0,0,10,0" MaxWidth="300">
                               <Paragraph>
-                                 <!--<Run Text="{x:Bind Text}"/>-->
+                                 <Run Text="{x:Bind MainText}"/>
                               </Paragraph>
                            </RichTextBlock>
                            <RichTextBlock Grid.Column="2" Margin="10,0,0,0" MaxWidth="300">
                               <Paragraph>
-                                 <!--<Run Text="{x:Bind ComparisonText}"/>-->
+                                 <Run Text="{x:Bind SecondText}"/>
                               </Paragraph>
                            </RichTextBlock>
                         </Grid>
                      </DataTemplate>
                   </ListView.ItemTemplate>
-                  <RichTextBlock Name="rtbVersesLeft"
-                              MaxWidth="600"
-                              MinWidth="300"
-                              FontFamily="/Assets/Fonts/Roboto.ttf#Roboto Slab"
-                              FontSize="16"
-                              LineHeight="25"
-                              TextWrapping="WrapWholeWords"
-                              TextAlignment="Left"
-                              HorizontalAlignment="Stretch"
-                              VerticalAlignment="Stretch">
-                     <Paragraph>Quisque diam erat, suscipit at purus non, bibendum molestie urna. Mauris pulvinar mauris lectus, vel pellentesque orci ultrices quis. Nam aliquam, libero in pharetra rhoncus, arcu orci vestibulum sapien, sit amet cursus nisi lectus vitae turpis. Pellentesque tempus ligula non metus maximus, ac feugiat felis facilisis. Sed ut lorem ligula. In hac habitasse platea dictumst. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Phasellus nec tristique neque. Maecenas eu tincidunt arcu. Sed tempor, nibh sit amet vehicula finibus, elit ligula ultrices dui, nec tincidunt eros erat sit amet lorem. Donec posuere sagittis velit. Nulla facilisi. Donec tempor, velit ac pulvinar convallis, dui erat ultricies odio, non imperdiet diam magna vitae ex. Quisque auctor hendrerit elementum. Quisque quis eros finibus leo commodo sodales id ut tellus. Donec suscipit eget felis sed sodales.</Paragraph>
-                     <Paragraph>Nam sed convallis arcu, a tempor ex. Curabitur ut ante a massa fermentum tristique eu vitae nisi. Donec et lectus nec mauris pellentesque pellentesque eu nec tellus. Maecenas fermentum ullamcorper condimentum. Pellentesque ut blandit eros. Pellentesque ornare volutpat erat ut commodo. Nam ut ultricies tellus, vitae tristique ex. Aenean varius blandit ipsum, quis sollicitudin purus interdum tincidunt. Phasellus a odio lacus. In at libero nec lacus vulputate iaculis.</Paragraph>
-                     <Paragraph>Donec semper pulvinar turpis, ut ullamcorper metus vehicula at. Donec consectetur sed ex ac semper. Aenean et nulla turpis. Praesent orci leo, gravida rutrum finibus id, porttitor quis ligula. Donec nec lectus sit amet lectus tempus faucibus vel sit amet est. Mauris eu nulla non purus sollicitudin consequat. Sed et ligula a mauris gravida scelerisque at et sapien. Fusce id dictum metus, nec bibendum nunc. Nunc erat erat, bibendum sit amet aliquet id, gravida vel magna. In cursus ex eget leo congue pharetra. Vivamus vitae mattis risus. Nullam condimentum eros dolor. Aliquam fermentum varius libero nec aliquam. Praesent ac enim vitae enim egestas maximus. Etiam non nisl vitae sapien gravida commodo.</Paragraph>
-                  </RichTextBlock>
                </ListView>
             </StackPanel>
          </ScrollViewer>

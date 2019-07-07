@@ -41,30 +41,34 @@ namespace BibleBrowserUWP
       /// </summary>
       public List<Verse> Verses {
          get {
-            List<Verse> verses = new List<Verse>();
-            List<string> versesI = Version.GetChapterVerses(this);
-            List<string> versesJ = Version.GetChapterVerses(this);
+            List<Verse> verses = new List<Verse>()
+            {
+               new Verse("Denis", "Coralie"),
+               new Verse("Yann", "Katalin")
+            };
+            //List<string> versesI = Version.GetChapterVerses(this);
+            //List<string> versesJ = Version.GetChapterVerses(this);
 
-            if(versesI.Count > versesJ.Count)
-            {
-               for(int i = 0; i < versesI.Count; i++)
-               {
-                  if (i < versesJ.Count)
-                     verses.Add(new Verse(versesI[i], versesJ[i]));
-                  else
-                     verses.Add(new Verse(versesI[i]));
-               }
-            }
-            else
-            {
-               for (int i = 0; i < versesI.Count; i++)
-               {
-                  if (i < versesI.Count)
-                     verses.Add(new Verse(versesI[i], versesJ[i]));
-                  else
-                     verses.Add(new Verse(versesI[i]));
-               }
-            }
+            //if(versesI.Count > versesJ.Count)
+            //{
+            //   for(int i = 0; i < versesI.Count; i++)
+            //   {
+            //      if (i < versesJ.Count)
+            //         verses.Add(new Verse(versesI[i], versesJ[i]));
+            //      else
+            //         verses.Add(new Verse(versesI[i]));
+            //   }
+            //}
+            //else
+            //{
+            //   for (int i = 0; i < versesI.Count; i++)
+            //   {
+            //      if (i < versesI.Count)
+            //         verses.Add(new Verse(versesI[i], versesJ[i]));
+            //      else
+            //         verses.Add(new Verse(versesI[i]));
+            //   }
+            //}
             return verses;
          }
       }

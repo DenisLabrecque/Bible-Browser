@@ -469,15 +469,27 @@ namespace BibleBrowserUWP
             gvCompareVerses.Visibility = Visibility.Collapsed;
             rtbVerses.Visibility = Visibility.Visible;
             rtbVerses.Blocks.Add(reference.GetChapterTextFormatted());
+
+            //try
+            //{
+            //   List<Verse> test = new List<Verse>()
+            //{
+            //   new Verse("verse text 1", "verse text 2"),
+            //   new Verse("verse text 3", "verse text 4")
+            //};
+            //}
+            //catch (Exception e) {
+            //   Debug.WriteLine(e.Message);
+            //}
          }
          // With comparison version
          else
          {
-            //rtbVerses.Visibility = Visibility.Collapsed;
-            //gvCompareVerses.Visibility = Visibility.Visible;
-            //gvCompareVerses.ItemsSource = null;
+            rtbVerses.Visibility = Visibility.Collapsed;
+            gvCompareVerses.Visibility = Visibility.Visible;
 
-            //gvCompareVerses.ItemsSource = reference.Verses;
+            gvCompareVerses.ItemsSource = null;
+            gvCompareVerses.ItemsSource = reference.Verses;
          }
       }
 

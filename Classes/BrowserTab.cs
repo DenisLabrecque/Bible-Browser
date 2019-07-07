@@ -211,18 +211,6 @@ namespace BibleBrowserUWP
       #region Constructor
 
       /// <summary>
-      /// Static constructor.
-      /// List browser tabs that were open in the past.
-      /// </summary>
-      static BrowserTab()
-      {
-         // Default view before the previous tabs are restored from memory
-         // We do this because it's impossible to call an async operation (read stored XML) from a static method.
-         //Tabs.Add(new BrowserTab());
-         //Task.Run(() => LoadSavedTabs()).Wait();
-      }
-
-      /// <summary>
       /// Create a new browser tab with the default <c>BibleReference</c>.
       /// </summary>
       public BrowserTab(BibleReference reference)
