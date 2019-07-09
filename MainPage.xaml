@@ -44,6 +44,9 @@
                      <VisualStateManager.VisualStateGroups>
                         <VisualStateGroup x:Name="CommonStates">
                            <VisualState x:Name="Normal">
+                              <VisualState.Setters>
+                                 <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource ButtonColour}" />
+                              </VisualState.Setters>
 
                               <Storyboard>
                                  <PointerUpThemeAnimation Storyboard.TargetName="RootGrid" />
@@ -55,7 +58,7 @@
                                  <Setter Target="RootGrid.(RevealBrush.State)" Value="PointerOver" />
                                  <Setter Target="RootGrid.Background" Value="{ThemeResource ButtonRevealBackgroundPointerOver}" />
                                  <Setter Target="ContentPresenter.BorderBrush" Value="{ThemeResource ButtonRevealBorderBrushPointerOver}" />
-                                 <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource ButtonForegroundPointerOver}" />
+                                 <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource ButtonColour}" />
                               </VisualState.Setters>
 
                               <Storyboard>
@@ -68,7 +71,7 @@
                                  <Setter Target="RootGrid.(RevealBrush.State)" Value="Pressed" />
                                  <Setter Target="RootGrid.Background" Value="{ThemeResource ButtonRevealBackgroundPressed}" />
                                  <Setter Target="ContentPresenter.BorderBrush" Value="{ThemeResource ButtonRevealBorderBrushPressed}" />
-                                 <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource ButtonForegroundPressed}" />
+                                 <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource ButtonColour}" />
                               </VisualState.Setters>
 
                               <Storyboard>
@@ -80,7 +83,7 @@
                               <VisualState.Setters>
                                  <Setter Target="RootGrid.Background" Value="Transparent" />
                                  <Setter Target="ContentPresenter.BorderBrush" Value="{ThemeResource ButtonRevealBorderBrushDisabled}" />
-                                 <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource ButtonForegroundDisabled}" />
+                                 <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource DisabledButtonColour}" />
                               </VisualState.Setters>
                            </VisualState>
 
@@ -100,7 +103,7 @@
       <Style x:Key="TabBarButton" TargetType="Button" BasedOn="{StaticResource CommandButton}">
          <Setter Property="Height" Value="30"/>
          <Setter Property="Width" Value="35"/>
-         <Setter Property="Foreground" Value="{ThemeResource ReceptusLighGrey}"/>
+         <Setter Property="Foreground" Value="{ThemeResource ButtonColour}"/>
          <Setter Property="Template">
             <Setter.Value>
                <ControlTemplate TargetType="Button">
@@ -119,7 +122,7 @@
                                  <Setter Target="RootGrid.(RevealBrush.State)" Value="PointerOver" />
                                  <Setter Target="RootGrid.Background" Value="{ThemeResource ButtonRevealBackgroundPointerOver}" />
                                  <Setter Target="ContentPresenter.BorderBrush" Value="{ThemeResource ButtonRevealBorderBrushPointerOver}" />
-                                 <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource ReceptusLight}" />
+                                 <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource ButtonColour}" />
                               </VisualState.Setters>
 
                               <Storyboard>
@@ -132,7 +135,7 @@
                                  <Setter Target="RootGrid.(RevealBrush.State)" Value="Pressed" />
                                  <Setter Target="RootGrid.Background" Value="{ThemeResource ButtonRevealBackgroundPressed}" />
                                  <Setter Target="ContentPresenter.BorderBrush" Value="{ThemeResource ButtonRevealBorderBrushPressed}" />
-                                 <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource ReceptusLight}" />
+                                 <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource ButtonColour}" />
                               </VisualState.Setters>
 
                               <Storyboard>
@@ -144,7 +147,7 @@
                               <VisualState.Setters>
                                  <Setter Target="RootGrid.Background" Value="Transparent" />
                                  <Setter Target="ContentPresenter.BorderBrush" Value="{ThemeResource ButtonRevealBorderBrushDisabled}" />
-                                 <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource ButtonForegroundDisabled}" />
+                                 <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource DisabledButtonColour}" />
                               </VisualState.Setters>
                            </VisualState>
 
@@ -160,13 +163,14 @@
          </Setter>
       </Style>
 
+      <!-- Close tab button -->
       <Style x:Key="TabCloseButton" TargetType="Button">
          <Setter Property="Height" Value="34"/>
          <Setter Property="Width" Value="28"/>
          <Setter Property="Margin" Value="1"/>
          <Setter Property="BorderThickness" Value="0"/>
          <Setter Property="Background" Value="Transparent"/>
-         <Setter Property="Foreground" Value="{ThemeResource ReceptusGrey}"/>
+         <Setter Property="Foreground" Value="{ThemeResource ButtonColour}"/>
       </Style>
 
       <!-- A tab -->
@@ -174,7 +178,7 @@
          <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}"/>
          <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}"/>
          <Setter Property="Background" Value="{ThemeResource ListViewItemBackground}"/>
-         <Setter Property="Foreground" Value="{ThemeResource ReceptusLighGrey}"/>
+         <Setter Property="Foreground" Value="{ThemeResource ButtonColour}"/>
          <Setter Property="TabNavigation" Value="Local"/>
          <Setter Property="IsHoldingEnabled" Value="True"/>
          <Setter Property="HorizontalContentAlignment" Value="Left"/>
@@ -219,7 +223,11 @@
                      <VisualStateManager.VisualStateGroups>
                         <VisualStateGroup x:Name="CommonStates">
                            <VisualState x:Name="Normal"/>
-                           <VisualState x:Name="Selected"/>
+                           <VisualState x:Name="Selected">
+                              <VisualState.Setters>
+                                 <Setter Target="Root.Foreground" Value="{ThemeResource ButtonColour}"/>
+                              </VisualState.Setters>
+                           </VisualState>
                            <VisualState x:Name="PointerOver">
                               <VisualState.Setters>
                                  <Setter Target="Root.(RevealBrush.State)" Value="PointerOver"/>
@@ -248,6 +256,7 @@
                               <VisualState.Setters>
                                  <Setter Target="Root.(RevealBrush.State)" Value="Pressed"/>
                                  <Setter Target="Root.RevealBorderBrush" Value="{ThemeResource ListViewItemRevealBorderBrushPressed}"/>
+                                 <Setter Target="Root.Foreground" Value="{ThemeResource ButtonColour}"/>
                               </VisualState.Setters>
                            </VisualState>
                         </VisualStateGroup>
@@ -265,6 +274,7 @@
             </Setter.Value>
          </Setter>
       </Style>
+      
       <Style x:Key="TabListViewItemContainer" BasedOn="{StaticResource ListViewItemRevealStyle}" TargetType="ListViewItem"/>
       
       <Style x:Key="BrowserSearchTextBox" TargetType="TextBox">
@@ -529,8 +539,7 @@
 
       <!-- Official title bar (must be defined in code for the custom title bar) -->
       <!-- Any child of this won't be clickable, so I don't use it (it would be good for styling the background if wanted) -->
-      <Grid x:Name="grdTitleBar"
-            Background="Transparent">
+      <Grid x:Name="grdTitleBar">
          <!-- Width of the padding columns is set in LayoutMetricsChanged handler. -->
          <!-- Using padding columns instead of Margin ensures that the background
               paints the area under the caption control buttons (for transparent buttons). -->
@@ -605,7 +614,7 @@
 
             <!-- New Tab Button -->
             <Button Name="btnNewTab"
-                    Style="{StaticResource TabBarButton}"
+                    Style="{ThemeResource TabBarButton}"
                     ToolTipService.ToolTip="New tab (Ctrl+T)"
                     Click="BtnNewTab_Click">
                <FontIcon FontSize="15" Glyph="&#xE710;"/>

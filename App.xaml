@@ -19,18 +19,20 @@
             <ResourceDictionary x:Key="Light">
                <!-- Override the accent colour -->
                <Color x:Key="SystemAccentColor">#E23F47</Color>
-               <Color x:Key="AppBarBackgroundThemeBrush">#7FA1AB</Color>
-               
+               <Color x:Key="AppBarBackgroundThemeBrush">#FF749099</Color>
+
                <SolidColorBrush x:Key="ReceptusRed" Color="#E23F47"/>
                <SolidColorBrush x:Key="ReceptusGrey" Color="#7FA1AB"/>
                <SolidColorBrush x:Key="ReceptusLight" Color="#F2F2F2"/>
                <SolidColorBrush x:Key="ReceptusLighGrey" Color="#D3DBDE"/>
-               
+               <SolidColorBrush x:Key="ButtonColour" Color="White"/>
+               <SolidColorBrush x:Key="DisabledButtonColour" Color="#FF99BCC7"/>
+
                <AcrylicBrush x:Key="ReceptusAcrylicMutedWindow"
                              BackgroundSource="HostBackdrop"
-                             TintColor="#7FA1AB"
+                             TintColor="#FF749099"
                              TintOpacity="0.4"
-                             FallbackColor="#7FA1AB"/>
+                             FallbackColor="#FF749099"/>
                <AcrylicBrush x:Key="ReceptusAcrylicAccentWindow"
                              BackgroundSource="HostBackdrop"
                              TintColor="#E23F47"
@@ -58,8 +60,10 @@
                
                <SolidColorBrush x:Key="ReceptusRed" Color="#F2F2F2"/>
                <SolidColorBrush x:Key="ReceptusGrey" Color="#F2F2F2"/>
-               <SolidColorBrush x:Key="ReceptusLight" Color="#CC0D0A0A"/>
+               <SolidColorBrush x:Key="ReceptusLight" Color="Black"/>
                <SolidColorBrush x:Key="ReceptusLighGrey" Color="#D3DBDE"/>
+               <SolidColorBrush x:Key="ButtonColour" Color="WhiteSmoke"/>
+               <SolidColorBrush x:Key="DisabledButtonColour" Color="#FF99BCC7"/>
                
                <AcrylicBrush x:Key="ReceptusAcrylicMutedWindow"
                              BackgroundSource="HostBackdrop"
@@ -68,9 +72,9 @@
                              FallbackColor="#7FA1AB"/>
                <AcrylicBrush x:Key="ReceptusAcrylicAccentWindow"
                              BackgroundSource="HostBackdrop"
-                             TintColor="#D8460202"
-                             TintOpacity="0.3"
-                             FallbackColor="#E58B0000"/>
+                             TintColor="Black"
+                             TintOpacity="0.9"
+                             FallbackColor="Black"/>
                <AcrylicBrush x:Key="ReceptusLightAcrylicElement"
                              BackgroundSource="Backdrop"
                              TintColor="#7FA1AB"

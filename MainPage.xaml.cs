@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Core;
+using Windows.Devices.Input;
 using Windows.Media.SpeechSynthesis;
 using Windows.Storage;
 using Windows.UI;
@@ -75,6 +76,13 @@ namespace BibleBrowserUWP
       public static double VerseWidth {
          get;
          private set;
+      }
+
+      public static bool IsKeyboardAttached {
+         get {
+            KeyboardCapabilities keyboardCapabilities = new Windows.Devices.Input.KeyboardCapabilities();
+            return keyboardCapabilities.KeyboardPresent == 0 ? false : true;
+         }
       }
 
       #endregion
@@ -578,7 +586,9 @@ namespace BibleBrowserUWP
          lvTabs.SelectedIndex = Tabs.Count - 1;
          asbSearch.Text = string.Empty;
          ActivateButtons();
-         asbSearch.Focus(FocusState.Programmatic);
+
+         if(IsKeyboardAttached)
+            asbSearch.Focus(FocusState.Programmatic);
       }
 
       private void MfiAddBible_Click(object sender, RoutedEventArgs e)
