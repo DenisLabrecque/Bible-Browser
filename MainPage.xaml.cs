@@ -45,6 +45,7 @@ namespace BibleBrowserUWP
 
       bool m_isPlaybackStarted = false;
       bool m_areTabsLoaded = false;
+      private BibleReference m_previousReference = new BibleReference(BibleVersion.DefaultVersion);
 
       #endregion
 
@@ -73,15 +74,35 @@ namespace BibleBrowserUWP
       }
 
       // Set the text width on the main page
-      public static double VerseWidth {
-         get;
-         private set;
+      //public static double VerseWidth {
+      //   get {
+      //      this.WindowWidth
+      //   }
+      //   private set;
+      //}
+
+      public double WindowWidth {
+         get {
+            return root.Width;
+         }
       }
 
+      /// <summary>
+      /// Determine whether the user has a keyboard, or is using touchscreen only (for tablets).
+      /// </summary>
       public static bool IsKeyboardAttached {
          get {
-            KeyboardCapabilities keyboardCapabilities = new Windows.Devices.Input.KeyboardCapabilities();
-            return keyboardCapabilities.KeyboardPresent == 0 ? false : true;
+            KeyboardCapabilities keyboardCapabilities = new KeyboardCapabilities();
+            if(keyboardCapabilities.KeyboardPresent == 0)
+            {
+               Debug.WriteLine("Keyboard not found.");
+               return false;
+            }
+            else
+            {
+               Debug.WriteLine("Keyboard present.");
+               return true;
+            }
          }
       }
 
@@ -129,20 +150,13 @@ namespace BibleBrowserUWP
       /// </summary>
       private void MainPage_SizeChanged(object sender, SizeChangedEventArgs e)
       {
-         // Reduce the main text to fit within margins
-         if (e.NewSize.Width < (2 * MINMARGIN) + MAXTEXTWIDTH)
-            rtbVerses.Width = e.NewSize.Width - (2 * MINMARGIN);
-         // The margins must increase to center the text
-         else
-            rtbVerses.Width = MAXTEXTWIDTH;
-
          // Do the same for the compare view
          if (e.NewSize.Width < (2 * MINMARGIN) + (2 * MAXTEXTWIDTH))
             gvCompareVerses.Width = e.NewSize.Width - (2 * MINMARGIN);
          else
          {
-            rtbVerses.Width = MAXTEXTWIDTH * 2;
-            VerseWidth = (rtbVerses.Width / 2) - 12; // Half the verse number width
+            //rtbVerses.Width = MAXTEXTWIDTH * 2;
+            //VerseWidth = (rtbVerses.Width / 2) - 12; // Half the verse number width
          }
 
          // Set the maximum width of the tab area
@@ -322,8 +336,15 @@ namespace BibleBrowserUWP
             if (reference == null)
             {
                btnCompare.IsEnabled = false;
-               ddbVersion.Visibility = Visibility.Collapsed;
-               ddbBook.Visibility = Visibility.Collapsed;
+
+               gvBooks.ItemsSource = m_previousReference.Version.BookNames;
+               gvChapters.ItemsSource = m_previousReference.Chapters;
+
+               asbSearch.Text = string.Empty;
+               asbSearch.PlaceholderText = string.Empty;
+
+               ddbVersion.Visibility = Visibility.Visible;
+               ddbBook.Visibility = Visibility.Visible;
                ddbChapter.Visibility = Visibility.Collapsed;
             }
             else
@@ -344,7 +365,7 @@ namespace BibleBrowserUWP
                ddbChapter.Visibility = Visibility.Visible;
 
                btnCompare.IsEnabled = true;
-               rtbVerses.Focus(FocusState.Programmatic); // Focus away from the search box
+               //rtbVerses.Focus(FocusState.Programmatic); // Focus away from the search box
             }
          }
       }
@@ -484,16 +505,19 @@ namespace BibleBrowserUWP
             return;
          // Single version
          else if (reference.ComparisonVersion == null)
-
          {
-            gvCompareVerses.Visibility = Visibility.Collapsed;
-            rtbVerses.Visibility = Visibility.Visible;
-            rtbVerses.Blocks.Add(reference.GetChapterTextFormatted());
+            //rtbVerses.Visibility = Visibility.Collapsed;
+            gvCompareVerses.Visibility = Visibility.Visible;
+
+            gvCompareVerses.ItemsSource = null;
+            gvCompareVerses.ItemsSource = reference.Verses;
+
+            //rtbVerses.Blocks.Add(reference.GetChapterTextFormatted());
          }
          // With comparison version
          else
          {
-            rtbVerses.Visibility = Visibility.Collapsed;
+            //rtbVerses.Visibility = Visibility.Collapsed;
             gvCompareVerses.Visibility = Visibility.Visible;
 
             gvCompareVerses.ItemsSource = null;
@@ -528,7 +552,7 @@ namespace BibleBrowserUWP
       /// </summary>
       private void EraseText()
       {
-         rtbVerses.Blocks.Clear();
+         //rtbVerses.Blocks.Clear();
       }
 
       #endregion
@@ -581,14 +605,18 @@ namespace BibleBrowserUWP
       /// </summary>
       private void BtnNewTab_Click(object sender, RoutedEventArgs e)
       {
+         if(BrowserTab.Selected != null && BrowserTab.Selected.Reference != null)
+            m_previousReference = BrowserTab.Selected.Reference;
          Tabs.Add(new BrowserTab());
          btnCompare.IsEnabled = false;
          lvTabs.SelectedIndex = Tabs.Count - 1;
          asbSearch.Text = string.Empty;
          ActivateButtons();
+         ShowAllDropdowns();
 
-         if(IsKeyboardAttached)
-            asbSearch.Focus(FocusState.Programmatic);
+         //if(IsKeyboardAttached)
+         //   asbSearch.Focus(FocusState.Programmatic); // TODO this seem to always execute
+         //                                                  regardless of being in tablet mode without keyboard
       }
 
       private void MfiAddBible_Click(object sender, RoutedEventArgs e)
@@ -665,7 +693,7 @@ namespace BibleBrowserUWP
 
             if(reference == null)
             {
-               asbSearch.Focus(FocusState.Programmatic); // Focus autohides all dropdowns
+               //asbSearch.Focus(FocusState.Programmatic); // Focus autohides all dropdowns // TODO this causes problems on tablets
                PrintChapter(null);
             }
             else
@@ -717,8 +745,19 @@ namespace BibleBrowserUWP
          string book = (string)e.ClickedItem;
 
          // Go to the book in the present reference
-         BibleVersion version = BrowserTab.Selected.Reference.Version;
-         BibleReference reference = new BibleReference(version, BibleReference.StringToBook(book, version));
+         BibleVersion version;
+         BibleReference reference;
+         if (BrowserTab.Selected.Reference != null) // This tab is already open
+         {
+            version = BrowserTab.Selected.Reference.Version;
+            reference = new BibleReference(version, BibleReference.StringToBook(book, version));
+         }
+         // A new tab has a null reference, but the user may be seeing dropdowns relating to the previous reference;
+         // this is desirable because it gives him a default starting point for his new tab when using the touchscreen.
+         else
+         {
+            reference = m_previousReference;
+         }
          BrowserTab.Selected.GoToReference(ref reference, BrowserTab.NavigationMode.Add);
 
          flyBook.Hide();
@@ -964,6 +1003,16 @@ namespace BibleBrowserUWP
             AppSettings.Theme = AppSettings.DEFAULTTHEME;
             window.RequestedTheme = AppSettings.DEFAULTTHEME;
          }
+      }
+
+      private void BtnLeftPage_Click(object sender, RoutedEventArgs e)
+      {
+         PreviousChapter();
+      }
+
+      private void BtnRightPage_Click(object sender, RoutedEventArgs e)
+      {
+         NextChapter();
       }
    }
 }

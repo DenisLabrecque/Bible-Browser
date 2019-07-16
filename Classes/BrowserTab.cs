@@ -137,6 +137,8 @@ namespace BibleBrowserUWP
 
       #region Properties
 
+      public bool IsNewTab { get; private set; }
+
       /// <summary>
       /// A list of the current and previous references visited under this tab.
       /// The last item is most recently viewed.
@@ -154,6 +156,20 @@ namespace BibleBrowserUWP
             else
                //throw new Exception("Reference is null");
                return null;
+         }
+      }
+
+      /// <summary>
+      /// The reference this tab is at, or a new tab appelation.
+      /// </summary>
+      public string TabName {
+         get {
+            if(IsNewTab)
+               return "New tab";
+            else
+            {
+               return Reference.BookName + " " + Reference.Chapter;
+            }
          }
       }
 
@@ -211,24 +227,37 @@ namespace BibleBrowserUWP
       #region Constructor
 
       /// <summary>
-      /// Create a new browser tab with the default <c>BibleReference</c>.
+      /// Create a custom browser tab.
+      /// </summary>
+      public BrowserTab(BibleReference reference, bool isNewTab)
+      {
+         Worker(reference, IsNewTab);
+      }
+
+      /// <summary>
+      /// Create a pre-existing browser tab.
       /// </summary>
       public BrowserTab(BibleReference reference)
       {
-         if(reference == null)
+         Worker(reference, false);
+      }
+
+      /// <summary>
+      /// Create a new tab with the default reference.
+      /// </summary>
+      public BrowserTab()
+      {
+         Worker(BibleReference.Default, true);
+      }
+
+      private void Worker(BibleReference reference, bool isNewTab)
+      {
+         if (reference == null)
             throw new ArgumentNullException("A new browser tab without a reference should be created with the overloaded constructor.");
          else
             History.Add(reference);
          Guid = Guid.NewGuid();
-      }
-
-      /// <summary>
-      /// Create a new blank browser tab.
-      /// </summary>
-      public BrowserTab()
-      {
-         // Do not add anything to history yet.
-         Guid = Guid.NewGuid();
+         IsNewTab = IsNewTab;
       }
 
       #endregion

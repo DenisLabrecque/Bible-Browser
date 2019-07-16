@@ -37,32 +37,55 @@ namespace BibleBrowserUWP
       public string SimplifiedReference { get => BookName + " " + Chapter; } // Book name and chapter
 
       /// <summary>
+      /// The default Bible reference.
+      /// </summary>
+      public static BibleReference Default {
+         get {
+            return new BibleReference(BibleVersion.DefaultVersion);
+         }
+      }
+
+      /// <summary>
       /// This chapter's verses.
       /// </summary>
       public List<Verse> Verses {
          get {
             List<Verse> verses = new List<Verse>();
-            List<string> versesI = Version.GetChapterVerses(this);
-            List<string> versesJ = ComparisonVersion.GetChapterVerses(this);
 
-            if(versesI.Count > versesJ.Count)
+            // Single version
+            if (ComparisonVersion == null)
             {
-               for(int i = 0; i < versesI.Count; i++)
+               List<string> texts = Version.GetChapterVerses(this);
+               for (int i = 0; i < texts.Count; i++)
                {
-                  if (i < versesJ.Count)
-                     verses.Add(new Verse(versesI[i], versesJ[i], i + 1));
-                  else
-                     verses.Add(new Verse(versesI[i], i + 1));
+                  verses.Add(new Verse(texts[i], i + 1));
                }
             }
+            // Two version
             else
             {
-               for (int i = 0; i < versesI.Count; i++)
+               List<string> textsI = Version.GetChapterVerses(this);
+               List<string> textsJ = ComparisonVersion.GetChapterVerses(this);
+
+               if (textsI.Count > textsJ.Count)
                {
-                  if (i < versesI.Count)
-                     verses.Add(new Verse(versesI[i], versesJ[i], i + 1));
-                  else
-                     verses.Add(new Verse(versesI[i], i + 1));
+                  for (int i = 0; i < textsI.Count; i++)
+                  {
+                     if (i < textsJ.Count)
+                        verses.Add(new Verse(textsI[i], textsJ[i], i + 1));
+                     else
+                        verses.Add(new Verse(textsI[i], i + 1));
+                  }
+               }
+               else
+               {
+                  for (int i = 0; i < textsI.Count; i++)
+                  {
+                     if (i < textsI.Count)
+                        verses.Add(new Verse(textsI[i], textsJ[i], i + 1));
+                     else
+                        verses.Add(new Verse(textsI[i], i + 1));
+                  }
                }
             }
 

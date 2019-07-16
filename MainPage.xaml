@@ -5,6 +5,7 @@
    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
    xmlns:local1="using:BibleBrowserUWP"
+   xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
    mc:Ignorable="d"
    Background="{ThemeResource ReceptusAcrylicAccentWindow}" FontFamily="Segoe MDL2 Assets"
    Name="root">
@@ -274,9 +275,9 @@
             </Setter.Value>
          </Setter>
       </Style>
-      
+
       <Style x:Key="TabListViewItemContainer" BasedOn="{StaticResource ListViewItemRevealStyle}" TargetType="ListViewItem"/>
-      
+
       <Style x:Key="BrowserSearchTextBox" TargetType="TextBox">
          <Setter Property="Foreground" Value="{ThemeResource TextControlForeground}"/>
          <Setter Property="Background" Value="Transparent"/>
@@ -520,26 +521,28 @@
          <Setter Property="HorizontalAlignment" Value="Stretch"/>
          <Setter Property="VerticalAlignment" Value="Stretch"/>
       </Style>
-      
+
       <!-- Verse numbers -->
       <Style x:Key="VerseNumber" TargetType="RichTextBlock">
          <Setter Property="Foreground" Value="{ThemeResource SystemColorHighlightTextBrush}"/>
          <Setter Property="FontSize" Value="16"/>
       </Style>
    </Page.Resources>
-   
 
 
-   <Grid Background="Transparent">
+
+   <Grid Background="Transparent"
+         Name="grdWindowRoot">
       <Grid.RowDefinitions>
-         <RowDefinition Height="Auto"/><!-- Title bar -->
-         <RowDefinition /><!-- Main content -->
+         <RowDefinition Height="Auto"/>
+         <!-- Title bar -->
+         <RowDefinition />
+         <!-- Main content -->
       </Grid.RowDefinitions>
 
 
       <!-- Official title bar (must be defined in code for the custom title bar) -->
-      <!-- Any child of this won't be clickable, so I don't use it (it would be good for styling the background if wanted) -->
-      <Grid x:Name="grdTitleBar">
+      <Grid x:Name="grdTitleBar" Background="Transparent">
          <!-- Width of the padding columns is set in LayoutMetricsChanged handler. -->
          <!-- Using padding columns instead of Margin ensures that the background
               paints the area under the caption control buttons (for transparent buttons). -->
@@ -554,11 +557,13 @@
       <Grid>
          <Grid.ColumnDefinitions>
             <ColumnDefinition x:Name="cdLeftPadding" Width="0"/>
-            <ColumnDefinition Width="Auto"/><!-- Width of the tabs and buttons -->
-            <ColumnDefinition Width="1*"/><!-- Stretch area -->
+            <ColumnDefinition Width="Auto"/>
+            <!-- Width of the tabs and buttons -->
+            <ColumnDefinition Width="1*"/>
+            <!-- Stretch area -->
             <ColumnDefinition x:Name="cdRightPadding" Width="0"/>
          </Grid.ColumnDefinitions>
-         
+
          <!-- Left padding -->
          <StackPanel Orientation="Horizontal"
                      Grid.Column="0"/>
@@ -638,39 +643,19 @@
             <RowDefinition Height="1*"/>
          </Grid.RowDefinitions>
 
-         <ScrollViewer Grid.Row="0"
+         <ScrollViewer Name="svPageScroller"
+                       Grid.Row="0"
                        Grid.Column="0"
                        Margin="0,0,0,0"
-                       HorizontalScrollMode="Disabled"
+                       HorizontalScrollMode="Enabled"
                        HorizontalScrollBarVisibility="Hidden"
                        VerticalScrollBarVisibility="Hidden">
             <StackPanel>
 
-               <!-- Single reference -->
-               <Grid Name="grdSingleColumnVerses"
-                     Padding="0,80,0,90">
-                  <Grid.ColumnDefinitions>
-                     <ColumnDefinition/>
-                  </Grid.ColumnDefinitions>
-                  <Grid.RowDefinitions>
-                     <RowDefinition Height="1*"/>
-                  </Grid.RowDefinitions>
-                  <RichTextBlock Name="rtbVerses"
-                                 Style="{ThemeResource ReadableText}"
-                                 MaxWidth="600"
-                                 MinWidth="300">
-                     <Paragraph>Quisque diam erat, suscipit at purus non, bibendum molestie urna. Mauris pulvinar mauris lectus, vel pellentesque orci ultrices quis. Nam aliquam, libero in pharetra rhoncus, arcu orci vestibulum sapien, sit amet cursus nisi lectus vitae turpis. Pellentesque tempus ligula non metus maximus, ac feugiat felis facilisis. Sed ut lorem ligula. In hac habitasse platea dictumst. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Phasellus nec tristique neque. Maecenas eu tincidunt arcu. Sed tempor, nibh sit amet vehicula finibus, elit ligula ultrices dui, nec tincidunt eros erat sit amet lorem. Donec posuere sagittis velit. Nulla facilisi. Donec tempor, velit ac pulvinar convallis, dui erat ultricies odio, non imperdiet diam magna vitae ex. Quisque auctor hendrerit elementum. Quisque quis eros finibus leo commodo sodales id ut tellus. Donec suscipit eget felis sed sodales.</Paragraph>
-                     <Paragraph>Nam sed convallis arcu, a tempor ex. Curabitur ut ante a massa fermentum tristique eu vitae nisi. Donec et lectus nec mauris pellentesque pellentesque eu nec tellus. Maecenas fermentum ullamcorper condimentum. Pellentesque ut blandit eros. Pellentesque ornare volutpat erat ut commodo. Nam ut ultricies tellus, vitae tristique ex. Aenean varius blandit ipsum, quis sollicitudin purus interdum tincidunt. Phasellus a odio lacus. In at libero nec lacus vulputate iaculis.</Paragraph>
-                     <Paragraph>Donec semper pulvinar turpis, ut ullamcorper metus vehicula at. Donec consectetur sed ex ac semper. Aenean et nulla turpis. Praesent orci leo, gravida rutrum finibus id, porttitor quis ligula. Donec nec lectus sit amet lectus tempus faucibus vel sit amet est. Mauris eu nulla non purus sollicitudin consequat. Sed et ligula a mauris gravida scelerisque at et sapien. Fusce id dictum metus, nec bibendum nunc. Nunc erat erat, bibendum sit amet aliquet id, gravida vel magna. In cursus ex eget leo congue pharetra. Vivamus vitae mattis risus. Nullam condimentum eros dolor. Aliquam fermentum varius libero nec aliquam. Praesent ac enim vitae enim egestas maximus. Etiam non nisl vitae sapien gravida commodo.</Paragraph>
-                  </RichTextBlock>
-               </Grid>
-
                <!-- Compare view -->
-               <ListView Name="gvCompareVerses"
-                         Padding="0,80,0,90"
-                         AllowFocusOnInteraction="False"
-                         IsItemClickEnabled="False">
-                  <ListView.ItemTemplate>
+               <muxc:ItemsRepeater Name="gvCompareVerses"
+                         AllowFocusOnInteraction="False">
+                  <muxc:ItemsRepeater.ItemTemplate>
                      <DataTemplate x:DataType="local1:Verse">
                         <Grid>
                            <Grid.ColumnDefinitions>
@@ -699,11 +684,26 @@
                            </RichTextBlock>
                         </Grid>
                      </DataTemplate>
-                  </ListView.ItemTemplate>
-               </ListView>
+                  </muxc:ItemsRepeater.ItemTemplate>
+               </muxc:ItemsRepeater>
             </StackPanel>
          </ScrollViewer>
 
+         <Button Name="btnLeftPage"
+                 Height="50"
+                 Click="BtnLeftPage_Click"
+                 HorizontalAlignment="Left"
+                 VerticalAlignment="Center">
+            <FontIcon Glyph="&#xE76B;" /><!-- Chevron left -->
+         </Button>
+
+         <Button Name="btnRightPage"
+                 Height="50"
+                 Click="BtnRightPage_Click"
+                 HorizontalAlignment="Right"
+                 VerticalAlignment="Center">
+            <FontIcon Glyph="&#xE76C;" /><!-- Chevron right -->
+         </Button>
 
          <!-- Command Bar -->
          <Grid Height="40"
@@ -752,7 +752,8 @@
                        Click="BtnCompare_Click">
                   <Button.KeyboardAccelerators>
                   </Button.KeyboardAccelerators>
-                  <FontIcon FontSize="15" Glyph="&#xF164;"/><!-- Explore content single -->
+                  <FontIcon FontSize="15" Glyph="&#xF164;"/>
+                  <!-- Explore content single -->
                   <Button.Flyout>
                      <Flyout x:Name="flyCompare" FlyoutPresenterStyle="{ThemeResource Flyout}">
                         <ListView Name="lvCompareVersions"
@@ -923,7 +924,7 @@
                            <TextBlock Style="{ThemeResource TitleTextBlockStyle}">Credits</TextBlock>
                            <RichTextBlock LineHeight="18">
                               <Paragraph Margin="0, 5">App programmed by
-                                 <Hyperlink NavigateUri="http://denislabrecque.ca">Denis Labrecque</Hyperlink>, 2019.
+                                 <Hyperlink NavigateUri="http://denislabrecque.ca">Denis Labrecque</Hyperlink> , 2019.
                               </Paragraph>
                               <Paragraph Margin="0, 5">The Bible versions used in this application have expired their copyright and are therefore free to use.</Paragraph>
                            </RichTextBlock>

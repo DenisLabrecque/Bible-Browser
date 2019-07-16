@@ -32,7 +32,8 @@ namespace BibleBrowserUWP
 
       public GridLength Width {
          get {
-            return new GridLength(MainPage.VerseWidth);
+            //return new GridLength(MainPage.VerseWidth);
+            return new GridLength(400);
          }
       }
 
