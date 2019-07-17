@@ -31,6 +31,8 @@ namespace BibleBrowserUWP
 
       const int MINMARGIN = 90;
       const int MAXTEXTWIDTH = 600;
+      const int VERSECOLUMN = 30;
+      const int MIDDLCOLUMN = 0;
 
       #endregion
 
@@ -73,18 +75,11 @@ namespace BibleBrowserUWP
          }
       }
 
-      // Set the text width on the main page
-      //public static double VerseWidth {
-      //   get {
-      //      this.WindowWidth
-      //   }
-      //   private set;
-      //}
-
-      public double WindowWidth {
-         get {
-            return root.Width;
-         }
+      /// <summary>
+      /// The maximum width the chapter column can take up, in which verses fit.
+      /// </summary>
+      public static double ChapterWidth {
+         get; private set;
       }
 
       /// <summary>
@@ -150,13 +145,19 @@ namespace BibleBrowserUWP
       /// </summary>
       private void MainPage_SizeChanged(object sender, SizeChangedEventArgs e)
       {
+         double width;
+
          // Do the same for the compare view
          if (e.NewSize.Width < (2 * MINMARGIN) + (2 * MAXTEXTWIDTH))
-            gvCompareVerses.Width = e.NewSize.Width - (2 * MINMARGIN);
+         {
+            width = e.NewSize.Width - (2 * MINMARGIN) - VERSECOLUMN - MIDDLCOLUMN;
+            ChapterWidth = width;
+            gvCompareVerses.Width = width;
+         }
          else
          {
-            //rtbVerses.Width = MAXTEXTWIDTH * 2;
-            //VerseWidth = (rtbVerses.Width / 2) - 12; // Half the verse number width
+            width = (MAXTEXTWIDTH * 2) - VERSECOLUMN - MIDDLCOLUMN;
+            ChapterWidth = width;
          }
 
          // Set the maximum width of the tab area

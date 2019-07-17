@@ -650,18 +650,18 @@
                        HorizontalScrollMode="Enabled"
                        HorizontalScrollBarVisibility="Hidden"
                        VerticalScrollBarVisibility="Hidden">
-            <StackPanel>
+            <StackPanel Margin="0, 80">
 
-               <!-- Compare view -->
-               <muxc:ItemsRepeater Name="gvCompareVerses"
-                         AllowFocusOnInteraction="False">
+               <!-- Compare view (main content) -->
+               <muxc:ItemsRepeater Name="gvCompareVerses">
                   <muxc:ItemsRepeater.ItemTemplate>
                      <DataTemplate x:DataType="local1:Verse">
                         <Grid>
                            <Grid.ColumnDefinitions>
                               <ColumnDefinition Width="24"/>
-                              <ColumnDefinition Width="{x:Bind Width}"/>
-                              <ColumnDefinition Width="{x:Bind Width}"/>
+                              <ColumnDefinition Width="{x:Bind Width1}"/>
+                              <ColumnDefinition Width="24"/>
+                              <ColumnDefinition Width="{x:Bind Width2}"/>
                            </Grid.ColumnDefinitions>
 
                            <TextBlock Text="{x:Bind Number}"
@@ -677,7 +677,7 @@
                               </Paragraph>
                            </RichTextBlock>
                            <RichTextBlock Style="{ThemeResource ReadableText}"
-                                          Grid.Column="2">
+                                          Grid.Column="3">
                               <Paragraph>
                                  <Run Text="{x:Bind SecondText}"/>
                               </Paragraph>
@@ -745,7 +745,7 @@
                   <FontIcon FontSize="15" Glyph="&#xE72A;"/>
                </Button>
 
-               <!-- Compare to -->
+               <!-- Compare to button -->
                <Button Style="{ThemeResource CommandButton}"
                        Name="btnCompare"
                        ToolTipService.ToolTip="Compare view"
