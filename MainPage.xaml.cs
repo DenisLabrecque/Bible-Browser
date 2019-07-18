@@ -30,9 +30,9 @@ namespace BibleBrowserUWP
       #region Constants
 
       const int MINMARGIN = 90;
-      const int MAXTEXTWIDTH = 600;
+      const int MAXTEXTWIDTH = 560;
       const int VERSECOLUMN = 30;
-      const int MIDDLCOLUMN = 0;
+      const int MIDDLCOLUMN = 30;
 
       #endregion
 
@@ -145,25 +145,34 @@ namespace BibleBrowserUWP
       /// </summary>
       private void MainPage_SizeChanged(object sender, SizeChangedEventArgs e)
       {
-         double width;
+         SetWidth();
+      }
+
+      /// <summary>
+      /// Set the width of the title bar and reading main content area.
+      /// </summary>
+      private void SetWidth()
+      {
+         double pageWidth = ((Frame)Window.Current.Content).ActualWidth;
+         double contentWidth;
 
          // Do the same for the compare view
-         if (e.NewSize.Width < (2 * MINMARGIN) + (2 * MAXTEXTWIDTH))
+         if (pageWidth < (2 * MINMARGIN) + (2 * MAXTEXTWIDTH))
          {
-            width = e.NewSize.Width - (2 * MINMARGIN) - VERSECOLUMN - MIDDLCOLUMN;
-            ChapterWidth = width;
-            gvCompareVerses.Width = width;
+            contentWidth = pageWidth - (2 * MINMARGIN) - VERSECOLUMN - MIDDLCOLUMN;
+            ChapterWidth = contentWidth;
+            gvCompareVerses.Width = contentWidth;
          }
          else
          {
-            width = (MAXTEXTWIDTH * 2) - VERSECOLUMN - MIDDLCOLUMN;
-            ChapterWidth = width;
+            contentWidth = (MAXTEXTWIDTH * 2) - VERSECOLUMN - MIDDLCOLUMN;
+            ChapterWidth = contentWidth;
+            gvCompareVerses.Width = contentWidth;
          }
 
          // Set the maximum width of the tab area
          CoreApplicationViewTitleBar titleBar = CoreApplication.GetCurrentView().TitleBar;
-         //((StackPanel)lvTabs.ItemsPanelRoot).MaxWidth = e.NewSize.Width - (titleBar.SystemOverlayLeftInset + titleBar.SystemOverlayRightInset);
-         spTabArea.MaxWidth = e.NewSize.Width - (titleBar.SystemOverlayLeftInset + titleBar.SystemOverlayRightInset);
+         spTabArea.MaxWidth = pageWidth - (titleBar.SystemOverlayLeftInset + titleBar.SystemOverlayRightInset);
       }
 
       /// <summary>
@@ -180,6 +189,8 @@ namespace BibleBrowserUWP
             // Open the tab that was active before the app was last closed
             lvTabs.SelectedItem = BrowserTab.Selected;
          }
+
+         SetWidth();
       }
 
       /// <summary>
@@ -951,18 +962,6 @@ namespace BibleBrowserUWP
 
 
       #region Accelerators
-
-      private void KeyboardAccelerator_PreviousChapter(Windows.UI.Xaml.Input.KeyboardAccelerator sender, Windows.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args)
-      {
-         PreviousChapter();
-         args.Handled = true;
-      }
-
-      private void KeyboardAccelerator_NextChapter(Windows.UI.Xaml.Input.KeyboardAccelerator sender, Windows.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args)
-      {
-         NextChapter();
-         args.Handled = true;
-      }
 
       private void KeyboardAccelerator_Search(Windows.UI.Xaml.Input.KeyboardAccelerator sender, Windows.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args)
       {

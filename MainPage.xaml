@@ -13,8 +13,6 @@
    <Page.KeyboardAccelerators>
       <KeyboardAccelerator Modifiers="None" Key="None"/>
       <!-- HACK: prevents the tooltip from displaying a keyboard shortcut -->
-      <KeyboardAccelerator Modifiers="None" Key="Left" Invoked="KeyboardAccelerator_PreviousChapter"/>
-      <KeyboardAccelerator Modifiers="None" Key="Right" Invoked="KeyboardAccelerator_NextChapter"/>
       <KeyboardAccelerator Modifiers="Control" Key="S" Invoked="KeyboardAccelerator_Search"/>
    </Page.KeyboardAccelerators>
 
@@ -659,23 +657,31 @@
                         <Grid>
                            <Grid.ColumnDefinitions>
                               <ColumnDefinition Width="24"/>
-                              <ColumnDefinition Width="{x:Bind Width1}"/>
-                              <ColumnDefinition Width="24"/>
-                              <ColumnDefinition Width="{x:Bind Width2}"/>
+                              <ColumnDefinition Width="1*"/>
+                              <ColumnDefinition Width="{x:Bind ColumnWidth}"/>
+                              <ColumnDefinition Width="{x:Bind CompareWidth}"/>
                            </Grid.ColumnDefinitions>
 
+                           <!-- Verse number -->
                            <TextBlock Text="{x:Bind Number}"
-                                      FontSize="16"
+                                      Padding="0,3,5,0"
+                                      FontSize="12"
+                                      TextAlignment="Right"
+                                      FontWeight="Bold"
                                       Grid.Column="0"
-                                      Width="30"
-                                      Foreground="{ThemeResource SystemColorHighlightTextBrush}"
-                                      FontFamily="/Assets/Fonts/Roboto.ttf#Roboto Slab"/>
+                                      Width="24"
+                                      Foreground="Gray"
+                                      FontFamily="/Assets/Fonts/PalanquinDark.ttf#Palanquin Dark Regular"/>
+                           
+                           <!-- Verse text -->
                            <RichTextBlock Style="{ThemeResource ReadableText}"
                                           Grid.Column="1">
                               <Paragraph>
                                  <Run Text="{x:Bind MainText}"/>
                               </Paragraph>
                            </RichTextBlock>
+                           
+                           <!-- Compare verse text -->
                            <RichTextBlock Style="{ThemeResource ReadableText}"
                                           Grid.Column="3">
                               <Paragraph>
@@ -690,19 +696,29 @@
          </ScrollViewer>
 
          <Button Name="btnLeftPage"
+                 Style="{ThemeResource CommandButton}"
                  Height="50"
                  Click="BtnLeftPage_Click"
                  HorizontalAlignment="Left"
-                 VerticalAlignment="Center">
+                 VerticalAlignment="Center"
+                 ToolTipService.ToolTip="Previous chapter (Left arrow)">
             <FontIcon Glyph="&#xE76B;" /><!-- Chevron left -->
+            <Button.KeyboardAccelerators>
+               <KeyboardAccelerator Modifiers="None" Key="Left"/>
+            </Button.KeyboardAccelerators>
          </Button>
 
          <Button Name="btnRightPage"
+                 Style="{ThemeResource CommandButton}"
                  Height="50"
                  Click="BtnRightPage_Click"
                  HorizontalAlignment="Right"
-                 VerticalAlignment="Center">
+                 VerticalAlignment="Center"
+                 ToolTipService.ToolTip="Next chapter (Right arrow)">
             <FontIcon Glyph="&#xE76C;" /><!-- Chevron right -->
+            <Button.KeyboardAccelerators>
+               <KeyboardAccelerator Modifiers="None" Key="Right"/>
+            </Button.KeyboardAccelerators>
          </Button>
 
          <!-- Command Bar -->

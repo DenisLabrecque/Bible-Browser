@@ -30,21 +30,21 @@ namespace BibleBrowserUWP
          get { return m_number; }
       }
 
-      public GridLength Width1 {
+      public GridLength CompareWidth {
          get {
-            //return new GridLength(MainPage.VerseWidth);
-            //return new GridLength(400);
-            double width = MainPage.ChapterWidth;
             if (string.IsNullOrEmpty(m_compare))
-               return new GridLength(width);
+               return new GridLength(0);
             else
-               return new GridLength(width * 0.5);
+               return new GridLength(1, GridUnitType.Star);
          }
       }
 
-      public GridLength Width2 {
+      public GridLength ColumnWidth {
          get {
-            return new GridLength(400);
+            if (string.IsNullOrEmpty(m_compare))
+               return new GridLength(0);
+            else
+               return new GridLength(24);
          }
       }
 
