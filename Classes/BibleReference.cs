@@ -35,6 +35,7 @@ namespace BibleBrowserUWP
       public BookNumeral Numeral { get; private set; }
       public BibleBook Book { get; private set; }
       public string SimplifiedReference { get => BookName + " " + Chapter; } // Book name and chapter
+      public double VerticalScrollOffset = 0; // How much has been seen; default to zero to start at the top
 
       /// <summary>
       /// The default Bible reference.
@@ -121,11 +122,14 @@ namespace BibleBrowserUWP
       /// If the chapter or verse are set too high, they will be clamped to the maximum chapter or verse.
       /// If the chapter or verse are set too low, an <c>ArgumentOutOfRangeException</c> is thrown.
       /// </summary>
-      public BibleReference(BibleVersion version, BibleBook book = BibleBook.Gn, int chapter = 1, int verse = 1, BibleVersion compare = null)
+      public BibleReference(BibleVersion version, BibleBook book = BibleBook.Gn, int chapter = 1, int verse = 1,
+                            BibleVersion compare = null,
+                            double verticalOffset = 0)
       {
          Version = version ?? throw new ArgumentNullException("A BibleReference cannot be created with a null BibleVersion");
          Book = book;
          ComparisonVersion = compare;
+         VerticalScrollOffset = verticalOffset;
 
          if (chapter < 1)
             throw new ArgumentOutOfRangeException("A chapter cannot be set to less than 1");

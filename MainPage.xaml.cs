@@ -112,7 +112,6 @@ namespace BibleBrowserUWP
          Application.Current.LeavingBackground += new LeavingBackgroundEventHandler(App_LeavingBackground);
 
          this.InitializeComponent();
-         EraseText();
          HideAllDropdowns(); // Don't show Genesis 1
 
          // Set theme for window root.
@@ -233,9 +232,11 @@ namespace BibleBrowserUWP
          {
             Debug.WriteLine("Previous reference called!");
             BibleReference reference = BrowserTab.Selected.Reference;
+            reference.VerticalScrollOffset = svPageScroller.VerticalOffset;
             BrowserTab.Selected.GoToReference(ref reference, BrowserTab.NavigationMode.Previous);
             PrintChapter(reference);
             ActivateButtons();
+            svPageScroller.ChangeView(null, reference.VerticalScrollOffset, null);
          }
       }
 
@@ -248,9 +249,11 @@ namespace BibleBrowserUWP
          {
             Debug.WriteLine("Next reference called!");
             BibleReference reference = BrowserTab.Selected.Reference;
+            reference.VerticalScrollOffset = svPageScroller.VerticalOffset;
             BrowserTab.Selected.GoToReference(ref reference, BrowserTab.NavigationMode.Next);
             PrintChapter(reference);
             ActivateButtons();
+            svPageScroller.ChangeView(null, reference.VerticalScrollOffset, null);
          }
       }
 
@@ -278,8 +281,9 @@ namespace BibleBrowserUWP
                chapter = int.MaxValue; // Because this gets clamped later
             }
 
-            BibleReference newReference = new BibleReference(oldReference.Version, book, chapter);
+            BibleReference newReference = new BibleReference(oldReference.Version, book, chapter, 1, oldReference.ComparisonVersion);
             BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
+            svPageScroller.ChangeView(null, 0, null, true);
          }
       }
 
@@ -306,8 +310,9 @@ namespace BibleBrowserUWP
                chapter = 1;
             }
 
-            BibleReference newReference = new BibleReference(oldReference.Version, book, chapter);
+            BibleReference newReference = new BibleReference(oldReference.Version, book, chapter, 1, oldReference.ComparisonVersion);
             BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
+            svPageScroller.ChangeView(null, 0, null, true);
          }
       }
 
@@ -350,7 +355,7 @@ namespace BibleBrowserUWP
                btnCompare.IsEnabled = false;
 
                gvBooks.ItemsSource = m_previousReference.Version.BookNames;
-               gvChapters.ItemsSource = m_previousReference.Chapters;
+               lvChapters.ItemsSource = m_previousReference.Chapters;
 
                asbSearch.Text = string.Empty;
                asbSearch.PlaceholderText = string.Empty;
@@ -363,7 +368,7 @@ namespace BibleBrowserUWP
             {
                // Fill dropdowns with content
                gvBooks.ItemsSource = reference.Version.BookNames;
-               gvChapters.ItemsSource = reference.Chapters;
+               lvChapters.ItemsSource = reference.Chapters;
 
                asbSearch.Text = string.Empty;
                asbSearch.PlaceholderText = string.Empty;
@@ -510,28 +515,20 @@ namespace BibleBrowserUWP
       /// <param name="reference">The chapter to print. If null, this will simply erase page contents.</param>
       private void PrintChapter(BibleReference reference)
       {
-         EraseText();
-
          // New tab, leave blank
          if (BrowserTab.Selected.Reference == null)
-            return;
+         {
+            gvCompareVerses.ItemsSource = null;
+         }
          // Single version
          else if (reference.ComparisonVersion == null)
          {
-            //rtbVerses.Visibility = Visibility.Collapsed;
-            gvCompareVerses.Visibility = Visibility.Visible;
-
             gvCompareVerses.ItemsSource = null;
             gvCompareVerses.ItemsSource = reference.Verses;
-
-            //rtbVerses.Blocks.Add(reference.GetChapterTextFormatted());
          }
          // With comparison version
          else
          {
-            //rtbVerses.Visibility = Visibility.Collapsed;
-            gvCompareVerses.Visibility = Visibility.Visible;
-
             gvCompareVerses.ItemsSource = null;
             gvCompareVerses.ItemsSource = reference.Verses;
          }
@@ -557,14 +554,6 @@ namespace BibleBrowserUWP
          {
             // Cancelled
          }
-      }
-
-      /// <summary>
-      /// Remove the previous chapter contents.
-      /// </summary>
-      private void EraseText()
-      {
-         //rtbVerses.Blocks.Clear();
       }
 
       #endregion
@@ -1013,6 +1002,20 @@ namespace BibleBrowserUWP
       private void BtnRightPage_Click(object sender, RoutedEventArgs e)
       {
          NextChapter();
+      }
+
+      private void SwipeItem_PreviousChapter(SwipeItem sender, SwipeItemInvokedEventArgs args)
+      {
+         Debug.WriteLine("Previous chapter invoked.");
+         PreviousChapter();
+         Debug.WriteLine("Previous chapter invoke ended");
+      }
+
+      private void SwipeItem_NextChapter(SwipeItem sender, SwipeItemInvokedEventArgs args)
+      {
+         Debug.WriteLine("Next chapter invoked");
+         NextChapter();
+         Debug.WriteLine("Next chapter ended");
       }
    }
 }

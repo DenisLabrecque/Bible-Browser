@@ -641,29 +641,50 @@
             <RowDefinition Height="1*"/>
          </Grid.RowDefinitions>
 
-         <ScrollViewer Name="svPageScroller"
-                       Grid.Row="0"
-                       Grid.Column="0"
-                       Margin="0,0,0,0"
-                       HorizontalScrollMode="Enabled"
-                       HorizontalScrollBarVisibility="Hidden"
-                       VerticalScrollBarVisibility="Hidden">
-            <StackPanel Margin="0, 80">
+         <Border Grid.Row="0"
+                 Grid.Column="0">
+            <Border.Resources>
+               <FontIconSource x:Key="ChevronLeft" Glyph="&#xE76B;"/>
+               <FontIconSource x:Key="ChevronRight" Glyph="&#xE76C;"/>
+               <SwipeItems x:Key="Left" Mode="Execute">
+                  <SwipeItem Background="{ThemeResource ReceptusGrey}"
+                             IconSource="{StaticResource ChevronLeft}"
+                             BehaviorOnInvoked="Close"
+                             Invoked="SwipeItem_PreviousChapter"/>
+               </SwipeItems>
+               <SwipeItems x:Key="Right" Mode="Execute">
+                  <SwipeItem Background="{ThemeResource ReceptusGrey}"
+                             IconSource="{StaticResource ChevronRight}"
+                             BehaviorOnInvoked="Close"
+                             Invoked="SwipeItem_NextChapter"/>
+               </SwipeItems>
+            </Border.Resources>
 
-               <!-- Compare view (main content) -->
-               <muxc:ItemsRepeater Name="gvCompareVerses">
-                  <muxc:ItemsRepeater.ItemTemplate>
-                     <DataTemplate x:DataType="local1:Verse">
-                        <Grid>
-                           <Grid.ColumnDefinitions>
-                              <ColumnDefinition Width="24"/>
-                              <ColumnDefinition Width="1*"/>
-                              <ColumnDefinition Width="{x:Bind ColumnWidth}"/>
-                              <ColumnDefinition Width="{x:Bind CompareWidth}"/>
-                           </Grid.ColumnDefinitions>
 
-                           <!-- Verse number -->
-                           <TextBlock Text="{x:Bind Number}"
+            <SwipeControl RightItems="{StaticResource Right}"
+                          LeftItems="{StaticResource Left}">
+
+               <ScrollViewer Name="svPageScroller"
+                             Margin="0,0,0,0"
+                             VerticalScrollBarVisibility="Auto"
+                             HorizontalScrollMode="Disabled"
+                             HorizontalScrollBarVisibility="Hidden">
+               <StackPanel Margin="0, 80">
+
+                  <!-- Compare view (main content) -->
+                  <muxc:ItemsRepeater Name="gvCompareVerses">
+                     <muxc:ItemsRepeater.ItemTemplate>
+                        <DataTemplate x:DataType="local1:Verse">
+                           <Grid>
+                              <Grid.ColumnDefinitions>
+                                 <ColumnDefinition Width="24"/>
+                                 <ColumnDefinition Width="1*"/>
+                                 <ColumnDefinition Width="{x:Bind ColumnWidth}"/>
+                                 <ColumnDefinition Width="{x:Bind CompareWidth}"/>
+                              </Grid.ColumnDefinitions>
+
+                              <!-- Verse number -->
+                              <TextBlock Text="{x:Bind Number}"
                                       Padding="0,3,5,0"
                                       FontSize="12"
                                       TextAlignment="Right"
@@ -672,28 +693,30 @@
                                       Width="24"
                                       Foreground="Gray"
                                       FontFamily="/Assets/Fonts/PalanquinDark.ttf#Palanquin Dark Regular"/>
-                           
-                           <!-- Verse text -->
-                           <RichTextBlock Style="{ThemeResource ReadableText}"
+
+                              <!-- Verse text -->
+                              <RichTextBlock Style="{ThemeResource ReadableText}"
                                           Grid.Column="1">
-                              <Paragraph>
-                                 <Run Text="{x:Bind MainText}"/>
-                              </Paragraph>
-                           </RichTextBlock>
-                           
-                           <!-- Compare verse text -->
-                           <RichTextBlock Style="{ThemeResource ReadableText}"
+                                 <Paragraph>
+                                    <Run Text="{x:Bind MainText}"/>
+                                 </Paragraph>
+                              </RichTextBlock>
+
+                              <!-- Compare verse text -->
+                              <RichTextBlock Style="{ThemeResource ReadableText}"
                                           Grid.Column="3">
-                              <Paragraph>
-                                 <Run Text="{x:Bind SecondText}"/>
-                              </Paragraph>
-                           </RichTextBlock>
-                        </Grid>
-                     </DataTemplate>
-                  </muxc:ItemsRepeater.ItemTemplate>
-               </muxc:ItemsRepeater>
-            </StackPanel>
-         </ScrollViewer>
+                                 <Paragraph>
+                                    <Run Text="{x:Bind SecondText}"/>
+                                 </Paragraph>
+                              </RichTextBlock>
+                           </Grid>
+                        </DataTemplate>
+                     </muxc:ItemsRepeater.ItemTemplate>
+                  </muxc:ItemsRepeater>
+               </StackPanel>
+            </ScrollViewer>
+            </SwipeControl>
+         </Border>
 
          <Button Name="btnLeftPage"
                  Style="{ThemeResource CommandButton}"
@@ -761,7 +784,7 @@
                   <FontIcon FontSize="15" Glyph="&#xE72A;"/>
                </Button>
 
-               <!-- Compare to button -->
+               <!-- Compare view button -->
                <Button Style="{ThemeResource CommandButton}"
                        Name="btnCompare"
                        ToolTipService.ToolTip="Compare view"
@@ -846,7 +869,7 @@
                              Content="1">
                         <Button.Flyout>
                            <Flyout x:Name="flyChapter" FlyoutPresenterStyle="{StaticResource Flyout}">
-                              <GridView Name="gvChapters"
+                              <GridView Name="lvChapters"
                                         SelectionMode="None"
                                         IsItemClickEnabled="True"
                                         ItemClick="GvChapters_ItemClick">
