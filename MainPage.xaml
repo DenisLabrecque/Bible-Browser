@@ -231,6 +231,7 @@
                               <VisualState.Setters>
                                  <Setter Target="Root.(RevealBrush.State)" Value="PointerOver"/>
                                  <Setter Target="Root.RevealBorderBrush" Value="{ThemeResource ListViewItemRevealBorderBrushPointerOver}"/>
+                                 <Setter Target="Root.Foreground" Value="{ThemeResource ButtonColour}"/>
                               </VisualState.Setters>
                            </VisualState>
                            <VisualState x:Name="PointerOverSelected">
@@ -249,6 +250,7 @@
                               <VisualState.Setters>
                                  <Setter Target="Root.(RevealBrush.State)" Value="Pressed"/>
                                  <Setter Target="Root.RevealBorderBrush" Value="{ThemeResource ListViewItemRevealBorderBrushPressed}"/>
+                                 <Setter Target="Root.Foreground" Value="{ThemeResource ButtonColour}"/>
                               </VisualState.Setters>
                            </VisualState>
                            <VisualState x:Name="PressedSelected">
@@ -278,6 +280,7 @@
 
       <Style x:Key="BrowserSearchTextBox" TargetType="TextBox">
          <Setter Property="Foreground" Value="{ThemeResource TextControlForeground}"/>
+         <Setter Property="SelectionHighlightColor" Value="{ThemeResource ReceptusRed}"/>
          <Setter Property="Background" Value="Transparent"/>
          <Setter Property="BorderThickness" Value="0"/>
          <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}"/>
@@ -518,6 +521,7 @@
          <Setter Property="TextAlignment" Value="Left"/>
          <Setter Property="HorizontalAlignment" Value="Stretch"/>
          <Setter Property="VerticalAlignment" Value="Stretch"/>
+         <Setter Property="SelectionHighlightColor" Value="{ThemeResource ReceptusRed}"/>
       </Style>
 
       <!-- Verse numbers -->
@@ -643,28 +647,8 @@
 
          <Border Grid.Row="0"
                  Grid.Column="0">
-            <Border.Resources>
-               <FontIconSource x:Key="ChevronLeft" Glyph="&#xE76B;"/>
-               <FontIconSource x:Key="ChevronRight" Glyph="&#xE76C;"/>
-               <SwipeItems x:Key="Left" Mode="Execute">
-                  <SwipeItem Background="{ThemeResource ReceptusGrey}"
-                             IconSource="{StaticResource ChevronLeft}"
-                             BehaviorOnInvoked="Close"
-                             Invoked="SwipeItem_PreviousChapter"/>
-               </SwipeItems>
-               <SwipeItems x:Key="Right" Mode="Execute">
-                  <SwipeItem Background="{ThemeResource ReceptusGrey}"
-                             IconSource="{StaticResource ChevronRight}"
-                             BehaviorOnInvoked="Close"
-                             Invoked="SwipeItem_NextChapter"/>
-               </SwipeItems>
-            </Border.Resources>
 
-
-            <SwipeControl RightItems="{StaticResource Right}"
-                          LeftItems="{StaticResource Left}">
-
-               <ScrollViewer Name="svPageScroller"
+            <ScrollViewer Name="svPageScroller"
                              Margin="0,0,0,0"
                              VerticalScrollBarVisibility="Auto"
                              HorizontalScrollMode="Disabled"
@@ -715,7 +699,6 @@
                   </muxc:ItemsRepeater>
                </StackPanel>
             </ScrollViewer>
-            </SwipeControl>
          </Border>
 
          <Button Name="btnLeftPage"
@@ -785,14 +768,14 @@
                </Button>
 
                <!-- Compare view button -->
-               <Button Style="{ThemeResource CommandButton}"
+               <!--<Button Style="{ThemeResource CommandButton}"
                        Name="btnCompare"
                        ToolTipService.ToolTip="Compare view"
                        Click="BtnCompare_Click">
                   <Button.KeyboardAccelerators>
                   </Button.KeyboardAccelerators>
                   <FontIcon FontSize="15" Glyph="&#xF164;"/>
-                  <!-- Explore content single -->
+                  --><!-- Explore content single --><!--
                   <Button.Flyout>
                      <Flyout x:Name="flyCompare" FlyoutPresenterStyle="{ThemeResource Flyout}">
                         <ListView Name="lvCompareVersions"
@@ -808,7 +791,7 @@
                         </ListView>
                      </Flyout>
                   </Button.Flyout>
-               </Button>
+               </Button>-->
             </StackPanel>
 
             <!-- Search -->
@@ -833,17 +816,31 @@
                              Click="DdbVersion_Click">
                         <Button.Flyout>
                            <Flyout x:Name="flyVersion" FlyoutPresenterStyle="{StaticResource Flyout}">
-                              <ListView Name="gvVersions"
+                              <StackPanel>
+                                 <ListView Name="gvVersions"
                                         SelectionMode="None"
                                         ItemsSource="{x:Bind Bibles}"
                                         IsItemClickEnabled="True"
                                         ItemClick="GvVersions_ItemClick">
-                                 <ListView.ItemTemplate>
-                                    <DataTemplate x:DataType="local1:BibleVersion">
-                                       <TextBlock Text="{x:Bind Title}"/>
-                                    </DataTemplate>
-                                 </ListView.ItemTemplate>
-                              </ListView>
+                                    <ListView.ItemTemplate>
+                                       <DataTemplate x:DataType="local1:BibleVersion">
+                                          <TextBlock Text="{x:Bind Title}"/>
+                                       </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                 </ListView>
+                                 <TextBlock Style="{ThemeResource TitleTextBlockStyle}">Compare To</TextBlock>
+                                 <ListView Name="lvCompareVersions"
+                                           SelectionMode="None"
+                                           ItemsSource="{x:Bind Bibles}"
+                                           IsItemClickEnabled="True"
+                                           ItemClick="LvCompareVersions_ItemClicked">
+                                    <ListView.ItemTemplate>
+                                       <DataTemplate x:DataType="local1:BibleVersion">
+                                          <TextBlock Text="{x:Bind Title}"/>
+                                       </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                 </ListView>
+                              </StackPanel>
                            </Flyout>
                         </Button.Flyout>
                      </Button>
@@ -900,7 +897,7 @@
                         HorizontalAlignment="Right">
 
                <!-- Play (read out loud) -->
-               <Button Name="btnPlay"
+               <!--<Button Name="btnPlay"
                        Style="{StaticResource CommandButton}"
                        ToolTipService.ToolTip="Read aloud (Ctrl+P)"
                        Click="BtnPlay_Click"
@@ -909,9 +906,9 @@
                      <KeyboardAccelerator Modifiers="Control" Key="P"/>
                   </Button.KeyboardAccelerators>
                   <FontIcon FontSize="15" Glyph="&#xE768;"/>
-               </Button>
+               </Button>-->
                <!-- Pause (read out loud) -->
-               <Button Name="btnPause"
+               <!--<Button Name="btnPause"
                        Style="{StaticResource CommandButton}"
                        Visibility="Collapsed"
                        ToolTipService.ToolTip="Pause reading (Space)"
@@ -921,14 +918,15 @@
                      <KeyboardAccelerator Modifiers="None" Key="Space"/>
                   </Button.KeyboardAccelerators>
                   <FontIcon FontSize="15" Glyph="&#xE769;"/>
-               </Button>
+               </Button>-->
 
                <!-- More hamburger menu -->
                <Button Name="btnMore"
                        Style="{StaticResource CommandButton}"
                        ToolTipService.ToolTip="Menu (Ctrl+M)"
                        FontFamily="Segoe MDL2 Assets"
-                       HorizontalAlignment="Right">
+                       HorizontalAlignment="Right"
+                       Margin="45,0">
                   <Button.KeyboardAccelerators>
                      <KeyboardAccelerator Modifiers="Control" Key="M"/>
                   </Button.KeyboardAccelerators>
@@ -963,11 +961,11 @@
                            <TextBlock Style="{ThemeResource TitleTextBlockStyle}">Credits</TextBlock>
                            <RichTextBlock LineHeight="18">
                               <Paragraph Margin="0, 5">App programmed by
-                                 <Hyperlink NavigateUri="http://denislabrecque.ca">Denis Labrecque</Hyperlink> , 2019.
+                                 <Hyperlink NavigateUri="https://www.linkedin.com/in/denisglabrecque/">Denis Labrecque</Hyperlink>, 2019.
                               </Paragraph>
                               <Paragraph Margin="0, 5">The Bible versions used in this application have expired their copyright and are therefore free to use.</Paragraph>
                            </RichTextBlock>
-                           <Image Source="/Assets/Receptus-logotype.svg" MaxWidth="250"/>
+                           <Image Source="/Assets/Receptus-logo-general.png" MaxWidth="250" Margin="20"/>
                         </StackPanel>
                      </Flyout>
                   </Button.Flyout>

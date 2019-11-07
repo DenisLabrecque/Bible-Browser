@@ -58,8 +58,8 @@
             <ResourceDictionary x:Key="Dark">
                <Color x:Key="SystemAccentColor">#F2F2F2</Color>
                <Color x:Key="AppBarBackgroundThemeBrush">#587077</Color>
-               
-               <SolidColorBrush x:Key="ReceptusRed" Color="#F2F2F2"/>
+
+               <SolidColorBrush x:Key="ReceptusRed" Color="#E23F47"/>
                <SolidColorBrush x:Key="ReceptusGrey" Color="#F2F2F2"/>
                <SolidColorBrush x:Key="ReceptusLight" Color="Black"/>
                <SolidColorBrush x:Key="ReceptusLighGrey" Color="#D3DBDE"/>

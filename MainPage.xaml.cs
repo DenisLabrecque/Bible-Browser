@@ -326,7 +326,7 @@ namespace BibleBrowserUWP
             BibleReference reference = BrowserTab.Selected.Reference;
             if (reference == null)
             {
-               btnCompare.IsEnabled = false;
+               //btnCompare.IsEnabled = false;
                asbSearch.PlaceholderText = "Search or enter reference";
             }
             else
@@ -352,7 +352,7 @@ namespace BibleBrowserUWP
 
             if (reference == null)
             {
-               btnCompare.IsEnabled = false;
+               //btnCompare.IsEnabled = false;
 
                gvBooks.ItemsSource = m_previousReference.Version.BookNames;
                lvChapters.ItemsSource = m_previousReference.Chapters;
@@ -381,7 +381,7 @@ namespace BibleBrowserUWP
                ddbBook.Visibility = Visibility.Visible;
                ddbChapter.Visibility = Visibility.Visible;
 
-               btnCompare.IsEnabled = true;
+               //btnCompare.IsEnabled = true;
                //rtbVerses.Focus(FocusState.Programmatic); // Focus away from the search box
             }
          }
@@ -480,12 +480,12 @@ namespace BibleBrowserUWP
          {
             btnPrevious.IsEnabled = false;
             btnNext.IsEnabled = false;
-            btnPlay.IsEnabled = false;
+            //btnPlay.IsEnabled = false;
          }
          // There is text already displayed: check whether there is history
          else
          {
-            btnPlay.IsEnabled = true;
+            //btnPlay.IsEnabled = true;
 
             // There is a history of references
             if (BrowserTab.Selected.History.Count >= 2)
@@ -574,15 +574,15 @@ namespace BibleBrowserUWP
       private void BtnPlay_Click(object sender, RoutedEventArgs e)
       {
          ReadMainTextAloud();
-         btnPlay.Visibility = Visibility.Collapsed;
-         btnPause.Visibility = Visibility.Visible;
+         //btnPlay.Visibility = Visibility.Collapsed;
+         //btnPause.Visibility = Visibility.Visible;
       }
 
       private void BtnPause_Click(object sender, RoutedEventArgs e)
       {
          m_mediaElement.Pause();
-         btnPause.Visibility = Visibility.Collapsed;
-         btnPlay.Visibility = Visibility.Visible;
+         //btnPause.Visibility = Visibility.Collapsed;
+         //btnPlay.Visibility = Visibility.Visible;
       }
 
       /// <summary>
@@ -609,7 +609,7 @@ namespace BibleBrowserUWP
          if(BrowserTab.Selected != null && BrowserTab.Selected.Reference != null)
             m_previousReference = BrowserTab.Selected.Reference;
          Tabs.Add(new BrowserTab());
-         btnCompare.IsEnabled = false;
+         //btnCompare.IsEnabled = false;
          lvTabs.SelectedIndex = Tabs.Count - 1;
          asbSearch.Text = string.Empty;
          ActivateButtons();
@@ -684,8 +684,8 @@ namespace BibleBrowserUWP
          // Stop audio playback when changing tabs
          m_isPlaybackStarted = false;
          m_mediaElement.Stop();
-         btnPause.Visibility = Visibility.Collapsed;
-         btnPlay.Visibility = Visibility.Visible;
+         //btnPause.Visibility = Visibility.Collapsed;
+         //btnPlay.Visibility = Visibility.Visible;
 
          // Only display the reference when there is still a tab to show; if not, we are closing the app anyway
          if (lvTabs.Items.Count > 0)
@@ -718,7 +718,7 @@ namespace BibleBrowserUWP
          BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
          Debug.WriteLine("Compare version added as " + newReference.ComparisonVersion);
 
-         flyCompare.Hide();
+         //flyCompare.Hide();
       }
 
       /// <summary>
