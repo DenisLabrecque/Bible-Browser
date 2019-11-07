@@ -30,7 +30,7 @@ namespace BibleBrowserUWP
       #region Constants
 
       const int MINMARGIN = 90;
-      const int MAXTEXTWIDTH = 560;
+      const int MAXTEXTWIDTH = 400;
       const int VERSECOLUMN = 30;
       const int MIDDLCOLUMN = 30;
 
