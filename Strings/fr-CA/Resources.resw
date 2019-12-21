@@ -118,36 +118,36 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="btnNext.ToolTipService.ToolTip" xml:space="preserve">
-    <value>Forward (Ctrl+Right Arrow)</value>
+    <value>Suivant (ctrl+flèche droite)</value>
   </data>
   <data name="btnPrevious.ToolTipService.ToolTip" xml:space="preserve">
-    <value>Back Ctrl+Left Arrow</value>
+    <value>Retour (ctrl+flèche gauche)</value>
   </data>
   <data name="NewTab" xml:space="preserve">
-    <value>New tab</value>
+    <value>Nouvel onglet</value>
   </data>
   <data name="asbSearch.PlaceholderText" xml:space="preserve">
-    <value>Reference or word search</value>
+    <value>Recherche par mot ou référence</value>
   </data>
   <data name="cbDefaultVersion.Header" xml:space="preserve">
-    <value>Default version</value>
+    <value>Version par défaut</value>
   </data>
   <data name="paraFreeToUse.Content" xml:space="preserve">
-    <value>The Bible versions used in this application have expired their copyright and are therefore free to use.</value>
+    <value>Les versions de la Bible présentées dans cette application, ayant expiré leurs droits d'auteur, sont libres d'utilisation.</value>
   </data>
   <data name="SettingsTitle.Text" xml:space="preserve">
-    <value>Settings</value>
+    <value>Ajustements</value>
   </data>
   <data name="tglAppTheme.Header" xml:space="preserve">
-    <value>Colour theme</value>
+    <value>Couleurs du thème</value>
   </data>
   <data name="tglAppTheme.OffContent" xml:space="preserve">
-    <value>Dark mode</value>
+    <value>Mode foncé</value>
   </data>
   <data name="tglAppTheme.OnContent" xml:space="preserve">
-    <value>Light</value>
+    <value>Mode clair</value>
   </data>
   <data name="txtCredits.Text" xml:space="preserve">
-    <value>Credits</value>
+    <value>Crédits</value>
   </data>
 </root>

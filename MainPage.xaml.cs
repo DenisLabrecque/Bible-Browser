@@ -535,7 +535,7 @@ namespace BibleBrowserUWP
       }
 
       /// <summary>
-      /// 
+      /// TODO
       /// </summary>
       private async void PickNewBibleAsync() // TODO
       {
@@ -556,6 +556,26 @@ namespace BibleBrowserUWP
          }
       }
 
+      /// <summary>
+      /// Add a version to compare to the original reference, and print the new layout.
+      /// </summary>
+      private void AddCompareToVersion(BibleVersion compareVersion, BibleReference oldReference)
+      {
+         BibleReference newReference = new BibleReference(oldReference.Version, oldReference.Book, oldReference.Chapter, oldReference.Verse, compareVersion);
+         BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
+         Debug.WriteLine("Compare version added as " + newReference.ComparisonVersion);
+      }
+
+      /// <summary>
+      /// Remove a version to compare to the original reference, and print the new layout.
+      /// </summary>
+      private void RemoveCompareToVersion(BibleReference oldReference)
+      {
+         BibleReference newReference = new BibleReference(oldReference.Version, oldReference.Book, oldReference.Chapter, oldReference.Verse);
+         BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
+         Debug.WriteLine("Compare version removed.");
+      }
+
       #endregion
 
 
@@ -564,11 +584,6 @@ namespace BibleBrowserUWP
       private async void Home_Click(object sender, RoutedEventArgs e)
       {
          await BrowserTab.SaveOpenTabs();
-      }
-
-      private void BtnCompare_Click(object sender, RoutedEventArgs e)
-      {
-         /// TODO add text to compare
       }
 
       private void BtnPlay_Click(object sender, RoutedEventArgs e)
@@ -708,17 +723,11 @@ namespace BibleBrowserUWP
       }
 
       /// <summary>
-      /// When a version is selected from the "compare to" flyout.
+      /// When a version is selected from the "compare to" list.
       /// </summary>
       private void LvCompareVersions_ItemClicked(object sender, ItemClickEventArgs e)
       {
-         BibleVersion compareVersion = (BibleVersion)e.ClickedItem;
-         BibleReference oldReference = BrowserTab.Selected.Reference;
-         BibleReference newReference = new BibleReference(oldReference.Version, oldReference.Book, oldReference.Chapter, oldReference.Verse, compareVersion);
-         BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
-         Debug.WriteLine("Compare version added as " + newReference.ComparisonVersion);
-
-         //flyCompare.Hide();
+         AddCompareToVersion((BibleVersion)e.ClickedItem, BrowserTab.Selected.Reference);
       }
 
       /// <summary>
@@ -1016,6 +1025,11 @@ namespace BibleBrowserUWP
          Debug.WriteLine("Next chapter invoked");
          NextChapter();
          Debug.WriteLine("Next chapter ended");
+      }
+
+      private void BtnRemoveCompareView_Click(object sender, RoutedEventArgs e)
+      {
+         RemoveCompareToVersion(BrowserTab.Selected.Reference);
       }
    }
 }

@@ -828,6 +828,7 @@
                                        </DataTemplate>
                                     </ListView.ItemTemplate>
                                  </ListView>
+                                 
                                  <TextBlock Style="{ThemeResource TitleTextBlockStyle}">Compare To</TextBlock>
                                  <ListView Name="lvCompareVersions"
                                            SelectionMode="None"
@@ -840,6 +841,11 @@
                                        </DataTemplate>
                                     </ListView.ItemTemplate>
                                  </ListView>
+
+                                 <Button Style="{ThemeResource CommandButton}"
+                                         Click="BtnRemoveCompareView_Click"
+                                         Name="btnRemoveCompareView"
+                                         ToolTipService.ToolTip="Remove the current comparison Bible version">Remove Comparison Version</Button>
                               </StackPanel>
                            </Flyout>
                         </Button.Flyout>
@@ -878,6 +884,7 @@
 
                   <TextBox Style="{ThemeResource BrowserSearchTextBox}"
                            Name="asbSearch"
+                           x:Uid="asbSearch"
                            TabIndex="0"
                            Grid.Column="1"
                            PlaceholderText="Reference or word search"
@@ -936,13 +943,17 @@
                   <Button.Flyout>
                      <Flyout x:Name="spMainMenu" FlyoutPresenterStyle="{StaticResource Flyout}">
                         <StackPanel HorizontalAlignment="Left" Padding="20,5">
-                           <TextBlock HorizontalAlignment="Left" HorizontalTextAlignment="Left" Margin="0,0"
-                                      Style="{ThemeResource TitleTextBlockStyle}">Settings</TextBlock>
+                           <TextBlock HorizontalAlignment="Left"
+                                      HorizontalTextAlignment="Left"
+                                      Margin="0,0"
+                                      Style="{ThemeResource TitleTextBlockStyle}"
+                                      x:Uid="SettingsTitle">Settings</TextBlock>
                            <ComboBox Name="cbDefaultVersion"
                                      Header="Default version"
                                      HorizontalAlignment="Left"
                                      ItemsSource="{x:Bind Bibles}"
-                                     SelectionChanged="CbDefaultVersion_SelectionChanged">
+                                     SelectionChanged="CbDefaultVersion_SelectionChanged"
+                                     x:Uid="cbDefaultVersion">
                               <ComboBox.ItemTemplate>
                                  <DataTemplate x:DataType="local1:BibleVersion">
                                     <TextBlock Text="{x:Bind Title}"/>
@@ -956,10 +967,13 @@
                                          OffContent="Light"
                                          OnContent="Dark"
                                          IsOn="False"
-                                         Toggled="ToggleSwitch_Toggled" />
+                                         Toggled="ToggleSwitch_Toggled"
+                                         x:Uid="tglAppTheme" />
 
-                           <TextBlock Style="{ThemeResource TitleTextBlockStyle}">Credits</TextBlock>
-                           <RichTextBlock LineHeight="18">
+                           <TextBlock Style="{ThemeResource TitleTextBlockStyle}"
+                                      x:Uid="txtCredits">Credits</TextBlock>
+                           <RichTextBlock LineHeight="18"
+                                          x:Uid="rtbCredits">
                               <Paragraph Margin="0, 5">App programmed by
                                  <Hyperlink NavigateUri="https://www.linkedin.com/in/denisglabrecque/">Denis Labrecque</Hyperlink>, 2019.
                               </Paragraph>

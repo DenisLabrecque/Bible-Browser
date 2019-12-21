@@ -130,6 +130,7 @@
     <Content Include="Assets\Fonts\Roboto-Bold.ttf" />
     <Content Include="Assets\Fonts\Roboto-Italic.ttf" />
     <Content Include="Assets\Fonts\Roboto-Regular.ttf" />
+    <PRIResource Include="Strings\fr-CA\Resources.resw" />
     <PRIResource Include="Strings\en-CA\Resources.resw" />
   </ItemGroup>
   <ItemGroup>
