@@ -292,8 +292,12 @@ namespace BibleBrowserUWP
             if (tab.Reference != null)
             {
                // Check, otherwise throwing in null will fail the constructor
-               string comparisonVersion = "Null";
-               if(tab.Reference.ComparisonVersion.FileName != null)
+               string comparisonVersion;
+               if(tab.Reference.ComparisonVersion == null)
+               {
+                  comparisonVersion = "Null";
+               }
+               else
                {
                   comparisonVersion = tab.Reference.ComparisonVersion.FileName;
                }
