@@ -843,6 +843,7 @@
                                  </ListView>
 
                                  <Button Style="{ThemeResource CommandButton}"
+                                         Width="400"
                                          Click="BtnRemoveCompareView_Click"
                                          Name="btnRemoveCompareView"
                                          ToolTipService.ToolTip="Remove the current comparison Bible version">Remove Comparison Version</Button>
@@ -871,7 +872,8 @@
                              Style="{ThemeResource TextBlockButtonStyle}"
                              Content="1">
                         <Button.Flyout>
-                           <Flyout x:Name="flyChapter" FlyoutPresenterStyle="{StaticResource Flyout}">
+                           <Flyout x:Name="flyChapter"
+                                   FlyoutPresenterStyle="{StaticResource Flyout}">
                               <GridView Name="lvChapters"
                                         SelectionMode="None"
                                         IsItemClickEnabled="True"

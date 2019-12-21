@@ -291,8 +291,16 @@ namespace BibleBrowserUWP
          {
             if (tab.Reference != null)
             {
+               // Check, otherwise throwing in null will fail the constructor
+               string comparisonVersion = "Null";
+               if(tab.Reference.ComparisonVersion.FileName != null)
+               {
+                  comparisonVersion = tab.Reference.ComparisonVersion.FileName;
+               }
+
                XElement element = new XElement("Reference",
                   new XElement("FileName", tab.Reference.Version.FileName),
+                  new XElement("ComparisonFileName", comparisonVersion),
                   new XElement("BookName", tab.Reference.BookName),
                   new XElement("Chapter", tab.Reference.Chapter),
                   new XElement("Verse", tab.Reference.Verse)
@@ -339,13 +347,22 @@ namespace BibleBrowserUWP
             {
                // Get the information from XML
                BibleVersion bibleVersion = new BibleVersion(node.Element("FileName").Value);
+               BibleVersion comparisonVersion;
+               if(node.Element("ComparisonFileName").Value == "Null")
+               {
+                  comparisonVersion = null;
+               }
+               else
+               {
+                  comparisonVersion = new BibleVersion(node.Element("ComparisonFileName").Value);
+               }
                string bookName = node.Element("BookName").Value;
                BibleBook book = BibleReference.StringToBook(bookName, bibleVersion);
                int chapter = int.Parse(node.Element("Chapter").Value);
                int verse = int.Parse(node.Element("Verse").Value);
 
                // Create the reference that goes in the tab
-               BibleReference reference = new BibleReference(bibleVersion, book, chapter, verse);
+               BibleReference reference = new BibleReference(bibleVersion, comparisonVersion, book, chapter, verse);
                savedTabs.Add(new BrowserTab(reference));
             }
 

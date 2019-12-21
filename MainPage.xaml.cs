@@ -47,7 +47,7 @@ namespace BibleBrowserUWP
 
       bool m_isPlaybackStarted = false;
       bool m_areTabsLoaded = false;
-      private BibleReference m_previousReference = new BibleReference(BibleVersion.DefaultVersion);
+      private BibleReference m_previousReference = new BibleReference(BibleVersion.DefaultVersion, null);
 
       #endregion
 
@@ -281,7 +281,7 @@ namespace BibleBrowserUWP
                chapter = int.MaxValue; // Because this gets clamped later
             }
 
-            BibleReference newReference = new BibleReference(oldReference.Version, book, chapter, 1, oldReference.ComparisonVersion);
+            BibleReference newReference = new BibleReference(oldReference.Version, oldReference.ComparisonVersion, book, chapter);
             BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
             svPageScroller.ChangeView(null, 0, null, true);
          }
@@ -310,7 +310,7 @@ namespace BibleBrowserUWP
                chapter = 1;
             }
 
-            BibleReference newReference = new BibleReference(oldReference.Version, book, chapter, 1, oldReference.ComparisonVersion);
+            BibleReference newReference = new BibleReference(oldReference.Version, oldReference.ComparisonVersion, book, chapter);
             BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
             svPageScroller.ChangeView(null, 0, null, true);
          }
@@ -561,7 +561,7 @@ namespace BibleBrowserUWP
       /// </summary>
       private void AddCompareToVersion(BibleVersion compareVersion, BibleReference oldReference)
       {
-         BibleReference newReference = new BibleReference(oldReference.Version, oldReference.Book, oldReference.Chapter, oldReference.Verse, compareVersion);
+         BibleReference newReference = new BibleReference(oldReference.Version, compareVersion, oldReference.Book, oldReference.Chapter, oldReference.Verse);
          BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
          Debug.WriteLine("Compare version added as " + newReference.ComparisonVersion);
       }
@@ -571,7 +571,7 @@ namespace BibleBrowserUWP
       /// </summary>
       private void RemoveCompareToVersion(BibleReference oldReference)
       {
-         BibleReference newReference = new BibleReference(oldReference.Version, oldReference.Book, oldReference.Chapter, oldReference.Verse);
+         BibleReference newReference = new BibleReference(oldReference.Version, oldReference.ComparisonVersion, oldReference.Book, oldReference.Chapter, oldReference.Verse);
          BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
          Debug.WriteLine("Compare version removed.");
       }
@@ -740,7 +740,14 @@ namespace BibleBrowserUWP
 
          // Go to the version in the present reference
          BibleReference oldReference = BrowserTab.Selected.Reference;
-         BibleReference newReference = new BibleReference(version, oldReference.Book, oldReference.Chapter);
+         BibleReference newReference;
+         if (version == oldReference.ComparisonVersion) // Flip versions when they would result in two of the same version
+         {
+            newReference = new BibleReference(version, oldReference.Version, oldReference.Book, oldReference.Chapter);
+         }
+         else {
+            newReference = new BibleReference(version, oldReference.ComparisonVersion, oldReference.Book, oldReference.Chapter);
+         }
          BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
 
          flyVersion.Hide();
@@ -756,11 +763,13 @@ namespace BibleBrowserUWP
 
          // Go to the book in the present reference
          BibleVersion version;
+         BibleVersion comparisonVersion;
          BibleReference reference;
          if (BrowserTab.Selected.Reference != null) // This tab is already open
          {
             version = BrowserTab.Selected.Reference.Version;
-            reference = new BibleReference(version, BibleReference.StringToBook(book, version));
+            comparisonVersion = BrowserTab.Selected.Reference.ComparisonVersion;
+            reference = new BibleReference(version, comparisonVersion, BibleReference.StringToBook(book, version));
          }
          // A new tab has a null reference, but the user may be seeing dropdowns relating to the previous reference;
          // this is desirable because it gives him a default starting point for his new tab when using the touchscreen.
@@ -784,7 +793,7 @@ namespace BibleBrowserUWP
 
          // Go to the book in the present reference
          BibleReference oldReference = BrowserTab.Selected.Reference;
-         BibleReference newReference = new BibleReference(oldReference.Version, oldReference.Book, chapter);
+         BibleReference newReference = new BibleReference(oldReference.Version, oldReference.ComparisonVersion, oldReference.Book, chapter);
          BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
 
          flyChapter.Hide();
@@ -812,7 +821,7 @@ namespace BibleBrowserUWP
             // Have a reference to go to ready
             BibleReference reference = BrowserTab.Selected.Reference;
             if (reference == null) {
-               reference = new BibleReference(BibleVersion.DefaultVersion);
+               reference = new BibleReference(BibleVersion.DefaultVersion, null);
             }
 
             BibleVersion version = null;
@@ -912,7 +921,7 @@ namespace BibleBrowserUWP
                }
                else
                {
-                  reference = new BibleReference(version, reference.Book, chapter);
+                  reference = new BibleReference(version, null, reference.Book, chapter);
                   BrowserTab.Selected.GoToReference(ref reference, BrowserTab.NavigationMode.Add);
                }
             }
@@ -922,12 +931,12 @@ namespace BibleBrowserUWP
                bookName = BibleSearch.ClosestBookName(version, bookName);
                if (chapter == 0)
                {
-                  reference = new BibleReference(version, BibleReference.StringToBook(bookName, version));
+                  reference = new BibleReference(version, null, BibleReference.StringToBook(bookName, version));
                   BrowserTab.Selected.GoToReference(ref reference, BrowserTab.NavigationMode.Add);
                }
                else
                {
-                  reference = new BibleReference(version, BibleReference.StringToBook(bookName, version), chapter);
+                  reference = new BibleReference(version, null, BibleReference.StringToBook(bookName, version), chapter);
                   BrowserTab.Selected.GoToReference(ref reference, BrowserTab.NavigationMode.Add);
                }
             }

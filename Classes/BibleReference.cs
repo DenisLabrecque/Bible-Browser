@@ -42,7 +42,7 @@ namespace BibleBrowserUWP
       /// </summary>
       public static BibleReference Default {
          get {
-            return new BibleReference(BibleVersion.DefaultVersion);
+            return new BibleReference(BibleVersion.DefaultVersion, null);
          }
       }
 
@@ -122,8 +122,9 @@ namespace BibleBrowserUWP
       /// If the chapter or verse are set too high, they will be clamped to the maximum chapter or verse.
       /// If the chapter or verse are set too low, an <c>ArgumentOutOfRangeException</c> is thrown.
       /// </summary>
-      public BibleReference(BibleVersion version, BibleBook book = BibleBook.Gn, int chapter = 1, int verse = 1,
-                            BibleVersion compare = null,
+      public BibleReference(BibleVersion version, BibleVersion compare = null,
+                            BibleBook book = BibleBook.Gn,
+                            int chapter = 1, int verse = 1,
                             double verticalOffset = 0)
       {
          Version = version ?? throw new ArgumentNullException("A BibleReference cannot be created with a null BibleVersion");
