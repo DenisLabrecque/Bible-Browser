@@ -14,7 +14,7 @@ namespace BibleBrowserUWP
    /// Hold some metadata about a search (degree of completion, current task, etc.)
    /// Notifies that properties change.
    /// </summary>
-   public class SearchProgressInfo : INotifyPropertyChanged
+   public class SearchProgressInfo
    {
       private static SearchProgressInfo m_StaticProgress = null; // Reference back to a single progress object
 
@@ -56,14 +56,6 @@ namespace BibleBrowserUWP
          }
       }
 
-      // This method is called by the Set accessor of each property.  
-      // The CallerMemberName attribute that is applied to the optional propertyName  
-      // parameter causes the property name of the caller to be substituted as an argument.  
-      private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-      {
-         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-      }
-
       /// <summary>
       /// Percent of completion from 0 to 1. Updates the search time.
       /// </summary>
@@ -74,7 +66,6 @@ namespace BibleBrowserUWP
          set {
             m_Progress = value;
             m_TimeEnded = DateTime.Now;
-            NotifyPropertyChanged();
          }
       }
 
@@ -99,13 +90,12 @@ namespace BibleBrowserUWP
       /// <summary>
       /// Short description of the work currently being done.
       /// </summary>
-      public string Task {
+      public string Status {
          get {
             return m_Task;
          }
          set {
             m_Task = value;
-            NotifyPropertyChanged();
          }
       }
 
@@ -138,7 +128,6 @@ namespace BibleBrowserUWP
       public void AddResult(BibleReference match)
       {
          m_Results.Add(match);
-         NotifyPropertyChanged("SearchResults");
       }
    }
 }

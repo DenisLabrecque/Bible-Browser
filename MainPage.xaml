@@ -656,7 +656,7 @@
                <StackPanel Margin="0, 80">
                   
                   <!-- Search view -->
-                  <TextBlock Text="{x:Bind SearchProgress.Task, Mode=OneWay}" Style="{StaticResource BaseTextBlockStyle}" />
+                  <TextBlock x:Name="txtSearchStatus" Style="{StaticResource BaseTextBlockStyle}" />
                   <ProgressBar x:Name="progSearchProgress"  Maximum="1" />
                   <ListView x:Name="lvSearchResults">
                   </ListView>

@@ -817,13 +817,17 @@ namespace BibleBrowserUWP
       }
 
       /// <summary>
+      /// Called every time search reports progress.
+      /// Put code that manages new search results in here.
       /// https://devblogs.microsoft.com/dotnet/async-in-4-5-enabling-progress-and-cancellation-in-async-apis/
       /// </summary>
       private void ReportSearchProgress(SearchProgressInfo progress)
       {
          // Update the UI to reflect the progress value that is passed back.
-         Debug.WriteLine("Progress reported from search with values: " + " task: " + progress.Task + ", percent: " + progress.Progress * 100);
+         Debug.WriteLine("Progress reported from search with values: " + " task: " + progress.Status + ", percent: " + progress.Progress * 100);
          progSearchProgress.Value = progress.Progress;
+         lvSearchResults.ItemsSource = progress.Results;
+         txtSearchStatus.Text = progress.Status;
       }
 
       private async void AsbSearch_KeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)

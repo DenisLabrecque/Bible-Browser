@@ -122,12 +122,12 @@ namespace BibleBrowserUWP
             {
                BibleReference reference = new BibleReference(version, null, (BibleBook)book);
                SearchProgressInfo.Single.Progress = DGL.Math.Percent(book + 1, version.BookNumbers.Count);
-               SearchProgressInfo.Single.Task = "Searching " + version.BookNames[book];
+               SearchProgressInfo.Single.Status = "Searching " + version.BookNames[book];
                progress.Report(SearchProgressInfo.Single);
 
                Debug.WriteLine("-----------------------------------------------------");
                Debug.WriteLine("Progress " + SearchProgressInfo.Single.Progress + "%");
-               Debug.WriteLine(SearchProgressInfo.Single.Task);
+               Debug.WriteLine(SearchProgressInfo.Single.Status);
                Debug.WriteLine("-----------------------------------------------------");
 
                // Go through each chapter of the book of the Bible
@@ -150,7 +150,7 @@ namespace BibleBrowserUWP
                   }
                }
                
-               SearchProgressInfo.Single.Task = "Searched for '" + SearchProgressInfo.Single.Query + "' in " + SearchProgressInfo.Single.SearchTime.TotalSeconds + "s";
+               SearchProgressInfo.Single.Status = "Searched for '" + SearchProgressInfo.Single.Query + "' in " + SearchProgressInfo.Single.SearchTime.TotalSeconds + "s";
             }
 
             return SearchProgressInfo.Single;
@@ -176,11 +176,11 @@ namespace BibleBrowserUWP
          {
             BibleReference reference = new BibleReference(version, null, (BibleBook)book);
             SearchProgressInfo.Single.Progress = DGL.Math.Percent(book + 1, version.BookNumbers.Count);
-            SearchProgressInfo.Single.Task = "Searching " + version.BookNames[book];
+            SearchProgressInfo.Single.Status = "Searching " + version.BookNames[book];
 
             Debug.WriteLine("-----------------------------------------------------");
             Debug.WriteLine("Progress " + SearchProgressInfo.Single.Progress + "%");
-            Debug.WriteLine(SearchProgressInfo.Single.Task);
+            Debug.WriteLine(SearchProgressInfo.Single.Status);
             Debug.WriteLine("-----------------------------------------------------");
 
             // Go through each chapter of the book of the Bible
@@ -203,7 +203,7 @@ namespace BibleBrowserUWP
                }
             }
 
-            SearchProgressInfo.Single.Task = "Searched for '" + SearchProgressInfo.Single.Query + "' in " + SearchProgressInfo.Single.SearchTime.TotalSeconds + "s";
+            SearchProgressInfo.Single.Status = "Searched for '" + SearchProgressInfo.Single.Query + "' in " + SearchProgressInfo.Single.SearchTime.TotalSeconds + "s";
          }
       }
 
