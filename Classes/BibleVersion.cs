@@ -16,7 +16,7 @@ namespace BibleBrowserUWP
    /// A summary of metadata and the document representing an XML Bible document.
    /// A list of these is created on load.
    /// </summary>
-   class BibleVersion
+   public class BibleVersion
    {
       #region Members
 

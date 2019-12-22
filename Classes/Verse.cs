@@ -6,7 +6,7 @@ namespace BibleBrowserUWP
    /// <summary>
    /// Verse text in the Bible.
    /// </summary>
-   class Verse
+   public class Verse
    {
       #region Members
 

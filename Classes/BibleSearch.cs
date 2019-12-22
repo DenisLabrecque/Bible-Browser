@@ -12,63 +12,6 @@ namespace BibleBrowserUWP
 {
    static class BibleSearch
    {
-      #region Members
-
-      public static ObservableCollection<BibleReference> SearchResults { get; private set; } = new ObservableCollection<BibleReference>();
-      public static SearchProgress Progress { get; private set; } = new SearchProgress();
-
-      /// <summary>
-      /// Hold some metadata about a search (degree of completion, current task, etc.)
-      /// Notifies that properties change.
-      /// </summary>
-      public class SearchProgress : INotifyPropertyChanged
-      {
-         private float m_CompletionPercent;
-         private string m_CurrentTask;
-
-         public event PropertyChangedEventHandler PropertyChanged;
-
-         /// <summary>
-         /// Reinitializes values like a constructor.
-         /// </summary>
-         public void Reinitialize()
-         {
-            m_CompletionPercent = 0f;
-            m_CurrentTask = string.Empty;
-         }
-
-         // This method is called by the Set accessor of each property.  
-         // The CallerMemberName attribute that is applied to the optional propertyName  
-         // parameter causes the property name of the caller to be substituted as an argument.  
-         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-         }
-
-         public float CompletionPercent {
-            get {
-               return m_CompletionPercent;
-            }
-            set {
-               m_CompletionPercent = value;
-               NotifyPropertyChanged();
-            }
-         }
-
-         public string CurrentTask {
-            get {
-               return m_CurrentTask;
-            }
-            set {
-               m_CurrentTask = value;
-               NotifyPropertyChanged();
-            }
-         }
-      }
-
-      #endregion
-
-
       #region Methods
 
       /// <summary>
@@ -166,22 +109,21 @@ namespace BibleBrowserUWP
       /// Search the Bible for every verse that contains a certain text as a substring.
       /// </summary>
       /// <param name="query">The string to be matched in the Bible reference for the verse to be returned.</param>
-      public static async Task<ObservableCollection<BibleReference>> Search(BibleVersion version, string query)
+      public static void Search(BibleVersion version, string query)
       {
          query = query.ToLower().RemoveDiacritics();
-         SearchResults = new ObservableCollection<BibleReference>();
-         Progress.Reinitialize();
+         SearchProgress.StaticProgress.Reinitialize();
 
          // Go through each book of the Bible
          for (int book = 0; book < version.BookNumbers.Count; book++)
          {
             BibleReference reference = new BibleReference(version, null, (BibleBook)book);
-            Progress.CompletionPercent = DGL.Math.Percent(book + 1, version.BookNumbers.Count);
-            Progress.CurrentTask = "Searching " + version.BookNames[book];
+            SearchProgress.StaticProgress.Progress = DGL.Math.Percent(book + 1, version.BookNumbers.Count);
+            SearchProgress.StaticProgress.Task = "Searching " + version.BookNames[book];
 
             Debug.WriteLine("-----------------------------------------------------");
-            Debug.WriteLine("Progress " + Progress.CompletionPercent + "%");
-            Debug.WriteLine(Progress.CurrentTask);
+            Debug.WriteLine("Progress " + SearchProgress.StaticProgress.Progress + "%");
+            Debug.WriteLine(SearchProgress.StaticProgress.Task);
             Debug.WriteLine("-----------------------------------------------------");
 
             // Go through each chapter of the book of the Bible
@@ -197,15 +139,15 @@ namespace BibleBrowserUWP
                   {
                      BibleReference hit = new BibleReference(version, null, (BibleBook)book, chapter, verseNumber);
                      Debug.WriteLine(hit + ":" + verseNumber + " -- " + verse);
-                     SearchResults.Add(hit);
+                     SearchProgress.StaticProgress.AddResult(hit);
                   }
 
                   verseNumber++;
                }
             }
-         }
 
-         return SearchResults;
+            SearchProgress.StaticProgress.Task = "Done.";
+         }
       }
 
 

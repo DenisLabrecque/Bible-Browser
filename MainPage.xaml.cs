@@ -55,8 +55,7 @@ namespace BibleBrowserUWP
       #region Properties
 
       TrulyObservableCollection<BrowserTab> Tabs { get => BrowserTab.Tabs; }
-      ObservableCollection<BibleReference> SearchResults { get => BibleSearch.SearchResults; }
-      BibleSearch.SearchProgress SearchProgress { get => BibleSearch.Progress; }
+      SearchProgress SearchProgress { get => SearchProgress.StaticProgress; }
 
       // Gets all available Bibles, minus the one already selected, if there is one.
       ObservableCollection<BibleVersion> Bibles {
@@ -866,7 +865,10 @@ namespace BibleBrowserUWP
             }
             else
             {
-               await Task.Run(() => BibleSearch.Search(version, query));
+
+               ///await Task.Run(() => BibleSearch.Search(version, query));
+               ///
+               BibleSearch.Search(version, query);
             }
             
 
