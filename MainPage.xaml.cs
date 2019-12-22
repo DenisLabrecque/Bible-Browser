@@ -863,7 +863,7 @@ namespace BibleBrowserUWP
             // There must only be a book name
             if (queryElements.Count == 1)
             {
-               bookName = BibleSearch.ClosestBookName(version, queryElements[0]);
+               bookName = BibleSearch.ClosestBookName(version, queryElements[0], out _);
             }
             else
             {
@@ -928,7 +928,7 @@ namespace BibleBrowserUWP
             else
             {
                // Convert the book to the closest valid book
-               bookName = BibleSearch.ClosestBookName(version, bookName);
+               bookName = BibleSearch.ClosestBookName(version, bookName, out _);
                if (chapter == 0)
                {
                   reference = new BibleReference(version, null, BibleReference.StringToBook(bookName, version));

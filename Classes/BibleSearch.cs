@@ -39,21 +39,54 @@ namespace BibleBrowserUWP
       /// <summary>
       /// Return the Bible book name that most resembles the query according to Levenshtein distance (ignoring diacritics).
       /// </summary>
-      public static string ClosestBookName(BibleVersion version, string query)
+      /// <param name="version">The version of the Bible in which to search through the book names</param>
+      /// <param name="query">The text the user entered to match one of the Bible's book names</param>
+      /// <returns>The closest book name to the query string. Guaranteed to return something, no matter how unreasonable.</returns>
+      public static string ClosestBookName(BibleVersion version, string query, out float levensteinPercent)
       {
+         Debug.WriteLine("NEW QUERY: " + query.ToLower().RemoveDiacritics());
+         if(query == null || query.Length == 0)
+         {
+            levensteinPercent = 0f;
+            return version.BookNames.First();
+         }
+
+         // When the user types an exact match to the first letters of a book, return that book.
+         // For example, EPH is EPHesians, not Esther as according to the Levenshtein distance.
+         foreach(string bookName in version.BookNames)
+         {
+            // Include only queries that are a subset of the book name
+            if (query.Length <= bookName.Length)
+            {
+               if (query.ToLower().RemoveDiacritics() == bookName.Substring(0, query.Length).ToLower().RemoveDiacritics())
+               {
+                  levensteinPercent = 1f;
+                  return bookName;
+               }
+            }
+         }
+
          // Store the percent similarity for each book name
          SortedDictionary<float, string> results = new SortedDictionary<float, string>();
 
+         // With this, a book name is guaranteed to be returned, so unintentional misspellings can be ignored.
+         // However, because typing ASDF will return AMOS, it is best to check the Levenstein distance for a too large error margin,
+         // so that a better search result can be presented instead.
+         float similarity = 0f;
          foreach (string bookName in version.BookNames)
          {
-            float similarity = LevenshteinSimilarity(query.ToLower().RemoveDiacritics(), bookName.ToLower().RemoveDiacritics());
+            similarity = LevenshteinSimilarity(query.ToLower().RemoveDiacritics(), bookName.ToLower().RemoveDiacritics());
             if (similarity == 1.0f)
+            {
+               levensteinPercent = similarity;
                return bookName;
+            }
             else
                results.TryAdd(similarity, bookName);
          }
-            
 
+         Debug.WriteLine("FOUND " + results.Last().Value + " WITH A SIMILARITY OF " + similarity);
+         levensteinPercent = similarity;
          return results.Last().Value;
       }
 
