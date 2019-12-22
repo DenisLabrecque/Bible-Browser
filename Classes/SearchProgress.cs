@@ -78,7 +78,7 @@ namespace BibleBrowserUWP
       /// <summary>
       /// A single reference to one instance of this class.
       /// </summary>
-      public static SearchProgress StaticProgress {
+      public static SearchProgress Single {
          get {
             if(m_StaticProgress == null)
             {

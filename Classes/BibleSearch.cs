@@ -112,18 +112,18 @@ namespace BibleBrowserUWP
       public static void Search(BibleVersion version, string query)
       {
          query = query.ToLower().RemoveDiacritics();
-         SearchProgress.StaticProgress.Reinitialize();
+         SearchProgress.Single.Reinitialize();
 
          // Go through each book of the Bible
          for (int book = 0; book < version.BookNumbers.Count; book++)
          {
             BibleReference reference = new BibleReference(version, null, (BibleBook)book);
-            SearchProgress.StaticProgress.Progress = DGL.Math.Percent(book + 1, version.BookNumbers.Count);
-            SearchProgress.StaticProgress.Task = "Searching " + version.BookNames[book];
+            SearchProgress.Single.Progress = DGL.Math.Percent(book + 1, version.BookNumbers.Count);
+            SearchProgress.Single.Task = "Searching " + version.BookNames[book];
 
             Debug.WriteLine("-----------------------------------------------------");
-            Debug.WriteLine("Progress " + SearchProgress.StaticProgress.Progress + "%");
-            Debug.WriteLine(SearchProgress.StaticProgress.Task);
+            Debug.WriteLine("Progress " + SearchProgress.Single.Progress + "%");
+            Debug.WriteLine(SearchProgress.Single.Task);
             Debug.WriteLine("-----------------------------------------------------");
 
             // Go through each chapter of the book of the Bible
@@ -139,14 +139,14 @@ namespace BibleBrowserUWP
                   {
                      BibleReference hit = new BibleReference(version, null, (BibleBook)book, chapter, verseNumber);
                      Debug.WriteLine(hit + ":" + verseNumber + " -- " + verse);
-                     SearchProgress.StaticProgress.AddResult(hit);
+                     SearchProgress.Single.AddResult(hit);
                   }
 
                   verseNumber++;
                }
             }
 
-            SearchProgress.StaticProgress.Task = "Done.";
+            SearchProgress.Single.Task = "Done.";
          }
       }
 

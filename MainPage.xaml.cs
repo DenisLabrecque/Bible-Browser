@@ -12,6 +12,7 @@ using Windows.Devices.Input;
 using Windows.Media.SpeechSynthesis;
 using Windows.Storage;
 using Windows.UI;
+using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
@@ -55,7 +56,7 @@ namespace BibleBrowserUWP
       #region Properties
 
       TrulyObservableCollection<BrowserTab> Tabs { get => BrowserTab.Tabs; }
-      SearchProgress SearchProgress { get => SearchProgress.StaticProgress; }
+      SearchProgress SearchProgress { get => SearchProgress.Single; }
 
       // Gets all available Bibles, minus the one already selected, if there is one.
       ObservableCollection<BibleVersion> Bibles {
@@ -868,7 +869,14 @@ namespace BibleBrowserUWP
 
                ///await Task.Run(() => BibleSearch.Search(version, query));
                ///
-               BibleSearch.Search(version, query);
+               await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+                  () =>
+                  {
+                     // Your UI update code goes here!
+                     BibleSearch.Search(version, query);
+                     lvSearchResults.ItemsSource = SearchProgress.Single.Results;
+                  }
+               );
             }
             
 
