@@ -657,10 +657,8 @@
                   
                   <!-- Search view -->
                   <TextBlock Text="{x:Bind SearchProgress.Task, Mode=OneWay}" Style="{StaticResource BaseTextBlockStyle}" />
-                  <ProgressBar x:Name="progSearchProgress"  Value="{x:Bind SearchProgress.Progress, Mode=OneWay}" Maximum="1" Margin="0,12"/>
-                  <ListView x:Name="lvSearchResults"
-                            Width="600"
-                            ItemsSource="{x:Bind SearchProgress.Results, Mode=OneWay}">
+                  <ProgressBar x:Name="progSearchProgress"  Maximum="1" />
+                  <ListView x:Name="lvSearchResults">
                   </ListView>
 
                   <!-- Compare view (main content) -->

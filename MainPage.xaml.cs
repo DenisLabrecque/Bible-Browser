@@ -56,7 +56,7 @@ namespace BibleBrowserUWP
       #region Properties
 
       TrulyObservableCollection<BrowserTab> Tabs { get => BrowserTab.Tabs; }
-      SearchProgress SearchProgress { get => SearchProgress.Single; }
+      SearchProgressInfo SearchProgress { get => SearchProgressInfo.Single; }
 
       // Gets all available Bibles, minus the one already selected, if there is one.
       ObservableCollection<BibleVersion> Bibles {
@@ -816,6 +816,16 @@ namespace BibleBrowserUWP
          ShowAllDropdowns();
       }
 
+      /// <summary>
+      /// https://devblogs.microsoft.com/dotnet/async-in-4-5-enabling-progress-and-cancellation-in-async-apis/
+      /// </summary>
+      private void ReportSearchProgress(SearchProgressInfo progress)
+      {
+         // Update the UI to reflect the progress value that is passed back.
+         Debug.WriteLine("Progress reported from search with values: " + " task: " + progress.Task + ", percent: " + progress.Progress * 100);
+         progSearchProgress.Value = progress.Progress;
+      }
+
       private async void AsbSearch_KeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
       {
          if(e.Key == Windows.System.VirtualKey.Enter)
@@ -869,14 +879,19 @@ namespace BibleBrowserUWP
 
                ///await Task.Run(() => BibleSearch.Search(version, query));
                ///
-               await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
-                  () =>
-                  {
-                     // Your UI update code goes here!
-                     BibleSearch.Search(version, query);
-                     lvSearchResults.ItemsSource = SearchProgress.Single.Results;
-                  }
-               );
+               //await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+               //   {
+               //      // Your UI update code goes here!
+               //      await BibleSearch.SearchAsync(version, query, searchProgress);
+               //      lvSearchResults.ItemsSource = SearchProgress.Results;
+               //   }
+               //);
+
+
+               //construct Progress<T>, passing ReportProgress as the Action<T> 
+               Progress<SearchProgressInfo> progressIndicator = new Progress<SearchProgressInfo>(ReportSearchProgress);
+               //call async method
+               await BibleSearch.SearchAsync(version, query, progressIndicator);
             }
             
 

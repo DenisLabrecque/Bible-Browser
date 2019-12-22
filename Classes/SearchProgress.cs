@@ -14,24 +14,46 @@ namespace BibleBrowserUWP
    /// Hold some metadata about a search (degree of completion, current task, etc.)
    /// Notifies that properties change.
    /// </summary>
-   public class SearchProgress : INotifyPropertyChanged
+   public class SearchProgressInfo : INotifyPropertyChanged
    {
-      private static SearchProgress m_StaticProgress = null; // Reference back to a single progress object
+      private static SearchProgressInfo m_StaticProgress = null; // Reference back to a single progress object
 
       private float m_Progress;
       private string m_Task;
-      private ObservableCollection<BibleReference> m_Results = new ObservableCollection<BibleReference>();
+      private ObservableCollection<BibleReference> m_Results;
+      private string m_Query;
+      private DateTime m_TimeStarted;
+      private DateTime m_TimeEnded;
 
       public event PropertyChangedEventHandler PropertyChanged;
 
       /// <summary>
+      /// Call this to reset the search before calling it. This removes any previous search result.
+      /// Sets the search start time.
+      /// </summary>
+      public void StartNewSearch(string query)
+      {
+         m_Query = query;
+         Reinitialize();
+         m_TimeStarted = DateTime.Now;
+         m_TimeEnded = DateTime.Now;
+      }
+
+      /// <summary>
       /// Reinitializes values like a constructor.
       /// </summary>
-      public void Reinitialize()
+      private void Reinitialize()
       {
          m_Progress = 0f;
          m_Task = "Doing Nothing";
-         m_Results = new ObservableCollection<BibleReference>();
+         if(m_Results == null)
+         {
+            m_Results = new ObservableCollection<BibleReference>();
+         }
+         else
+         {
+            m_Results.Clear();
+         }
       }
 
       // This method is called by the Set accessor of each property.  
@@ -43,7 +65,7 @@ namespace BibleBrowserUWP
       }
 
       /// <summary>
-      /// Percent of completion from 0 to 1.
+      /// Percent of completion from 0 to 1. Updates the search time.
       /// </summary>
       public float Progress {
          get {
@@ -51,7 +73,26 @@ namespace BibleBrowserUWP
          }
          set {
             m_Progress = value;
+            m_TimeEnded = DateTime.Now;
             NotifyPropertyChanged();
+         }
+      }
+
+      /// <summary>
+      /// The amount of time spent searching until the search progress was marked complete.
+      /// </summary>
+      public TimeSpan SearchTime {
+         get {
+            return m_TimeEnded - m_TimeStarted;
+         }
+      }
+
+      /// <summary>
+      /// The search query that initialized this search.
+      /// </summary>
+      public string Query {
+         get {
+            return m_Query;
          }
       }
 
@@ -78,17 +119,16 @@ namespace BibleBrowserUWP
       /// <summary>
       /// A single reference to one instance of this class.
       /// </summary>
-      public static SearchProgress Single {
+      public static SearchProgressInfo Single {
          get {
             if(m_StaticProgress == null)
             {
-               m_StaticProgress = new SearchProgress();
+               m_StaticProgress = new SearchProgressInfo();
             }
 
-            Debug.WriteLine("/n/n................................................");
-            Debug.WriteLine("STATIC PROGRESS RETURNED/n/n");
             return m_StaticProgress;
          }
+         set { m_StaticProgress = value; }
       }
 
       /// <summary>

@@ -105,25 +105,82 @@ namespace BibleBrowserUWP
       }
 
 
+
       /// <summary>
+      /// Asynchronously search the Bible for every verse that contains a certain text as a substring.
+      /// </summary>
+      /// <param name="query">The string to be matched in the Bible reference for the verse to be returned.</param>
+      public static async Task<SearchProgressInfo> SearchAsync(BibleVersion version, string query, IProgress<SearchProgressInfo> progress)
+      {
+         query = query.ToLower().RemoveDiacritics();
+         SearchProgressInfo.Single.StartNewSearch(query);
+
+         SearchProgressInfo.Single = await Task.Run<SearchProgressInfo>(() =>
+         {
+            // Go through each book of the Bible
+            for (int book = 0; book < version.BookNumbers.Count; book++)
+            {
+               BibleReference reference = new BibleReference(version, null, (BibleBook)book);
+               SearchProgressInfo.Single.Progress = DGL.Math.Percent(book + 1, version.BookNumbers.Count);
+               SearchProgressInfo.Single.Task = "Searching " + version.BookNames[book];
+               progress.Report(SearchProgressInfo.Single);
+
+               Debug.WriteLine("-----------------------------------------------------");
+               Debug.WriteLine("Progress " + SearchProgressInfo.Single.Progress + "%");
+               Debug.WriteLine(SearchProgressInfo.Single.Task);
+               Debug.WriteLine("-----------------------------------------------------");
+
+               // Go through each chapter of the book of the Bible
+               for (int chapter = 1; chapter <= version.GetChapterCount(reference); chapter++)
+               {
+                  BibleReference chapterReference = new BibleReference(version, null, (BibleBook)book, chapter);
+
+                  // Go through each verse of the chapter
+                  int verseNumber = 1;
+                  foreach (string verse in version.GetChapterVerses(chapterReference))
+                  {
+                     if (verse.ToLower().RemoveDiacritics().Contains(query))
+                     {
+                        BibleReference hit = new BibleReference(version, null, (BibleBook)book, chapter, verseNumber);
+                        Debug.WriteLine(hit + ":" + verseNumber + " -- " + verse);
+                        SearchProgressInfo.Single.AddResult(hit);
+                     }
+
+                     verseNumber++;
+                  }
+               }
+               
+               SearchProgressInfo.Single.Task = "Searched for '" + SearchProgressInfo.Single.Query + "' in " + SearchProgressInfo.Single.SearchTime.TotalSeconds + "s";
+            }
+
+            return SearchProgressInfo.Single;
+         });
+
+         return SearchProgressInfo.Single;
+      }
+
+
+      /// <summary>
+      /// Old version of the search method. Not asynchronous, does not report progress, not cancellable.
+      /// Progress reporting didn't work here.
       /// Search the Bible for every verse that contains a certain text as a substring.
       /// </summary>
       /// <param name="query">The string to be matched in the Bible reference for the verse to be returned.</param>
       public static void Search(BibleVersion version, string query)
       {
          query = query.ToLower().RemoveDiacritics();
-         SearchProgress.Single.Reinitialize();
+         SearchProgressInfo.Single.StartNewSearch(query);
 
          // Go through each book of the Bible
          for (int book = 0; book < version.BookNumbers.Count; book++)
          {
             BibleReference reference = new BibleReference(version, null, (BibleBook)book);
-            SearchProgress.Single.Progress = DGL.Math.Percent(book + 1, version.BookNumbers.Count);
-            SearchProgress.Single.Task = "Searching " + version.BookNames[book];
+            SearchProgressInfo.Single.Progress = DGL.Math.Percent(book + 1, version.BookNumbers.Count);
+            SearchProgressInfo.Single.Task = "Searching " + version.BookNames[book];
 
             Debug.WriteLine("-----------------------------------------------------");
-            Debug.WriteLine("Progress " + SearchProgress.Single.Progress + "%");
-            Debug.WriteLine(SearchProgress.Single.Task);
+            Debug.WriteLine("Progress " + SearchProgressInfo.Single.Progress + "%");
+            Debug.WriteLine(SearchProgressInfo.Single.Task);
             Debug.WriteLine("-----------------------------------------------------");
 
             // Go through each chapter of the book of the Bible
@@ -139,14 +196,14 @@ namespace BibleBrowserUWP
                   {
                      BibleReference hit = new BibleReference(version, null, (BibleBook)book, chapter, verseNumber);
                      Debug.WriteLine(hit + ":" + verseNumber + " -- " + verse);
-                     SearchProgress.Single.AddResult(hit);
+                     SearchProgressInfo.Single.AddResult(hit);
                   }
 
                   verseNumber++;
                }
             }
 
-            SearchProgress.Single.Task = "Done.";
+            SearchProgressInfo.Single.Task = "Searched for '" + SearchProgressInfo.Single.Query + "' in " + SearchProgressInfo.Single.SearchTime.TotalSeconds + "s";
          }
       }
 
