@@ -45,7 +45,7 @@ namespace BibleBrowserUWP
       public static string ClosestBookName(BibleVersion version, string query, out float levensteinPercent)
       {
          Debug.WriteLine("NEW QUERY: " + query.ToLower().RemoveDiacritics());
-         if(query == null || query.Length == 0)
+         if (query == null || query.Length == 0)
          {
             levensteinPercent = 0f;
             return version.BookNames.First();
@@ -53,7 +53,7 @@ namespace BibleBrowserUWP
 
          // When the user types an exact match to the first letters of a book, return that book.
          // For example, EPH is EPHesians, not Esther as according to the Levenshtein distance.
-         foreach(string bookName in version.BookNames)
+         foreach (string bookName in version.BookNames)
          {
             // Include only queries that are a subset of the book name
             if (query.Length <= bookName.Length)
@@ -106,6 +106,46 @@ namespace BibleBrowserUWP
          }
 
          return null;
+      }
+
+
+      /// <summary>
+      /// Search the Bible for every verse that contains a certain text as a substring.
+      /// </summary>
+      /// <param name="query">The string to be matched in the Bible reference for the verse to be returned.</param>
+      public static List<BibleReference> SearchBible(BibleVersion version, string query)
+      {
+         query = query.ToLower().RemoveDiacritics();
+         List<BibleReference> matches = new List<BibleReference>();
+
+         // Go through each book of the Bible
+         foreach(BibleBook book in version.BookNumbers)
+         {
+            BibleReference reference = new BibleReference(version, null, book);
+
+            // Go through each chapter of the book of the Bible
+            for (int chapter = 1; chapter <= version.GetChapterCount(reference); chapter++)
+            {
+               BibleReference chapterReference = new BibleReference(version, null, book, chapter);
+
+               // Go through each verse of the chapter
+               int verseNumber = 1;
+               foreach(string verse in version.GetChapterVerses(chapterReference))
+               {
+                  if (verse.ToLower().RemoveDiacritics().Contains(query))
+                  {
+                     BibleReference hit = new BibleReference(version, null, book, chapter, verseNumber);
+                     Debug.WriteLine("Book: " + book + ", Chapter: " + chapter + ", verse: " + verseNumber);
+                     Debug.WriteLine("HIT: " + hit + " -- " + verse);
+                     matches.Add(hit);
+                  }
+
+                  verseNumber++;
+               }
+            }
+         }
+
+         return matches;
       }
 
 

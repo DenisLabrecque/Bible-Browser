@@ -101,6 +101,10 @@ namespace BibleBrowserUWP
       public string BookName { get => Version.BookNames[(int)Book]; }
       public int Chapter { get; private set; }
       public int Verse { get; private set; }
+
+      /// <summary>
+      /// The number of chapters for each book in the Bible version.
+      /// </summary>
       public List<int> Chapters {
          get {
             List<int> chapters = new List<int>();

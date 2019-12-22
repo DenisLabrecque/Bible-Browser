@@ -833,6 +833,8 @@ namespace BibleBrowserUWP
             List<string> queryElements = new List<string>();
             string query = ((TextBox)sender).Text;
 
+
+
             // Separate the query into version and reference
             if (query.Contains(':'))
             {
@@ -848,6 +850,23 @@ namespace BibleBrowserUWP
                   }
                }
             }
+            else
+            {
+               version = BibleVersion.DefaultVersion;
+            }
+
+
+            //// TESTING
+            /// try searching for this in the Bible
+            if (version == null)
+            {
+               throw new Exception("Version null");
+            }
+            else
+            {
+               BibleSearch.SearchBible(version, query);
+            }
+            
 
             // Separate the query into book name and verse
             if (foundVersion == true)
