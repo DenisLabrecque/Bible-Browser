@@ -113,7 +113,7 @@ namespace BibleBrowserUWP
       /// Search the Bible for every verse that contains a certain text as a substring.
       /// </summary>
       /// <param name="query">The string to be matched in the Bible reference for the verse to be returned.</param>
-      public static List<BibleReference> SearchBible(BibleVersion version, string query)
+      public static async Task<List<BibleReference>> Search(BibleVersion version, string query)
       {
          query = query.ToLower().RemoveDiacritics();
          List<BibleReference> matches = new List<BibleReference>();
@@ -135,6 +135,7 @@ namespace BibleBrowserUWP
                   if (verse.ToLower().RemoveDiacritics().Contains(query))
                   {
                      BibleReference hit = new BibleReference(version, null, (BibleBook)book, chapter, verseNumber);
+                     Debug.WriteLine(hit + ":" + verseNumber + " -- " + verse);
                      matches.Add(hit);
                   }
 

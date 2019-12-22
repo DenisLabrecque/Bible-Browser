@@ -814,7 +814,7 @@ namespace BibleBrowserUWP
          ShowAllDropdowns();
       }
 
-      private void AsbSearch_KeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+      private async void AsbSearch_KeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
       {
          if(e.Key == Windows.System.VirtualKey.Enter)
          {
@@ -864,7 +864,7 @@ namespace BibleBrowserUWP
             }
             else
             {
-               BibleSearch.SearchBible(version, query);
+               await Task.Run(() => BibleSearch.Search(version, query));
             }
             
 
