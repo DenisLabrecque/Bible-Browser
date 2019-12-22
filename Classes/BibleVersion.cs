@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -101,7 +102,7 @@ namespace BibleBrowserUWP
 
          // Find the book numbers in XML
          foreach(XElement element in XDocument.Descendants(Zefania.NDE_BIBLEBOOK))
-            BookNumbers.Add(Int32.Parse(element.Attribute(Zefania.ATTR_BOOKNUM).Value));
+            BookNumbers.Add(int.Parse(element.Attribute(Zefania.ATTR_BOOKNUM).Value));
       }
 
       #endregion
@@ -142,7 +143,8 @@ namespace BibleBrowserUWP
          List<string> verseContents = new List<string>();
          if (reference == null)
             return verseContents; // Blank page
-         
+
+         Debug.WriteLine("INDEX SENT: " + (int)reference.Book);
          XElement book = XDocument.Descendants("BIBLEBOOK").ElementAt((int)reference.Book);
          XElement chapter = book.Descendants("CHAPTER").ElementAt(reference.Chapter - 1);
          

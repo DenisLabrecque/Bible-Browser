@@ -119,24 +119,22 @@ namespace BibleBrowserUWP
          List<BibleReference> matches = new List<BibleReference>();
 
          // Go through each book of the Bible
-         foreach(BibleBook book in version.BookNumbers)
+         for (int book = 0; book < version.BookNumbers.Count; book++)
          {
-            BibleReference reference = new BibleReference(version, null, book);
+            BibleReference reference = new BibleReference(version, null, (BibleBook)book);
 
             // Go through each chapter of the book of the Bible
             for (int chapter = 1; chapter <= version.GetChapterCount(reference); chapter++)
             {
-               BibleReference chapterReference = new BibleReference(version, null, book, chapter);
+               BibleReference chapterReference = new BibleReference(version, null, (BibleBook)book, chapter);
 
                // Go through each verse of the chapter
                int verseNumber = 1;
-               foreach(string verse in version.GetChapterVerses(chapterReference))
+               foreach (string verse in version.GetChapterVerses(chapterReference))
                {
                   if (verse.ToLower().RemoveDiacritics().Contains(query))
                   {
-                     BibleReference hit = new BibleReference(version, null, book, chapter, verseNumber);
-                     Debug.WriteLine("Book: " + book + ", Chapter: " + chapter + ", verse: " + verseNumber);
-                     Debug.WriteLine("HIT: " + hit + " -- " + verse);
+                     BibleReference hit = new BibleReference(version, null, (BibleBook)book, chapter, verseNumber);
                      matches.Add(hit);
                   }
 
