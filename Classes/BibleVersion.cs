@@ -143,8 +143,7 @@ namespace BibleBrowserUWP
          List<string> verseContents = new List<string>();
          if (reference == null)
             return verseContents; // Blank page
-
-         Debug.WriteLine("INDEX SENT: " + (int)reference.Book);
+         
          XElement book = XDocument.Descendants("BIBLEBOOK").ElementAt((int)reference.Book);
          XElement chapter = book.Descendants("CHAPTER").ElementAt(reference.Chapter - 1);
          

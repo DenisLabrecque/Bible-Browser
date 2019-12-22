@@ -654,6 +654,13 @@
                              HorizontalScrollMode="Disabled"
                              HorizontalScrollBarVisibility="Hidden">
                <StackPanel Margin="0, 80">
+                  
+                  <!-- Search view -->
+                  <ProgressBar x:Name="progSearchProgress"  Value="{x:Bind SearchProgress.CompletionPercent}" Maximum="1" Margin="0,12"/>
+                  <ListView x:Name="lvSearchResults"
+                            Width="600"
+                            ItemsSource="{x:Bind SearchResults}">
+                  </ListView>
 
                   <!-- Compare view (main content) -->
                   <muxc:ItemsRepeater Name="gvCompareVerses">
