@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Windows.ApplicationModel;
@@ -48,6 +49,7 @@ namespace BibleBrowserUWP
 
       bool m_isPlaybackStarted = false;
       bool m_areTabsLoaded = false;
+      CancellationTokenSource cancelSearch;
       private BibleReference m_previousReference = new BibleReference(BibleVersion.DefaultVersion, null);
       ObservableCollection<BibleReference> m_SearchResults = new ObservableCollection<BibleReference>();
 
@@ -577,11 +579,11 @@ namespace BibleBrowserUWP
          BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
          Debug.WriteLine("Compare version removed.");
       }
-
+      
       #endregion
 
 
-      #region Button Events
+      #region Events
 
       private async void Home_Click(object sender, RoutedEventArgs e)
       {
@@ -900,10 +902,19 @@ namespace BibleBrowserUWP
                //);
 
 
-               //construct Progress<T>, passing ReportProgress as the Action<T> 
+               // Construct Progress<T>, passing ReportProgress as the Action<T> 
                Progress<SearchProgressInfo> progressIndicator = new Progress<SearchProgressInfo>(ReportSearchProgress);
-               //call async method
-               await BibleSearch.SearchAsync(version, query, progressIndicator);
+               cancelSearch = new CancellationTokenSource();
+               // Call async method
+               try
+               {
+                  await BibleSearch.SearchAsync(version, query, progressIndicator, cancelSearch.Token);
+               }
+               // Handle the search being cancelled at any point
+               catch (OperationCanceledException)
+               {
+                  lvSearchResults.ItemsSource = null;
+               }
             }
             
 
@@ -1097,6 +1108,11 @@ namespace BibleBrowserUWP
       private void BtnRemoveCompareView_Click(object sender, RoutedEventArgs e)
       {
          RemoveCompareToVersion(BrowserTab.Selected.Reference);
+      }
+
+      private void BtnCancelSearch_Click(object sender, RoutedEventArgs e)
+      {
+         cancelSearch.Cancel();
       }
    }
 }

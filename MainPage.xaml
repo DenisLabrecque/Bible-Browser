@@ -658,6 +658,7 @@
                   <!-- Search view -->
                   <TextBlock x:Name="txtSearchStatus" Style="{StaticResource BaseTextBlockStyle}" />
                   <ProgressBar x:Name="progSearchProgress"  Maximum="1" />
+                  <Button x:Name="btnCancelSearch" Content="Cancel" Click="BtnCancelSearch_Click" />
                   <ListView x:Name="lvSearchResults">
                   </ListView>
 

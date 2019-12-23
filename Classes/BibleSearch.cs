@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BibleBrowserUWP
@@ -110,7 +111,7 @@ namespace BibleBrowserUWP
       /// Asynchronously search the Bible for every verse that contains a certain text as a substring.
       /// </summary>
       /// <param name="query">The string to be matched in the Bible reference for the verse to be returned.</param>
-      public static async Task<SearchProgressInfo> SearchAsync(BibleVersion version, string query, IProgress<SearchProgressInfo> progress)
+      public static async Task<SearchProgressInfo> SearchAsync(BibleVersion version, string query, IProgress<SearchProgressInfo> progress, CancellationToken cancellation)
       {
          SearchProgressInfo progressInfo = new SearchProgressInfo(query);
          query = query.ToLower().RemoveDiacritics();
@@ -128,20 +129,31 @@ namespace BibleBrowserUWP
                // Go through each chapter of the book of the Bible
                for (int chapter = 1; chapter <= version.GetChapterCount(reference); chapter++)
                {
-                  BibleReference chapterReference = new BibleReference(version, null, (BibleBook)book, chapter);
-
-                  // Go through each verse of the chapter
-                  int verseNumber = 1;
-                  foreach (string verse in version.GetChapterVerses(chapterReference))
+                  // Continue if the search was not cancelled
+                  try
                   {
-                     if (verse.ToLower().RemoveDiacritics().Contains(query))
-                     {
-                        BibleReference hit = new BibleReference(version, null, (BibleBook)book, chapter, verseNumber);
-                        Debug.WriteLine(hit + ":" + verseNumber + " -- " + verse);
-                        progressInfo.AddResult(hit);
-                     }
+                     // Skip if the search was cancelled
+                     cancellation.ThrowIfCancellationRequested();
+                     BibleReference chapterReference = new BibleReference(version, null, (BibleBook)book, chapter);
 
-                     verseNumber++;
+                     // Go through each verse of the chapter
+                     int verseNumber = 1;
+                     foreach (string verse in version.GetChapterVerses(chapterReference))
+                     {
+                        if (verse.ToLower().RemoveDiacritics().Contains(query))
+                        {
+                           BibleReference hit = new BibleReference(version, null, (BibleBook)book, chapter, verseNumber);
+                           Debug.WriteLine(hit + ":" + verseNumber + " -- " + verse);
+                           progressInfo.AddResult(hit);
+                        }
+
+                        verseNumber++;
+                     }
+                  }
+                  // Handle the search being cancelled
+                  catch (OperationCanceledException e) {
+                     Debug.WriteLine(e.Message);
+                     return progressInfo; // That's all we got folks
                   }
                }
             }
