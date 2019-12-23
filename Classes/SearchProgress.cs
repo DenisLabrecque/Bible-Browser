@@ -16,50 +16,31 @@ namespace BibleBrowserUWP
    /// </summary>
    public class SearchProgressInfo
    {
-      private static SearchProgressInfo m_StaticProgress = null; // Reference back to a single progress object
-
       private float m_Progress;
       private string m_Task;
-      private ObservableCollection<BibleReference> m_Results;
+      private List<BibleReference> m_Results;
       private string m_Query;
       private DateTime m_TimeStarted;
       private DateTime m_TimeEnded;
 
-      public event PropertyChangedEventHandler PropertyChanged;
 
       /// <summary>
-      /// Call this to reset the search before calling it. This removes any previous search result.
-      /// Sets the search start time.
+      /// Constructor that initializes the new search.
       /// </summary>
-      public void StartNewSearch(string query)
+      public SearchProgressInfo(string query)
       {
          m_Query = query;
-         Reinitialize();
+         m_Progress = 0f;
+         m_Task = string.Empty;
+         m_Results = new List<BibleReference>();
          m_TimeStarted = DateTime.Now;
          m_TimeEnded = DateTime.Now;
       }
 
       /// <summary>
-      /// Reinitializes values like a constructor.
-      /// </summary>
-      private void Reinitialize()
-      {
-         m_Progress = 0f;
-         m_Task = "Doing Nothing";
-         if(m_Results == null)
-         {
-            m_Results = new ObservableCollection<BibleReference>();
-         }
-         else
-         {
-            m_Results.Clear();
-         }
-      }
-
-      /// <summary>
       /// Percent of completion from 0 to 1. Updates the search time.
       /// </summary>
-      public float Progress {
+      public float Completion {
          get {
             return m_Progress;
          }
@@ -102,23 +83,8 @@ namespace BibleBrowserUWP
       /// <summary>
       /// The list of results found, updated dynamically as results are added.
       /// </summary>
-      public ObservableCollection<BibleReference> Results {
+      public List<BibleReference> Results {
          get { return m_Results; }
-      }
-
-      /// <summary>
-      /// A single reference to one instance of this class.
-      /// </summary>
-      public static SearchProgressInfo Single {
-         get {
-            if(m_StaticProgress == null)
-            {
-               m_StaticProgress = new SearchProgressInfo();
-            }
-
-            return m_StaticProgress;
-         }
-         set { m_StaticProgress = value; }
       }
 
       /// <summary>

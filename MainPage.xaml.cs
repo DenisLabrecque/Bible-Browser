@@ -49,6 +49,7 @@ namespace BibleBrowserUWP
       bool m_isPlaybackStarted = false;
       bool m_areTabsLoaded = false;
       private BibleReference m_previousReference = new BibleReference(BibleVersion.DefaultVersion, null);
+      ObservableCollection<BibleReference> m_SearchResults = new ObservableCollection<BibleReference>();
 
       #endregion
 
@@ -56,7 +57,6 @@ namespace BibleBrowserUWP
       #region Properties
 
       TrulyObservableCollection<BrowserTab> Tabs { get => BrowserTab.Tabs; }
-      SearchProgressInfo SearchProgress { get => SearchProgressInfo.Single; }
 
       // Gets all available Bibles, minus the one already selected, if there is one.
       ObservableCollection<BibleVersion> Bibles {
@@ -824,9 +824,17 @@ namespace BibleBrowserUWP
       private void ReportSearchProgress(SearchProgressInfo progress)
       {
          // Update the UI to reflect the progress value that is passed back.
-         Debug.WriteLine("Progress reported from search with values: " + " task: " + progress.Status + ", percent: " + progress.Progress * 100);
-         progSearchProgress.Value = progress.Progress;
-         lvSearchResults.ItemsSource = progress.Results;
+         Debug.WriteLine("Progress reported from search with values: " + " task: " + progress.Status + ", percent: " + progress.Completion * 100);
+         progSearchProgress.Value = progress.Completion;
+         lvSearchResults.ItemsSource = m_SearchResults;
+         if(m_SearchResults.Count < progress.Results.Count) // A new result was found since last time
+         {
+            // Add the new results that were found
+            for (int i = Math.Clamp(m_SearchResults.Count - 1, 0, int.MaxValue); i < Math.Clamp(progress.Results.Count - 1, 0, int.MaxValue); i++)
+            {
+               m_SearchResults.Add(progress.Results[i]);
+            }
+         }
          txtSearchStatus.Text = progress.Status;
       }
 
