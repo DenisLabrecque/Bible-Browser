@@ -51,7 +51,7 @@ namespace BibleBrowserUWP
       bool m_areTabsLoaded = false;
       CancellationTokenSource cancelSearch;
       private BibleReference m_previousReference = new BibleReference(BibleVersion.DefaultVersion, null);
-      ObservableCollection<BibleReference> m_SearchResults = new ObservableCollection<BibleReference>();
+      ObservableCollection<SearchResult> m_SearchResults = new ObservableCollection<SearchResult>();
 
       #endregion
 
@@ -59,6 +59,7 @@ namespace BibleBrowserUWP
       #region Properties
 
       TrulyObservableCollection<BrowserTab> Tabs { get => BrowserTab.Tabs; }
+      ObservableCollection<SearchResult> SearchResults { get => m_SearchResults; }
 
       // Gets all available Bibles, minus the one already selected, if there is one.
       ObservableCollection<BibleVersion> Bibles {
@@ -82,7 +83,7 @@ namespace BibleBrowserUWP
       /// <summary>
       /// The maximum width the chapter column can take up, in which verses fit.
       /// </summary>
-      public static double ChapterWidth {
+      public double ChapterWidth {
          get; private set;
       }
 
@@ -840,6 +841,20 @@ namespace BibleBrowserUWP
          txtSearchStatus.Text = progress.Status;
       }
 
+      private void HideSearch()
+      {
+         lvSearchResults.Visibility = Visibility.Collapsed;
+         progSearchProgress.Visibility = Visibility.Collapsed;
+         btnCancelSearch.Visibility = Visibility.Collapsed;
+      }
+
+      private void ShowSearch()
+      {
+         lvSearchResults.Visibility = Visibility.Visible;
+         progSearchProgress.Visibility = Visibility.Visible;
+         btnCancelSearch.Visibility = Visibility.Visible;
+      }
+
       private async void AsbSearch_KeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
       {
          if(e.Key == Windows.System.VirtualKey.Enter)
@@ -890,29 +905,19 @@ namespace BibleBrowserUWP
             }
             else
             {
-
-               ///await Task.Run(() => BibleSearch.Search(version, query));
-               ///
-               //await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
-               //   {
-               //      // Your UI update code goes here!
-               //      await BibleSearch.SearchAsync(version, query, searchProgress);
-               //      lvSearchResults.ItemsSource = SearchProgress.Results;
-               //   }
-               //);
-
-
                // Construct Progress<T>, passing ReportProgress as the Action<T> 
                Progress<SearchProgressInfo> progressIndicator = new Progress<SearchProgressInfo>(ReportSearchProgress);
                cancelSearch = new CancellationTokenSource();
                // Call async method
                try
                {
+                  ShowSearch();
                   await BibleSearch.SearchAsync(version, query, progressIndicator, cancelSearch.Token);
                }
                // Handle the search being cancelled at any point
                catch (OperationCanceledException)
                {
+                  HideSearch();
                   lvSearchResults.ItemsSource = null;
                }
             }

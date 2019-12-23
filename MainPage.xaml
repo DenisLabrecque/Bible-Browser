@@ -657,9 +657,23 @@
                   
                   <!-- Search view -->
                   <TextBlock x:Name="txtSearchStatus" Style="{StaticResource BaseTextBlockStyle}" />
-                  <ProgressBar x:Name="progSearchProgress"  Maximum="1" />
-                  <Button x:Name="btnCancelSearch" Content="Cancel" Click="BtnCancelSearch_Click" />
-                  <ListView x:Name="lvSearchResults">
+                  <ListView x:Name="lvSearchResults"
+                            ItemsSource="{x:Bind SearchResults}"
+                            Width="500">
+                     <ListView.ItemTemplate>
+                        <DataTemplate>
+                           <StackPanel>
+                              <RichTextBlock>
+                                 <Paragraph>
+                                    <Run Text="{Binding FullReference}"></Run>
+                                 </Paragraph>
+                                 <Paragraph>
+                                    <Run Text="{Binding VerseText}"></Run>
+                                 </Paragraph>
+                              </RichTextBlock>
+                           </StackPanel>
+                        </DataTemplate>
+                     </ListView.ItemTemplate>
                   </ListView>
 
                   <!-- Compare view (main content) -->
@@ -735,8 +749,7 @@
          </Button>
 
          <!-- Command Bar -->
-         <Grid Height="40"
-               VerticalAlignment="Top"
+         <Grid VerticalAlignment="Top"
                Background="Transparent"
                BorderBrush="{ThemeResource ReceptusGrey}"
                BorderThickness="0,0,0,1"
@@ -746,9 +759,14 @@
                <ColumnDefinition Width="1*"/>
                <ColumnDefinition Width="90"/>
             </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+               <RowDefinition></RowDefinition>
+               <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
 
             <!-- Previous and Next buttons -->
             <StackPanel Grid.Column="0"
+                        Grid.Row="0"
                         Orientation="Horizontal"
                         Background="{ThemeResource AppBarBackgroundThemeBrush}">
 
@@ -803,6 +821,7 @@
 
             <!-- Search -->
             <StackPanel Grid.Column="1"
+                        Grid.Row="0"
                         BorderThickness="3"
                         BorderBrush="{ThemeResource AppBarBackgroundThemeBrush}">
                <Grid BorderBrush="{ThemeResource ReceptusGrey}"
@@ -935,6 +954,19 @@
                   </Button.KeyboardAccelerators>
                   <FontIcon FontSize="15" Glyph="&#xE769;"/>
                </Button>-->
+               <Button Style="{StaticResource CommandButton}"
+                       x:Name="btnCancelSearch"
+                       ToolTipService.ToolTip="Cancel search"
+                       Margin="4,0"
+                       FontFamily="Segoe MDL2 Assets"
+                       HorizontalAlignment="Right"
+                       Visibility="Collapsed"
+                       Click="BtnCancelSearch_Click">
+                  <Button.KeyboardAccelerators>
+                     <KeyboardAccelerator Modifiers="None" Key="Escape" />
+                  </Button.KeyboardAccelerators>
+                  <FontIcon FontSize="15" Glyph="&#xE711;"/>
+               </Button>
 
                <!-- More hamburger menu -->
                <Button Name="btnMore"
@@ -942,7 +974,7 @@
                        ToolTipService.ToolTip="Menu (Ctrl+M)"
                        FontFamily="Segoe MDL2 Assets"
                        HorizontalAlignment="Right"
-                       Margin="45,0">
+                       Margin="0,0">
                   <Button.KeyboardAccelerators>
                      <KeyboardAccelerator Modifiers="Control" Key="M"/>
                   </Button.KeyboardAccelerators>
@@ -993,6 +1025,11 @@
                      </Flyout>
                   </Button.Flyout>
                </Button>
+            </StackPanel>
+
+            <StackPanel Grid.ColumnSpan="3"
+                        Grid.Row="1">
+               <ProgressBar x:Name="progSearchProgress" Maximum="1" Visibility="Collapsed" />
             </StackPanel>
          </Grid>
       </Grid>

@@ -34,8 +34,15 @@ namespace BibleBrowserUWP
       public BibleVersion ComparisonVersion { get; private set; } // Null by default
       public BookNumeral Numeral { get; private set; }
       public BibleBook Book { get; private set; }
-      public string SimplifiedReference { get => BookName + " " + Chapter; } // Book name and chapter
-      public double VerticalScrollOffset = 0; // How much has been seen; default to zero to start at the top
+      /// <summary>
+      /// Book chapter
+      /// </summary>
+      public string SimplifiedReference { get => BookName + " " + Chapter; }
+      /// <summary>
+      /// Book chapter:verse
+      /// </summary>
+      public string FullReference { get => BookName + " " + Chapter + ":" + Verse; }
+      public double VerticalScrollOffset = 0; // How much of the chapter has been seen; default to zero to start at the top
 
       /// <summary>
       /// The default Bible reference.

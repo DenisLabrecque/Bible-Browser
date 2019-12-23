@@ -18,7 +18,7 @@ namespace BibleBrowserUWP
    {
       private float m_Progress;
       private string m_Task;
-      private List<BibleReference> m_Results;
+      private List<SearchResult> m_Results;
       private string m_Query;
       private DateTime m_TimeStarted;
       private DateTime m_TimeEnded;
@@ -32,7 +32,7 @@ namespace BibleBrowserUWP
          m_Query = query;
          m_Progress = 0f;
          m_Task = string.Empty;
-         m_Results = new List<BibleReference>();
+         m_Results = new List<SearchResult>();
          m_TimeStarted = DateTime.Now;
          m_TimeEnded = DateTime.Now;
       }
@@ -83,7 +83,7 @@ namespace BibleBrowserUWP
       /// <summary>
       /// The list of results found, updated dynamically as results are added.
       /// </summary>
-      public List<BibleReference> Results {
+      public List<SearchResult> Results {
          get { return m_Results; }
       }
 
@@ -91,7 +91,7 @@ namespace BibleBrowserUWP
       /// Main method to add a search result to the list of search hits.
       /// </summary>
       /// <param name="match">A reference that matches the search query being run.</param>
-      public void AddResult(BibleReference match)
+      public void AddResult(SearchResult match)
       {
          m_Results.Add(match);
       }
