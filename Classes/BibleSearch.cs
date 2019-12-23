@@ -123,7 +123,7 @@ namespace BibleBrowserUWP
             {
                BibleReference reference = new BibleReference(version, null, (BibleBook)book);
                progressInfo.Completion = DGL.Math.Percent(book + 1, version.BookNumbers.Count);
-               progressInfo.Status = "Searching " + version.BookNames[book];
+               progressInfo.Status = version.BookNames[book];
                progress.Report(progressInfo);
 
                // Go through each chapter of the book of the Bible
@@ -152,8 +152,8 @@ namespace BibleBrowserUWP
                   }
                   // Handle the search being cancelled
                   catch (OperationCanceledException e) {
-                     Debug.WriteLine(e.Message);
-                     return progressInfo; // That's all we got folks
+                     progressInfo.IsCanceled = true; // Let the user know that the operation has been ended unexpectedly
+                     return progressInfo;
                   }
                }
             }
@@ -161,6 +161,7 @@ namespace BibleBrowserUWP
             return progressInfo;
          });
 
+         progressInfo.Status = "Search complete.";
          return progressInfo;
       }
 

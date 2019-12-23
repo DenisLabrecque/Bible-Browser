@@ -118,6 +118,7 @@ namespace BibleBrowserUWP
 
          this.InitializeComponent();
          HideAllDropdowns(); // Don't show Genesis 1
+         HideSearch();
 
          // Set theme for window root.
          FrameworkElement root = (FrameworkElement)Window.Current.Content;
@@ -845,20 +846,31 @@ namespace BibleBrowserUWP
       {
          lvSearchResults.Visibility = Visibility.Collapsed;
          progSearchProgress.Visibility = Visibility.Collapsed;
+         txtSearchStatus.Visibility = Visibility.Collapsed;
          btnCancelSearch.Visibility = Visibility.Collapsed;
       }
 
+      /// <summary>
+      /// Show the search results region and progress bar.
+      /// </summary>
       private void ShowSearch()
       {
          lvSearchResults.Visibility = Visibility.Visible;
          progSearchProgress.Visibility = Visibility.Visible;
+         txtSearchStatus.Visibility = Visibility.Visible;
          btnCancelSearch.Visibility = Visibility.Visible;
       }
 
+      /// <summary>
+      /// Detect different keystrokes in the search bar.
+      /// </summary>
       private async void AsbSearch_KeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
       {
          if(e.Key == Windows.System.VirtualKey.Enter)
          {
+            // Set focus elsewhere than the search bar
+            root.Focus(FocusState.Programmatic);
+
             // Have a reference to go to ready
             BibleReference reference = BrowserTab.Selected.Reference;
             if (reference == null) {
@@ -909,17 +921,32 @@ namespace BibleBrowserUWP
                Progress<SearchProgressInfo> progressIndicator = new Progress<SearchProgressInfo>(ReportSearchProgress);
                cancelSearch = new CancellationTokenSource();
                // Call async method
-               try
-               {
-                  ShowSearch();
-                  await BibleSearch.SearchAsync(version, query, progressIndicator, cancelSearch.Token);
-               }
+               ShowSearch();
+               lvSearchResults.ItemsSource = null; // Empty from any previous search results
+               SearchProgressInfo task = await BibleSearch.SearchAsync(version, query, progressIndicator, cancelSearch.Token);
                // Handle the search being cancelled at any point
-               catch (OperationCanceledException)
+               if (task.IsCanceled)
                {
                   HideSearch();
                   lvSearchResults.ItemsSource = null;
                }
+               else
+               {
+                  // Show the number of results as status
+                  if(m_SearchResults.Count == 0)
+                  {
+                     txtSearchStatus.Text = "No result for '" + task.Query + "'";
+                  }
+                  else if(m_SearchResults.Count == 1)
+                  {
+                     txtSearchStatus.Text = "One result for '" + task.Query + "'";
+                  }
+                  else
+                  {
+                     txtSearchStatus.Text = task.Results.Count + " results for '" + task.Query + "'";
+                  }
+               }
+               cancelSearch.Dispose();
             }
             
 
@@ -1117,7 +1144,16 @@ namespace BibleBrowserUWP
 
       private void BtnCancelSearch_Click(object sender, RoutedEventArgs e)
       {
-         cancelSearch.Cancel();
+         try
+         {
+            cancelSearch.Cancel();
+         }
+         // The search is finished, so it can no longer be cancelled
+         catch(ObjectDisposedException)
+         {
+            // Close the search bar
+            HideSearch();
+         }
       }
    }
 }

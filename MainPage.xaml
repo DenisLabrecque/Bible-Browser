@@ -656,7 +656,6 @@
                <StackPanel Margin="0, 80">
                   
                   <!-- Search view -->
-                  <TextBlock x:Name="txtSearchStatus" Style="{StaticResource BaseTextBlockStyle}" />
                   <ListView x:Name="lvSearchResults"
                             ItemsSource="{x:Bind SearchResults}"
                             Width="500">
@@ -751,8 +750,6 @@
          <!-- Command Bar -->
          <Grid VerticalAlignment="Top"
                Background="Transparent"
-               BorderBrush="{ThemeResource ReceptusGrey}"
-               BorderThickness="0,0,0,1"
                Grid.Row="0">
             <Grid.ColumnDefinitions>
                <ColumnDefinition Width="130"/>
@@ -929,6 +926,7 @@
                         Orientation="Horizontal"
                         Background="{ThemeResource AppBarBackgroundThemeBrush}"
                         Width="90"
+                        FlowDirection="RightToLeft"
                         HorizontalAlignment="Right">
 
                <!-- Play (read out loud) -->
@@ -954,20 +952,7 @@
                   </Button.KeyboardAccelerators>
                   <FontIcon FontSize="15" Glyph="&#xE769;"/>
                </Button>-->
-               <Button Style="{StaticResource CommandButton}"
-                       x:Name="btnCancelSearch"
-                       ToolTipService.ToolTip="Cancel search"
-                       Margin="4,0"
-                       FontFamily="Segoe MDL2 Assets"
-                       HorizontalAlignment="Right"
-                       Visibility="Collapsed"
-                       Click="BtnCancelSearch_Click">
-                  <Button.KeyboardAccelerators>
-                     <KeyboardAccelerator Modifiers="None" Key="Escape" />
-                  </Button.KeyboardAccelerators>
-                  <FontIcon FontSize="15" Glyph="&#xE711;"/>
-               </Button>
-
+               
                <!-- More hamburger menu -->
                <Button Name="btnMore"
                        Style="{StaticResource CommandButton}"
@@ -983,7 +968,9 @@
                   <!-- Settings menu -->
                   <Button.Flyout>
                      <Flyout x:Name="spMainMenu" FlyoutPresenterStyle="{StaticResource Flyout}">
-                        <StackPanel HorizontalAlignment="Left" Padding="20,5">
+                        <StackPanel HorizontalAlignment="Left"
+                                    Padding="20,5"
+                                    FlowDirection="LeftToRight">
                            <TextBlock HorizontalAlignment="Left"
                                       HorizontalTextAlignment="Left"
                                       Margin="0,0"
@@ -1025,11 +1012,41 @@
                      </Flyout>
                   </Button.Flyout>
                </Button>
+
+               <!-- Close search -->
+               <Button Style="{StaticResource CommandButton}"
+                       x:Name="btnCancelSearch"
+                       ToolTipService.ToolTip="Cancel search"
+                       Margin="4,0"
+                       FontFamily="Segoe MDL2 Assets"
+                       HorizontalAlignment="Right"
+                       Visibility="Collapsed"
+                       Click="BtnCancelSearch_Click">
+                  <Button.KeyboardAccelerators>
+                     <KeyboardAccelerator Modifiers="None" Key="Escape" />
+                  </Button.KeyboardAccelerators>
+                  <FontIcon FontSize="15" Glyph="&#xE711;"/>
+               </Button>
             </StackPanel>
 
             <StackPanel Grid.ColumnSpan="3"
                         Grid.Row="1">
-               <ProgressBar x:Name="progSearchProgress" Maximum="1" Visibility="Collapsed" />
+               <Grid>
+                  <Grid.RowDefinitions>
+                     <RowDefinition/>
+                     <RowDefinition/>
+                  </Grid.RowDefinitions>
+
+                  <ProgressBar x:Name="progSearchProgress"
+                               Maximum="1"
+                               Grid.Row="0"/>
+                  <TextBlock x:Name="txtSearchStatus"
+                             Text="Status"
+                             Margin="5,0"
+                             Grid.Row="1"
+                             FontFamily="/Assets/Fonts/PalanquinDark.ttf#Palanquin Dark Regular"
+                             Style="{StaticResource CaptionTextBlockStyle}"/>
+               </Grid>
             </StackPanel>
          </Grid>
       </Grid>

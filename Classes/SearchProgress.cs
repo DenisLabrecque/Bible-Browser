@@ -22,6 +22,7 @@ namespace BibleBrowserUWP
       private string m_Query;
       private DateTime m_TimeStarted;
       private DateTime m_TimeEnded;
+      private bool m_IsCanceled;
 
 
       /// <summary>
@@ -35,6 +36,7 @@ namespace BibleBrowserUWP
          m_Results = new List<SearchResult>();
          m_TimeStarted = DateTime.Now;
          m_TimeEnded = DateTime.Now;
+         m_IsCanceled = false;
       }
 
       /// <summary>
@@ -94,6 +96,14 @@ namespace BibleBrowserUWP
       public void AddResult(SearchResult match)
       {
          m_Results.Add(match);
+      }
+
+      /// <summary>
+      /// Whether this operation has been ended by the user.
+      /// </summary>
+      public bool IsCanceled {
+         get { return m_IsCanceled; }
+         set { m_IsCanceled = value; }
       }
    }
 }
