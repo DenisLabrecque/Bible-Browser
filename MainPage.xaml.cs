@@ -49,6 +49,8 @@ namespace BibleBrowserUWP
 
       bool m_isPlaybackStarted = false;
       bool m_areTabsLoaded = false;
+      bool m_isAppNewlyOpened = true;
+      bool m_areDropdownsDisplayed = false;
       CancellationTokenSource cancelSearch;
       private BibleReference m_previousReference = new BibleReference(BibleVersion.DefaultVersion, null);
       ObservableCollection<SearchResult> m_SearchResults = new ObservableCollection<SearchResult>();
@@ -345,6 +347,7 @@ namespace BibleBrowserUWP
          ddbVersion.Visibility = Visibility.Collapsed;
          ddbBook.Visibility = Visibility.Collapsed;
          ddbChapter.Visibility = Visibility.Collapsed;
+         m_areDropdownsDisplayed = false;
       }
 
       /// <summary>
@@ -369,6 +372,7 @@ namespace BibleBrowserUWP
                ddbVersion.Visibility = Visibility.Visible;
                ddbBook.Visibility = Visibility.Visible;
                ddbChapter.Visibility = Visibility.Collapsed;
+               m_areDropdownsDisplayed = true;
             }
             else
             {
@@ -387,8 +391,8 @@ namespace BibleBrowserUWP
                ddbBook.Visibility = Visibility.Visible;
                ddbChapter.Visibility = Visibility.Visible;
 
-               //btnCompare.IsEnabled = true;
-               //rtbVerses.Focus(FocusState.Programmatic); // Focus away from the search box
+               txtSearchStatus.Focus(FocusState.Programmatic); // Focus away from the search box
+               m_areDropdownsDisplayed = true;
             }
          }
       }
@@ -812,7 +816,15 @@ namespace BibleBrowserUWP
 
       private void AsbSearch_GotFocus(object sender, RoutedEventArgs e)
       {
-         HideAllDropdowns();
+         if(m_isAppNewlyOpened)
+         {
+            // Ignore the first interaction so that the search bar doesn't get focus on app opening
+            m_isAppNewlyOpened = false;
+         }
+         else
+         {
+            HideAllDropdowns();
+         }
       }
 
       private void AsbSearch_LostFocus(object sender, RoutedEventArgs e)
@@ -868,8 +880,8 @@ namespace BibleBrowserUWP
       {
          if(e.Key == Windows.System.VirtualKey.Enter)
          {
-            // Set focus elsewhere than the search bar
-            root.Focus(FocusState.Programmatic);
+            string query = ((TextBox)sender).Text;
+            //QueryIsInJumpToForm();
 
             // Have a reference to go to ready
             BibleReference reference = BrowserTab.Selected.Reference;
@@ -884,7 +896,7 @@ namespace BibleBrowserUWP
             bool foundVersion = false;
 
             List<string> queryElements = new List<string>();
-            string query = ((TextBox)sender).Text;
+
 
 
 
@@ -922,7 +934,7 @@ namespace BibleBrowserUWP
                cancelSearch = new CancellationTokenSource();
                // Call async method
                ShowSearch();
-               lvSearchResults.ItemsSource = null; // Empty from any previous search results
+               m_SearchResults.Clear(); // Empty from any previous search results
                SearchProgressInfo task = await BibleSearch.SearchAsync(version, query, progressIndicator, cancelSearch.Token);
                // Handle the search being cancelled at any point
                if (task.IsCanceled)
@@ -1044,6 +1056,14 @@ namespace BibleBrowserUWP
             ShowAllDropdowns();
             PrintChapter(reference);            
          }
+         // Select the search box text on backspace if the dropdowns are being displayed
+         else if(e.Key == Windows.System.VirtualKey.Back)
+         {
+            if (m_areDropdownsDisplayed)
+            {
+               HideAllDropdowns();
+            }
+         }
          // Autosuggest
          else
          {
@@ -1064,6 +1084,19 @@ namespace BibleBrowserUWP
             //   }
             //}
          }
+      }
+
+      /// <summary>
+      /// Test whether the query closely matches a Bible book name.
+      /// When this is so, the whole query should be formatted in such a way that it fits the pattern.
+      /// Two ways the pattern can match:
+      /// 1. The query uses a correct version abbreviation (eg. KJV), followed by a colon, followed by a correct or nearly correct
+      /// book name, followed by optional numbers only.
+      /// 2. The query uses a correct or nearly correct book name, followed by optional numbers.
+      /// </summary>
+      private void QueryIsInJumpToForm()
+      {
+
       }
 
       #endregion

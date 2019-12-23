@@ -117,14 +117,14 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="btnNext.ToolTipService.ToolTip" xml:space="preserve">
+  <data name="btnRightPage.ToolTipService.ToolTip" xml:space="preserve">
     <value>Forward (Ctrl+Right Arrow)</value>
   </data>
-  <data name="btnPrevious.ToolTipService.ToolTip" xml:space="preserve">
-    <value>Back Ctrl+Left Arrow</value>
+  <data name="btnLeftPage.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Back (Ctrl+Left Arrow)</value>
   </data>
-  <data name="NewTab" xml:space="preserve">
-    <value>New tab</value>
+  <data name="btnNewTab.ToolTipService.ToolTip" xml:space="preserve">
+    <value>New tab (Ctrl+T)</value>
   </data>
   <data name="asbSearch.PlaceholderText" xml:space="preserve">
     <value>Reference or word search</value>
@@ -132,7 +132,7 @@
   <data name="cbDefaultVersion.Header" xml:space="preserve">
     <value>Default version</value>
   </data>
-  <data name="paraFreeToUse.Content" xml:space="preserve">
+  <data name="freeToUse.Text" xml:space="preserve">
     <value>The Bible versions used in this application have expired their copyright and are therefore free to use.</value>
   </data>
   <data name="SettingsTitle.Text" xml:space="preserve">
@@ -149,5 +149,32 @@
   </data>
   <data name="txtCredits.Text" xml:space="preserve">
     <value>Credits</value>
+  </data>
+  <data name="2019forFeedback.Text" xml:space="preserve">
+    <value>, 2019. For feedback or comments, please </value>
+  </data>
+  <data name="appProgrammedBy.Text" xml:space="preserve">
+    <value>App programmed by</value>
+  </data>
+  <data name="btnMore.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Options menu (Ctrl+M)</value>
+  </data>
+  <data name="btnNext.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Next (Ctrl+right arrow)</value>
+  </data>
+  <data name="btnPrevious.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Back (Ctrl+left arrow)</value>
+  </data>
+  <data name="contributePayPal.Text" xml:space="preserve">
+    <value>contributing a small sum on PayPal.</value>
+  </data>
+  <data name="contributionsAre.Text" xml:space="preserve">
+    <value>Any gift is optional, out of the kindness of your heart, and goes to my personal account.</value>
+  </data>
+  <data name="nonFundedEncouragement.Text" xml:space="preserve">
+    <value>This app is a non-funded personal project. If you like it, you can send encouragement by</value>
+  </data>
+  <data name="sendMeEmail.Text" xml:space="preserve">
+    <value>send me an email.</value>
   </data>
 </root>

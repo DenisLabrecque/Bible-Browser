@@ -117,14 +117,14 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="btnNext.ToolTipService.ToolTip" xml:space="preserve">
-    <value>Suivant (ctrl+flèche droite)</value>
+  <data name="btnRightPage.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Chapitre suivant (flèche droite)</value>
   </data>
-  <data name="btnPrevious.ToolTipService.ToolTip" xml:space="preserve">
-    <value>Retour (ctrl+flèche gauche)</value>
+  <data name="btnLeftPage.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Chapitre précédent (flèche gauche)</value>
   </data>
-  <data name="NewTab" xml:space="preserve">
-    <value>Nouvel onglet</value>
+  <data name="btnNewTab.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Nouvel onglet (Ctrl+T)</value>
   </data>
   <data name="asbSearch.PlaceholderText" xml:space="preserve">
     <value>Recherche par mot ou référence</value>
@@ -132,7 +132,7 @@
   <data name="cbDefaultVersion.Header" xml:space="preserve">
     <value>Version par défaut</value>
   </data>
-  <data name="paraFreeToUse.Content" xml:space="preserve">
+  <data name="freeToUse.Text" xml:space="preserve">
     <value>Les versions de la Bible présentées dans cette application, ayant expiré leurs droits d'auteur, sont libres d'utilisation.</value>
   </data>
   <data name="SettingsTitle.Text" xml:space="preserve">
@@ -149,5 +149,32 @@
   </data>
   <data name="txtCredits.Text" xml:space="preserve">
     <value>Crédits</value>
+  </data>
+  <data name="2019forFeedback.Text" xml:space="preserve">
+    <value>en 2019. Pour tout commentaire, veuillez</value>
+  </data>
+  <data name="appProgrammedBy.Text" xml:space="preserve">
+    <value>Cette application a été programmée par</value>
+  </data>
+  <data name="btnMore.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Menu d'options (Ctrl+M)</value>
+  </data>
+  <data name="btnNext.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Suivant (Ctrl+flèche droite)</value>
+  </data>
+  <data name="btnPrevious.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Retour (Ctrl+flèche gauche)</value>
+  </data>
+  <data name="contributePayPal.Text" xml:space="preserve">
+    <value>en contribuant un petit montant sur PayPal.</value>
+  </data>
+  <data name="contributionsAre.Text" xml:space="preserve">
+    <value>Tout don est optionnel, de la bonté de votre cœur, et va directement vers mon compte personnel.</value>
+  </data>
+  <data name="nonFundedEncouragement.Text" xml:space="preserve">
+    <value>Cette application est un projet personnel sans fonds. Si vous le désirez, vous pouvez m'envoyer un encouragement</value>
+  </data>
+  <data name="sendMeEmail.Text" xml:space="preserve">
+    <value>m'envoyer un courriel.</value>
   </data>
 </root>

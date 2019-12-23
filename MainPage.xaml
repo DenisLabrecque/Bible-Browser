@@ -622,6 +622,7 @@
             <!-- New Tab Button -->
             <Button Name="btnNewTab"
                     Style="{ThemeResource TabBarButton}"
+                    x:Uid="btnNewTab"
                     ToolTipService.ToolTip="New tab (Ctrl+T)"
                     Click="BtnNewTab_Click">
                <FontIcon FontSize="15" Glyph="&#xE710;"/>
@@ -727,6 +728,7 @@
                  Click="BtnLeftPage_Click"
                  HorizontalAlignment="Left"
                  VerticalAlignment="Center"
+                 x:Uid="btnLeftPage"
                  ToolTipService.ToolTip="Previous chapter (Left arrow)">
             <FontIcon Glyph="&#xE76B;" /><!-- Chevron left -->
             <Button.KeyboardAccelerators>
@@ -740,6 +742,7 @@
                  Click="BtnRightPage_Click"
                  HorizontalAlignment="Right"
                  VerticalAlignment="Center"
+                 x:Uid="btnRightPage"
                  ToolTipService.ToolTip="Next chapter (Right arrow)">
             <FontIcon Glyph="&#xE76C;" /><!-- Chevron right -->
             <Button.KeyboardAccelerators>
@@ -770,6 +773,7 @@
                <!-- Back -->
                <Button Style="{ThemeResource CommandButton}"
                        Name="btnPrevious"
+                       x:Uid="btnPrevious"
                        ToolTipService.ToolTip="Previous"
                        Click="BtnPrevious_Click">
                   <Button.KeyboardAccelerators>
@@ -781,6 +785,7 @@
                <!-- Next -->
                <Button Style="{ThemeResource CommandButton}"
                        Name="btnNext"
+                       x:Uid="btnNext"
                        ToolTipService.ToolTip="Next"
                        Click="BtnNext_Click">
                   <Button.KeyboardAccelerators>
@@ -956,6 +961,7 @@
                <!-- More hamburger menu -->
                <Button Name="btnMore"
                        Style="{StaticResource CommandButton}"
+                       x:Uid="btnMore"
                        ToolTipService.ToolTip="Menu (Ctrl+M)"
                        FontFamily="Segoe MDL2 Assets"
                        HorizontalAlignment="Right"
@@ -1002,10 +1008,24 @@
                                       x:Uid="txtCredits">Credits</TextBlock>
                            <RichTextBlock LineHeight="18"
                                           x:Uid="rtbCredits">
-                              <Paragraph Margin="0, 5">App programmed by
-                                 <Hyperlink NavigateUri="https://www.linkedin.com/in/denisglabrecque/">Denis Labrecque</Hyperlink>, 2019.
+                              <Paragraph Margin="0, 5">
+                                 <Run x:Uid="appProgrammedBy">App programmed by</Run>
+                                 <Hyperlink NavigateUri="https://www.linkedin.com/in/denisglabrecque/">Denis Labrecque</Hyperlink>
+                                 <Run x:Uid="2019forFeedback">, 2019. For feedback or comments, please </Run>
+                                 <Hyperlink NavigateUri="mailto:denis.g.labrecque@gmail.com">
+                                    <Run x:Uid="sendMeEmail">send me an email.</Run>
+                                 </Hyperlink>
                               </Paragraph>
-                              <Paragraph Margin="0, 5">The Bible versions used in this application have expired their copyright and are therefore free to use.</Paragraph>
+                              <Paragraph>
+                                 <Run x:Uid="nonFundedEncouragement">This app is a non-funded personal project. If you like it, you can send encouragement by</Run>
+                                 <Hyperlink NavigateUri="https://www.paypal.me/DenisLabrecque/5">
+                                    <Run x:Uid="contributePayPal">contributing a small sum on PayPal.</Run>
+                                 </Hyperlink>
+                                 <Run x:Uid="contributionsAre">Any contribution is completely optional, and goes to my personal account.</Run>
+                              </Paragraph>
+                              <Paragraph Margin="0, 5">
+                                 <Run x:Uid="freeToUse">The Bible versions used in this application have expired their copyright and are therefore free to use.</Run>
+                              </Paragraph>
                            </RichTextBlock>
                            <Image Source="/Assets/Receptus-logo-general.png" MaxWidth="250" Margin="20"/>
                         </StackPanel>
