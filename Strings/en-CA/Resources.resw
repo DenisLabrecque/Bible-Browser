@@ -142,10 +142,10 @@
     <value>Colour theme</value>
   </data>
   <data name="tglAppTheme.OffContent" xml:space="preserve">
-    <value>Dark mode</value>
+    <value>Light</value>
   </data>
   <data name="tglAppTheme.OnContent" xml:space="preserve">
-    <value>Light</value>
+    <value>Dark</value>
   </data>
   <data name="txtCredits.Text" xml:space="preserve">
     <value>Credits</value>
@@ -176,5 +176,17 @@
   </data>
   <data name="sendMeEmail.Text" xml:space="preserve">
     <value>send me an email.</value>
+  </data>
+  <data name="tglNotifications.Header" xml:space="preserve">
+    <value>Remind me to do my daily reading</value>
+  </data>
+  <data name="tglNotifications.OffContent" xml:space="preserve">
+    <value>Do not notify</value>
+  </data>
+  <data name="tglNotifications.OnContent" xml:space="preserve">
+    <value>Notify</value>
+  </data>
+  <data name="tpNotificationTime.Header" xml:space="preserve">
+    <value>Remind me at</value>
   </data>
 </root>

@@ -126,6 +126,8 @@ namespace BibleBrowserUWP
          FrameworkElement root = (FrameworkElement)Window.Current.Content;
          root.RequestedTheme = AppSettings.Theme;
          SetThemeToggle(AppSettings.Theme);
+         SetNotificationToggle(AppSettings.ReadingNotifications);
+         SetNotificationTime(AppSettings.NotifyTime);
 
          StyleTitleBar();
          cbDefaultVersion.SelectedItem = BibleVersion.DefaultVersion;
@@ -134,6 +136,13 @@ namespace BibleBrowserUWP
 
          // Save tabs when the app closes
          Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
+      }
+
+
+      private void SetNotificationTime(TimeSpan notifyTime)
+      {
+         Debug.WriteLine("Notification time found as " + notifyTime);
+         tpNotificationTime.Time = notifyTime;
       }
 
       /// <summary>
@@ -145,6 +154,23 @@ namespace BibleBrowserUWP
             tglAppTheme.IsOn = false;
          else
             tglAppTheme.IsOn = true;
+      }
+
+      /// <summary>
+      /// Set the Bible reading notification toggle.
+      /// </summary>
+      private void SetNotificationToggle(bool notificationsAllowed)
+      {
+         if(notificationsAllowed)
+         {
+            tglNotifications.IsOn = true;
+            tpNotificationTime.IsEnabled = true;
+         }
+         else
+         {
+            tglNotifications.IsOn = false;
+            tpNotificationTime.IsEnabled = false;
+         }
       }
 
       /// <summary>
@@ -1187,6 +1213,31 @@ namespace BibleBrowserUWP
             // Close the search bar
             HideSearch();
          }
+      }
+
+      /// <summary>
+      /// Toggle toast notification remeinders every day for doing your Bible reading.
+      /// </summary>
+      private void TglNotifications_Toggled(object sender, RoutedEventArgs e)
+      {
+         if (((ToggleSwitch)sender).IsOn)
+         {
+            AppSettings.ReadingNotifications = !AppSettings.NONOTIFICATIONS;
+            tpNotificationTime.IsEnabled = true;
+            Debug.WriteLine("Toast notifications " + AppSettings.ReadingNotifications);
+         }
+         else
+         {
+            AppSettings.ReadingNotifications = AppSettings.NONOTIFICATIONS;
+            tpNotificationTime.IsEnabled = false;
+            Debug.WriteLine("Toast notifications " + AppSettings.ReadingNotifications);
+         }
+      }
+
+      private void TpNotificationTime_TimeChanged(object sender, TimePickerValueChangedEventArgs e)
+      {
+         AppSettings.NotifyTime = e.NewTime;
+         Debug.WriteLine("Time changed to " + AppSettings.NotifyTime);
       }
    }
 }

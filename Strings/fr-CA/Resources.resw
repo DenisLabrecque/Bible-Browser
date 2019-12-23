@@ -139,13 +139,13 @@
     <value>Ajustements</value>
   </data>
   <data name="tglAppTheme.Header" xml:space="preserve">
-    <value>Couleurs du thème</value>
+    <value>Thème</value>
   </data>
   <data name="tglAppTheme.OffContent" xml:space="preserve">
-    <value>Mode foncé</value>
+    <value>Clair</value>
   </data>
   <data name="tglAppTheme.OnContent" xml:space="preserve">
-    <value>Mode clair</value>
+    <value>Foncé</value>
   </data>
   <data name="txtCredits.Text" xml:space="preserve">
     <value>Crédits</value>
@@ -176,5 +176,17 @@
   </data>
   <data name="sendMeEmail.Text" xml:space="preserve">
     <value>m'envoyer un courriel.</value>
+  </data>
+  <data name="tglNotifications.Header" xml:space="preserve">
+    <value>Me rappeler de faire ma lecture quotidienne</value>
+  </data>
+  <data name="tglNotifications.OffContent" xml:space="preserve">
+    <value>Aucun rappel</value>
+  </data>
+  <data name="tglNotifications.OnContent" xml:space="preserve">
+    <value>Rappel</value>
+  </data>
+  <data name="tpNotificationTime.Header" xml:space="preserve">
+    <value>Me notifier à</value>
   </data>
 </root>

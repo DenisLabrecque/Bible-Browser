@@ -1004,6 +1004,22 @@
                                          Toggled="ToggleSwitch_Toggled"
                                          x:Uid="tglAppTheme" />
 
+                           <!-- Toast notifications switch -->
+                           <ToggleSwitch Name="tglNotifications"
+                                         Header="Remind me to do my reading"
+                                         OffContent="Don't remind me"
+                                         OnContent="Remind me"
+                                         IsOn="False"
+                                         Toggled="TglNotifications_Toggled"
+                                         x:Uid="tglNotifications" />
+
+                           <!-- Toast notifications time -->
+                           <TimePicker Header="Reminder time"
+                                       Name="tpNotificationTime"
+                                       x:Uid="tpNotificationTime"
+                                       MinuteIncrement="15"
+                                       TimeChanged="TpNotificationTime_TimeChanged" />
+
                            <TextBlock Style="{ThemeResource TitleTextBlockStyle}"
                                       x:Uid="txtCredits">Credits</TextBlock>
                            <RichTextBlock LineHeight="18"
