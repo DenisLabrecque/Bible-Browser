@@ -15,22 +15,6 @@ namespace BibleBrowserUWP
    {
       #region Methods
 
-      /// <summary>
-      /// Calculate percentage similarity of two strings
-      /// <param name="source">Source String to Compare with</param>
-      /// <param name="target">Targeted String to Compare</param>
-      /// <returns>Return Similarity between two strings from 0 to 1.0</returns>
-      /// </summary>
-      public static float LevenshteinSimilarity(string source, string target)
-      {
-         if ((source == null) || (target == null)) return 0.0f;
-         else if ((source.Length == 0) || (target.Length == 0)) return 0.0f;
-         else if (source == target) return 1.0f;
-
-         int stepsToSame = ComputeLevenshteinDistance(source, target);
-         return (1.0f - ((float)stepsToSame / (float)Math.Max(source.Length, target.Length)));
-      }
-
 
       /// <summary>
       /// Return the Bible book name that most resembles the query according to Levenshtein distance (ignoring diacritics).
@@ -43,7 +27,7 @@ namespace BibleBrowserUWP
          Debug.WriteLine("NEW QUERY: " + query.ToLower().RemoveDiacritics());
          if (query == null || query.Length == 0)
          {
-            levensteinPercent = 0f;
+            levensteinPercent = 0.0f;
             return version.BookNames.First();
          }
 
@@ -56,7 +40,7 @@ namespace BibleBrowserUWP
             {
                if (query.ToLower().RemoveDiacritics() == bookName.Substring(0, query.Length).ToLower().RemoveDiacritics())
                {
-                  levensteinPercent = 1f;
+                  levensteinPercent = 1.0f;
                   return bookName;
                }
             }
@@ -104,7 +88,6 @@ namespace BibleBrowserUWP
 
          return null;
       }
-
 
 
       /// <summary>
@@ -167,6 +150,23 @@ namespace BibleBrowserUWP
 
 
       /// <summary>
+      /// Calculate percentage similarity of two strings
+      /// <param name="source">Source String to Compare with</param>
+      /// <param name="target">Targeted String to Compare</param>
+      /// <returns>Return Similarity between two strings from 0 to 1.0</returns>
+      /// </summary>
+      public static float LevenshteinSimilarity(string source, string target)
+      {
+         if ((source == null) || (target == null)) return 0.0f;
+         else if ((source.Length == 0) || (target.Length == 0)) return 0.0f;
+         else if (source == target) return 1.0f;
+
+         int stepsToSame = ComputeLevenshteinDistance(source, target);
+         return (1.0f - ((float)stepsToSame / (float)Math.Max(source.Length, target.Length)));
+      }
+
+
+      /// <summary>
       /// Returns the number of steps required to transform a source string
       /// into a target string.
       /// </summary>
@@ -205,6 +205,146 @@ namespace BibleBrowserUWP
          }
 
          return distance[sourceWordCount, targetWordCount];
+      }
+
+
+      /// <summary>
+      /// Calculate the Levenstein similarity probability that the query has a Bible book based on the version.
+      /// </summary>
+      /// <param name="splitQuery">The simplified query from which the version has been removed.</param>
+      /// <param name="version">The version to find the Bible book in.</param>
+      /// <param name="book">The closest book that was found. May be completely incorrect (check the return value)</param>
+      /// <returns>The Levenstein distance of the closest Bible book to the result book string found.</returns>
+      public static float QueryHasBibleBook(ref List<string> splitQuery, BibleVersion version, ref string book)
+      {
+         float levSimilarity;
+
+         if(splitQuery.Count == 0)
+         {
+            return 0f;
+         }
+         else if (QueryHasNumeral(ref splitQuery)) {
+            book = ClosestBookName(version, splitQuery[0], out levSimilarity);
+            Debug.WriteLine(book + " found from " + splitQuery[0] + " with lev distance of " + levSimilarity);
+            return levSimilarity;
+         }
+         else
+         {
+            book = ClosestBookName(version, splitQuery[0], out levSimilarity);
+            Debug.WriteLine(book + " found from " + splitQuery[0] + " with lev distance of " + levSimilarity);
+            return levSimilarity;
+         }
+      }
+
+
+      /// <summary>
+      /// Check whether a query has a Bible version.
+      /// </summary>
+      /// <param name="splitQuery">The original search query split between spaces and punctuation.
+      /// Removes the BibleVersion parameter if it is found.</param>
+      /// <param name="version">Changes to the correct BibleVersion if the version is found.</param>
+      /// <returns></returns>
+      public static bool QueryHasBibleVersion(ref List<string> splitQuery, ref BibleVersion version)
+      {
+         if (VersionByAbbreviation(splitQuery[0]) != null)
+         {
+            version = VersionByAbbreviation(splitQuery[0]);
+            splitQuery.RemoveAt(0);
+            return true;
+         }
+         else
+            return false;
+      }
+
+
+      /// <summary>
+      /// Find whether the query has a number or roman numeral from 1-10 as first item, with a  book name.
+      /// If there is, the search query item will be removed from the list, and the chapter number will be assigned that value.
+      /// </summary>
+      /// <param name="query">The user's query that may start with a number.
+      /// The first element will be removed if it is a number, and added to the book name.</param>
+      /// <param name="chapter">Assigned if a number is found</param>
+      /// <returns>Whether or not a number/numeral is found</returns>
+      public static bool QueryHasNumeral(ref List<string> query)
+      {
+         // One space for the numeral, and one for the book name itself
+         if(query.Count < 2)
+         {
+            return false;
+         }
+         else
+         {
+            int number = 0;
+
+            // There is indeed a book number
+            if (int.TryParse(query[0], out number))
+            {
+               query[1] = number + " " + query[1];
+               query.RemoveAt(0);
+               Debug.WriteLine("Query has numeral. " + query[0]);
+               return true;
+            }
+            // The chapter number is a Roman numeral from i-x
+            else if(IsRoman(query[0], ref number))
+            {
+               query[1] = number + " " + query[1];
+               query.RemoveAt(0);
+               Debug.WriteLine("Query has numeral. " + query[0]);
+               return true;
+            }
+            // Not a number
+            else
+            {
+               return false;
+            }
+         }
+      }
+
+
+      /// <summary>
+      /// Simple check for whether the string of characters matches Roman numerals from 1-10 (i-x).
+      /// Will NOT match numbers beyond this range.
+      /// </summary>
+      /// <param name="characters">The possible Roman numeral</param>
+      /// <param name="number">The amount from 1-10 the numeral stands for</param>
+      /// <returns>True if this is a Roman numeral from i to x</returns>
+      public static bool IsRoman(string characters, ref int number)
+      {
+         switch(characters.ToLower())
+         {
+            case "i":
+               number = 1;
+               return true;
+            case "ii":
+               number = 2;
+               return true;
+            case "iii":
+               number = 3;
+               return true;
+            case "iv":
+               number = 4;
+               return true;
+            case "v":
+               number = 5;
+               return true;
+            case "vi":
+               number = 6;
+               return true;
+            case "vii":
+               number = 7;
+               return true;
+            case "viii":
+               number = 8;
+               return true;
+            case "ix":
+               number = 9;
+               return true;
+            case "x":
+               number = 10;
+               return true;
+            default:
+               return false;
+         }
       }
 
       #endregion

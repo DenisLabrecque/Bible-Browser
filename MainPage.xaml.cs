@@ -918,30 +918,39 @@ namespace BibleBrowserUWP
             int chapter = 1;
 
             // The query has a version prefix (like KJV), so it is treated as a go to reference
-            if(QueryHasBibleVersion(ref splitQuery, ref version))
+            if(BibleSearch.QueryHasBibleVersion(ref splitQuery, ref version))
             {
-               QueryHasBibleBook(ref splitQuery, version, ref book);
+               // There is additional information
+               if (splitQuery.Count > 0)
+               {
+                  BibleSearch.QueryHasBibleBook(ref splitQuery, version, ref book);
 
-               BibleReference newReference = new BibleReference(version, comparison, book, chapter);
-               BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
-               ShowAllDropdowns();
-               PrintChapter(newReference);
+                  BibleReference newReference = new BibleReference(version, comparison, book, chapter);
+                  BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
+                  ShowAllDropdowns();
+                  PrintChapter(newReference);
+               }
+               // A version prefix like KJV doesn't give sufficient information to go anywhere
+               else
+               {
+                  return;
+               }
             }
             // The query does not have a version prefix, so decide whether it is a go to reference or a search
             else
             {
-               float certainty = QueryHasBibleBook(ref splitQuery, version, ref book);
+               float similarity = BibleSearch.QueryHasBibleBook(ref splitQuery, version, ref book);
 
                // This is a reference for sure
-               if (certainty > 0.5f)
+               if (similarity > 0.25f)
                {
                   BibleReference newReference = new BibleReference(version, comparison, book, chapter);
                   BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
                   ShowAllDropdowns();
                   PrintChapter(newReference);
                }
-               // High probability this is a search, but show a reference for good measure
-               else if (0.1f < certainty && certainty < 0.25f)
+               // Not sure whether this is a search or go to. Show both.
+               else if(0.25f > similarity && similarity > 0.1f)
                {
                   SearchAsync(query, version);
                }
@@ -968,46 +977,10 @@ namespace BibleBrowserUWP
       }
 
 
-      /// <summary>
-      /// Calculate the Levenstein distance probability that the query has a Bible book based on the version.
-      /// </summary>
-      /// <param name="splitQuery">The simplified query from which the version has been removed.</param>
-      /// <param name="version">The version to find the Bible book in.</param>
-      /// <param name="book">The closest book that was found. May be completely incorrect (check the return value)</param>
-      /// <returns>The Levenstein distance of the closest Bible book to the result book string found.</returns>
-      private float QueryHasBibleBook(ref List<string> splitQuery, BibleVersion version, ref string book)
-      {
-         float levDistance;
-         if(splitQuery.Count == 0)
-         {
-            return 1;
-         }
-         else
-         {
-            book = BibleSearch.ClosestBookName(version, splitQuery[0], out levDistance); // TODO consider the possibility of numerals
-            return levDistance;
-         }
-      }
 
 
-      /// <summary>
-      /// Check whether a query has a Bible version.
-      /// </summary>
-      /// <param name="splitQuery">The original search query split between spaces and punctuation.
-      /// Removes the BibleVersion parameter if it is found.</param>
-      /// <param name="version">Changes to the correct BibleVersion if the version is found.</param>
-      /// <returns></returns>
-      private bool QueryHasBibleVersion(ref List<string> splitQuery, ref BibleVersion version)
-      {
-         if (BibleSearch.VersionByAbbreviation(splitQuery[0]) != null)
-         {
-            version = BibleSearch.VersionByAbbreviation(splitQuery[0]);
-            splitQuery.RemoveAt(0);
-            return true;
-         }
-         else
-            return false;
-      }
+
+
 
 
       /// <summary>
