@@ -19,6 +19,8 @@ using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
+using Microsoft.Toolkit.Uwp.Notifications; // Notifications library
+using Windows.UI.Notifications;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -1220,12 +1222,15 @@ namespace BibleBrowserUWP
       /// </summary>
       private void TglNotifications_Toggled(object sender, RoutedEventArgs e)
       {
+         // Notifications turned on
          if (((ToggleSwitch)sender).IsOn)
          {
             AppSettings.ReadingNotifications = !AppSettings.NONOTIFICATIONS;
             tpNotificationTime.IsEnabled = true;
+            ConstructReminderToast(new DateTimeOffset(DateTime.Today.AddDays(1).AddHours(AppSettings.NotifyTime.Hours).AddMinutes(AppSettings.NotifyTime.Minutes))); // TODO this should create a schedule
             Debug.WriteLine("Toast notifications " + AppSettings.ReadingNotifications);
          }
+         // Notifications turned off
          else
          {
             AppSettings.ReadingNotifications = AppSettings.NONOTIFICATIONS;
@@ -1234,10 +1239,49 @@ namespace BibleBrowserUWP
          }
       }
 
+      /// <summary>
+      /// Save the new notification time.
+      /// </summary>
+      /// <param name="sender"></param>
+      /// <param name="e"></param>
       private void TpNotificationTime_TimeChanged(object sender, TimePickerValueChangedEventArgs e)
       {
          AppSettings.NotifyTime = e.NewTime;
          Debug.WriteLine("Time changed to " + AppSettings.NotifyTime);
+      }
+
+      private void ConstructReminderToast(DateTimeOffset time)
+      {
+         string title = "Bible Reading";
+         string content = "Remember to do your Bible reading today!";
+
+         // Create the visual toast elements
+         ToastVisual visual = new ToastVisual()
+         {
+            BindingGeneric = new ToastBindingGeneric()
+            {
+               Children =
+               {
+                  new AdaptiveText() { Text = title },
+                  new AdaptiveText() { Text = content }
+               }
+            }
+         };
+
+         // Put together the toast to push
+         ToastContent toastContent = new ToastContent()
+         {
+            Visual = visual
+         };
+
+         // Create the toast notification object.
+         ScheduledToastNotification toast = new ScheduledToastNotification(toastContent.GetXml(), time);
+         ToastNotificationManager.CreateToastNotifier().AddToSchedule(toast); ;
+
+         //// Create the actual toast notification
+         //ToastNotification toast = new ToastNotification(toastContent.GetXml());
+         //toast.ExpirationTime = DateTime.Now.AddHours(12);
+         //ToastNotificationManager.CreateToastNotifier().Show(toast);
       }
    }
 }
