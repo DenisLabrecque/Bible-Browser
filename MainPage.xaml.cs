@@ -850,9 +850,7 @@ namespace BibleBrowserUWP
             m_isAppNewlyOpened = false;
          }
          else
-         {
             HideAllDropdowns();
-         }
       }
 
       private void AsbSearch_LostFocus(object sender, RoutedEventArgs e)
@@ -882,6 +880,9 @@ namespace BibleBrowserUWP
          txtSearchStatus.Text = progress.Status;
       }
 
+      /// <summary>
+      /// Hide search result reporting.
+      /// </summary>
       private void HideSearch()
       {
          lvSearchResults.Visibility = Visibility.Collapsed;
@@ -909,180 +910,47 @@ namespace BibleBrowserUWP
          if(e.Key == Windows.System.VirtualKey.Enter)
          {
             string query = ((TextBox)sender).Text;
-            //QueryIsInJumpToForm();
+            query = query.RemoveDiacritics();
+            List<string> splitQuery = query.Split(new char[] { ' ', ':', ';', '.', ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            BibleVersion version = BrowserTab.Selected.Reference.Version;
+            BibleVersion comparison = BrowserTab.Selected.Reference.ComparisonVersion;
+            string book = BrowserTab.Selected.Reference.BookName;
+            int chapter = 1;
 
-            // Have a reference to go to ready
-            BibleReference reference = BrowserTab.Selected.Reference;
-            if (reference == null) {
-               reference = new BibleReference(BibleVersion.DefaultVersion, null);
-            }
-
-            BibleVersion version = null;
-            int bookNumeral = 0;
-            string bookName = null;
-            int chapter = 0;
-            bool foundVersion = false;
-
-            List<string> queryElements = new List<string>();
-
-
-
-
-            // Separate the query into version and reference
-            if (query.Contains(':'))
+            // The query has a version prefix (like KJV), so it is treated as a go to reference
+            if(QueryHasBibleVersion(ref splitQuery, ref version))
             {
-               foundVersion = true;
-               queryElements = query.Split(':', StringSplitOptions.RemoveEmptyEntries).ToList();
-               version = BibleSearch.VersionByAbbreviation(queryElements[0]);
-               if(version == null)
-               {
-                  version = reference.Version;
-                  if(version == null)
-                  {
-                     version = BibleVersion.DefaultVersion;
-                  }
-               }
+               QueryHasBibleBook(ref splitQuery, version, ref book);
+
+               BibleReference newReference = new BibleReference(version, comparison, book, chapter);
+               BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
+               ShowAllDropdowns();
+               PrintChapter(newReference);
             }
+            // The query does not have a version prefix, so decide whether it is a go to reference or a search
             else
             {
-               version = BibleVersion.DefaultVersion;
-            }
+               float certainty = QueryHasBibleBook(ref splitQuery, version, ref book);
 
-
-            //// TESTING
-            /// try searching for this in the Bible
-            if (version == null)
-            {
-               throw new Exception("Version null");
-            }
-            else
-            {
-               // Construct Progress<T>, passing ReportProgress as the Action<T> 
-               Progress<SearchProgressInfo> progressIndicator = new Progress<SearchProgressInfo>(ReportSearchProgress);
-               cancelSearch = new CancellationTokenSource();
-               // Call async method
-               ShowSearch();
-               m_SearchResults.Clear(); // Empty from any previous search results
-               SearchProgressInfo task = await BibleSearch.SearchAsync(version, query, progressIndicator, cancelSearch.Token);
-               // Handle the search being cancelled at any point
-               if (task.IsCanceled)
+               // This is a reference for sure
+               if (certainty > 0.5f)
                {
-                  HideSearch();
-                  lvSearchResults.ItemsSource = null;
+                  BibleReference newReference = new BibleReference(version, comparison, book, chapter);
+                  BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
+                  ShowAllDropdowns();
+                  PrintChapter(newReference);
                }
+               // High probability this is a search, but show a reference for good measure
+               else if (0.1f < certainty && certainty < 0.25f)
+               {
+                  SearchAsync(query, version);
+               }
+               // This is a search
                else
                {
-                  // Show the number of results as status
-                  if(m_SearchResults.Count == 0)
-                  {
-                     txtSearchStatus.Text = "No result for '" + task.Query + "'";
-                  }
-                  else if(m_SearchResults.Count == 1)
-                  {
-                     txtSearchStatus.Text = "One result for '" + task.Query + "'";
-                  }
-                  else
-                  {
-                     txtSearchStatus.Text = task.Results.Count + " results for '" + task.Query + "'";
-                  }
-               }
-               cancelSearch.Dispose();
-            }
-            
-
-            // Separate the query into book name and verse
-            if (foundVersion == true)
-            {
-               queryElements = queryElements[1].Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
-            }
-            else
-            {
-               version = BibleVersion.DefaultVersion;
-               queryElements = query.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
-            }
-
-            // There must only be a book name
-            if (queryElements.Count == 1)
-            {
-               bookName = BibleSearch.ClosestBookName(version, queryElements[0], out _);
-            }
-            else
-            {
-               int[] numberMatrix = new int[queryElements.Count]; // Where numbers are in the query elements
-
-               // Determine where the numbers are in the query elements
-               int number = 0;
-               for (int i = 0; i < queryElements.Count; i++)
-               {
-                  int.TryParse(queryElements[i], out number); // A fault here is that Roman numerals won't work, and the book name is assigned to the numeral TODO
-                  if (number != 0)
-                     numberMatrix[i] = Math.Abs(number);
-                  else
-                     numberMatrix[i] = 0;
-               }
-
-               // Assign book number, book name, and chapter in sequence
-               for (int i = 0; i < queryElements.Count; i++)
-               {
-                  // Book numeral
-                  if (bookName == null && bookNumeral == 0 && numberMatrix[i] != 0)
-                  {
-                     bookNumeral = numberMatrix[i];
-                     Debug.WriteLine("Book numeral entered as " + bookNumeral);
-                     continue;
-                  }
-                  // Book Name
-                  else if (bookName == null && numberMatrix[i] == 0)
-                  {
-                     bookName = queryElements[i];
-                     continue;
-                  }
-                  // Chapter
-                  else if (chapter == 0 && numberMatrix[i] != 0)
-                  {
-                     chapter = numberMatrix[i];
-                     break; // Stop here
-                  }
-               }
-
-               // Add the book numeral to the book name
-               if (bookNumeral != 0)
-               {
-                  bookName = bookNumeral + " " + bookName;
-               }
-               Debug.WriteLine("The user entered " + bookName + " " + chapter);
-            }
-
-            // Display the reference and contents
-            if (bookName == null)
-            {
-               if (chapter == 0)
-               {
-                  // Don't change anything
-               }
-               else
-               {
-                  reference = new BibleReference(version, null, reference.Book, chapter);
-                  BrowserTab.Selected.GoToReference(ref reference, BrowserTab.NavigationMode.Add);
+                  SearchAsync(query, version);
                }
             }
-            else
-            {
-               // Convert the book to the closest valid book
-               bookName = BibleSearch.ClosestBookName(version, bookName, out _);
-               if (chapter == 0)
-               {
-                  reference = new BibleReference(version, null, BibleReference.StringToBook(bookName, version));
-                  BrowserTab.Selected.GoToReference(ref reference, BrowserTab.NavigationMode.Add);
-               }
-               else
-               {
-                  reference = new BibleReference(version, null, BibleReference.StringToBook(bookName, version), chapter);
-                  BrowserTab.Selected.GoToReference(ref reference, BrowserTab.NavigationMode.Add);
-               }
-            }
-            ShowAllDropdowns();
-            PrintChapter(reference);            
          }
          // Select the search box text on backspace if the dropdowns are being displayed
          else if(e.Key == Windows.System.VirtualKey.Back)
@@ -1095,36 +963,98 @@ namespace BibleBrowserUWP
          // Autosuggest
          else
          {
-            //string query = asbSearch.Text.Trim();
 
-            //// Autosuggest a version
-            //if (!query.Contains(':'))
-            //{
-            //   foreach(BibleVersion version in BibleLoader.Bibles)
-            //   {
-            //      if(version.VersionAbbreviation.Length >= query.Length &&
-            //         version.VersionAbbreviation.Substring(0, query.Length) == query)
-            //      {
-            //         // Autosuggest the rest of the version name TODO
-            //         asbSearch.Text = version.VersionAbbreviation + ": ";
-            //         asbSearch.Select(query.Length, asbSearch.Text.Length - 1);
-            //      }
-            //   }
-            //}
          }
       }
 
-      /// <summary>
-      /// Test whether the query closely matches a Bible book name.
-      /// When this is so, the whole query should be formatted in such a way that it fits the pattern.
-      /// Two ways the pattern can match:
-      /// 1. The query uses a correct version abbreviation (eg. KJV), followed by a colon, followed by a correct or nearly correct
-      /// book name, followed by optional numbers only.
-      /// 2. The query uses a correct or nearly correct book name, followed by optional numbers.
-      /// </summary>
-      private void QueryIsInJumpToForm()
-      {
 
+      /// <summary>
+      /// Calculate the Levenstein distance probability that the query has a Bible book based on the version.
+      /// </summary>
+      /// <param name="splitQuery">The simplified query from which the version has been removed.</param>
+      /// <param name="version">The version to find the Bible book in.</param>
+      /// <param name="book">The closest book that was found. May be completely incorrect (check the return value)</param>
+      /// <returns>The Levenstein distance of the closest Bible book to the result book string found.</returns>
+      private float QueryHasBibleBook(ref List<string> splitQuery, BibleVersion version, ref string book)
+      {
+         float levDistance;
+         if(splitQuery.Count == 0)
+         {
+            return 1;
+         }
+         else
+         {
+            book = BibleSearch.ClosestBookName(version, splitQuery[0], out levDistance); // TODO consider the possibility of numerals
+            return levDistance;
+         }
+      }
+
+
+      /// <summary>
+      /// Check whether a query has a Bible version.
+      /// </summary>
+      /// <param name="splitQuery">The original search query split between spaces and punctuation.
+      /// Removes the BibleVersion parameter if it is found.</param>
+      /// <param name="version">Changes to the correct BibleVersion if the version is found.</param>
+      /// <returns></returns>
+      private bool QueryHasBibleVersion(ref List<string> splitQuery, ref BibleVersion version)
+      {
+         if (BibleSearch.VersionByAbbreviation(splitQuery[0]) != null)
+         {
+            version = BibleSearch.VersionByAbbreviation(splitQuery[0]);
+            splitQuery.RemoveAt(0);
+            return true;
+         }
+         else
+            return false;
+      }
+
+
+      /// <summary>
+      /// Start a search for a particular phrase.
+      /// </summary>
+      /// <param name="query">The non-diacritic, simplified query the user has typed.</param>
+      /// <param name="version">The version of the Bible to search in.</param>
+      /// <returns></returns>
+      private async Task SearchAsync(string query, BibleVersion version)
+      {
+         if (version == null)
+         {
+            throw new Exception("Version null");
+         }
+         else
+         {
+            // Construct Progress<T>, passing ReportProgress as the Action<T> 
+            Progress<SearchProgressInfo> progressIndicator = new Progress<SearchProgressInfo>(ReportSearchProgress);
+            cancelSearch = new CancellationTokenSource();
+            // Call async method
+            ShowSearch();
+            m_SearchResults.Clear(); // Empty from any previous search results
+            SearchProgressInfo task = await BibleSearch.SearchAsync(version, query, progressIndicator, cancelSearch.Token);
+            // Handle the search being cancelled at any point
+            if (task.IsCanceled)
+            {
+               HideSearch();
+               lvSearchResults.ItemsSource = null;
+            }
+            else
+            {
+               // Show the number of results as status
+               if (m_SearchResults.Count == 0)
+               {
+                  txtSearchStatus.Text = "No result for '" + task.Query + "'";
+               }
+               else if (m_SearchResults.Count == 1)
+               {
+                  txtSearchStatus.Text = "One result for '" + task.Query + "'";
+               }
+               else
+               {
+                  txtSearchStatus.Text = task.Results.Count + " results for '" + task.Query + "'";
+               }
+            }
+            cancelSearch.Dispose();
+         }
       }
 
       #endregion
@@ -1227,7 +1157,8 @@ namespace BibleBrowserUWP
          {
             AppSettings.ReadingNotifications = !AppSettings.NONOTIFICATIONS;
             tpNotificationTime.IsEnabled = true;
-            ConstructReminderToast(new DateTimeOffset(DateTime.Today.AddDays(1).AddHours(AppSettings.NotifyTime.Hours).AddMinutes(AppSettings.NotifyTime.Minutes))); // TODO this should create a schedule
+            ConstructReminderToast(new DateTimeOffset(DateTime.Now.AddSeconds(2))); // TODO this should create a schedule
+            //ConstructReminderToast(new DateTimeOffset(DateTime.Today.AddDays(1).AddHours(AppSettings.NotifyTime.Hours).AddMinutes(AppSettings.NotifyTime.Minutes)));
             Debug.WriteLine("Toast notifications " + AppSettings.ReadingNotifications);
          }
          // Notifications turned off
@@ -1276,7 +1207,7 @@ namespace BibleBrowserUWP
 
          // Create the toast notification object.
          ScheduledToastNotification toast = new ScheduledToastNotification(toastContent.GetXml(), time);
-         ToastNotificationManager.CreateToastNotifier().AddToSchedule(toast); ;
+         ToastNotificationManager.CreateToastNotifier().AddToSchedule(toast);
 
          //// Create the actual toast notification
          //ToastNotification toast = new ToastNotification(toastContent.GetXml());

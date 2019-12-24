@@ -129,11 +129,33 @@ namespace BibleBrowserUWP
       #region Constructor
 
       /// <summary>
+      /// Delegating constructor.
+      /// </summary>
+      public BibleReference(BibleVersion version, BibleVersion compare,
+                            string bookName, int chapter = 1, int verse = 1,
+                            double verticalOffset = 0)
+      {
+         BibleBook bookNumber = StringToBook(bookName, version);
+         Initialize(version, compare, bookNumber, chapter, verse, verticalOffset);
+      }
+
+      /// <summary>
       /// Default constructor.
       /// If the chapter or verse are set too high, they will be clamped to the maximum chapter or verse.
       /// If the chapter or verse are set too low, an <c>ArgumentOutOfRangeException</c> is thrown.
       /// </summary>
       public BibleReference(BibleVersion version, BibleVersion compare = null,
+                            BibleBook book = BibleBook.Gn,
+                            int chapter = 1, int verse = 1,
+                            double verticalOffset = 0)
+      {
+            Initialize(version, compare, book, chapter, verse, verticalOffset);
+      }
+
+      /// <summary>
+      /// Method that constructors delegate to.
+      /// </summary>
+      private void Initialize(BibleVersion version, BibleVersion compare = null,
                             BibleBook book = BibleBook.Gn,
                             int chapter = 1, int verse = 1,
                             double verticalOffset = 0)
@@ -157,7 +179,7 @@ namespace BibleBrowserUWP
          else
             Verse = verse;
 
-         switch(book)
+         switch (book)
          {
             case BibleBook.iS:
                Numeral = BookNumeral.i;
