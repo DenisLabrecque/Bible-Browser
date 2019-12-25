@@ -197,12 +197,14 @@ namespace BibleBrowserUWP
             contentWidth = pageWidth - (2 * MINMARGIN) - VERSECOLUMN - MIDDLCOLUMN;
             ChapterWidth = contentWidth;
             gvCompareVerses.Width = contentWidth;
+            lvSearchResults.Width = contentWidth;
          }
          else
          {
             contentWidth = (MAXTEXTWIDTH * 2) - VERSECOLUMN - MIDDLCOLUMN;
             ChapterWidth = contentWidth;
             gvCompareVerses.Width = contentWidth;
+            lvSearchResults.Width = contentWidth;
          }
 
          // Set the maximum width of the tab area
@@ -362,12 +364,16 @@ namespace BibleBrowserUWP
             BibleReference reference = BrowserTab.Selected.Reference;
             if (reference == null)
             {
-               //btnCompare.IsEnabled = false;
                asbSearch.PlaceholderText = "Search or enter reference";
+            }
+            else if(reference.ComparisonVersion == null)
+            {
+               asbSearch.Text = reference.Version + ": " + reference.ToString();
+               asbSearch.SelectAll();
             }
             else
             {
-               asbSearch.Text = reference.Version + ": " + reference.ToString();
+               asbSearch.Text = reference.Version + ":" + reference.ComparisonVersion + " " + reference.ToString();
                asbSearch.SelectAll();
             }
          }
@@ -411,7 +417,10 @@ namespace BibleBrowserUWP
                asbSearch.Text = string.Empty;
                asbSearch.PlaceholderText = string.Empty;
 
-               ddbVersion.Content = reference.Version;
+               if (reference.ComparisonVersion == null)
+                  ddbVersion.Content = reference.Version;
+               else
+                  ddbVersion.Content = reference.Version + ":" + reference.ComparisonVersion;
                ddbBook.Content = reference.BookName;
                ddbChapter.Content = reference.Chapter;
 
@@ -549,10 +558,18 @@ namespace BibleBrowserUWP
 
       /// <summary>
       /// Print a chapter of the Bible to the app page according to the reference sent.
+      /// Stop a search if it is in progress.
       /// </summary>
       /// <param name="reference">The chapter to print. If null, this will simply erase page contents.</param>
       private void PrintChapter(BibleReference reference)
       {
+         HideSearch();
+         lvSearchResults.ItemsSource = null;
+         if(cancelSearch != null)
+            cancelSearch.Dispose();
+
+         gvCompareVerses.Visibility = Visibility.Visible;
+
          // New tab, leave blank
          if (BrowserTab.Selected.Reference == null)
          {
@@ -570,6 +587,14 @@ namespace BibleBrowserUWP
             gvCompareVerses.ItemsSource = null;
             gvCompareVerses.ItemsSource = reference.Verses;
          }
+      }
+
+      /// <summary>
+      /// Show search results only.
+      /// </summary>
+      private void HideChapter()
+      {
+         gvCompareVerses.Visibility = Visibility.Collapsed;
       }
 
       /// <summary>
@@ -609,9 +634,12 @@ namespace BibleBrowserUWP
       /// </summary>
       private void RemoveCompareToVersion(BibleReference oldReference)
       {
-         BibleReference newReference = new BibleReference(oldReference.Version, oldReference.ComparisonVersion, oldReference.Book, oldReference.Chapter, oldReference.Verse);
-         BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
-         Debug.WriteLine("Compare version removed.");
+         if (oldReference.ComparisonVersion != null)
+         {
+            BibleReference newReference = new BibleReference(oldReference.Version, null, oldReference.Book, oldReference.Chapter, oldReference.Verse);
+            BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
+            Debug.WriteLine("Compare version removed.");
+         }
       }
       
       #endregion
@@ -872,7 +900,7 @@ namespace BibleBrowserUWP
          if(m_SearchResults.Count < progress.Results.Count) // A new result was found since last time
          {
             // Add the new results that were found
-            for (int i = Math.Clamp(m_SearchResults.Count - 1, 0, int.MaxValue); i < Math.Clamp(progress.Results.Count - 1, 0, int.MaxValue); i++)
+            for (int i = Math.Clamp(m_SearchResults.Count, 0, int.MaxValue); i < Math.Clamp(progress.Results.Count, 0, int.MaxValue); i++)
             {
                m_SearchResults.Add(progress.Results[i]);
             }
@@ -910,7 +938,10 @@ namespace BibleBrowserUWP
          if(e.Key == Windows.System.VirtualKey.Enter)
          {
             string query = ((TextBox)sender).Text;
-            query = query.RemoveDiacritics();
+            query = query.Trim().RemoveDiacritics();
+            if (string.IsNullOrWhiteSpace(query))
+               return;
+
             List<string> splitQuery = query.Split(new char[] { ' ', ':', ';', '.', ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
             BibleVersion version = BrowserTab.Selected.Reference.Version;
             BibleVersion comparison = BrowserTab.Selected.Reference.ComparisonVersion;
@@ -918,22 +949,27 @@ namespace BibleBrowserUWP
             int chapter = 1;
 
             // The query has a version prefix (like KJV), so it is treated as a go to reference
-            if(BibleSearch.QueryHasBibleVersion(ref splitQuery, ref version))
+            if(BibleSearch.QueryHasBibleVersion(ref splitQuery, ref version, ref comparison))
             {
                // There is additional information
                if (splitQuery.Count > 0)
                {
                   BibleSearch.QueryHasBibleBook(ref splitQuery, version, ref book);
+                  BibleSearch.QueryHasChapter(ref splitQuery, ref chapter);
 
                   BibleReference newReference = new BibleReference(version, comparison, book, chapter);
                   BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
                   ShowAllDropdowns();
-                  PrintChapter(newReference);
                }
-               // A version prefix like KJV doesn't give sufficient information to go anywhere
+               // A version prefix like KJV only
                else
                {
-                  return;
+                  if(version != BrowserTab.Selected.Reference.Version)
+                  {
+                     BibleReference newReference = new BibleReference(version, comparison, BrowserTab.Selected.Reference.Book, BrowserTab.Selected.Reference.Chapter);
+                     BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
+                     ShowAllDropdowns();
+                  }
                }
             }
             // The query does not have a version prefix, so decide whether it is a go to reference or a search
@@ -944,19 +980,21 @@ namespace BibleBrowserUWP
                // This is a reference for sure
                if (similarity > 0.25f)
                {
+                  BibleSearch.QueryHasChapter(ref splitQuery, ref chapter);
                   BibleReference newReference = new BibleReference(version, comparison, book, chapter);
                   BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
                   ShowAllDropdowns();
-                  PrintChapter(newReference);
                }
                // Not sure whether this is a search or go to. Show both.
                else if(0.25f > similarity && similarity > 0.1f)
                {
+                  HideChapter();
                   SearchAsync(query, version);
                }
                // This is a search
                else
                {
+                  HideChapter();
                   SearchAsync(query, version);
                }
             }
@@ -977,12 +1015,6 @@ namespace BibleBrowserUWP
       }
 
 
-
-
-
-
-
-
       /// <summary>
       /// Start a search for a particular phrase.
       /// </summary>
@@ -993,10 +1025,12 @@ namespace BibleBrowserUWP
       {
          if (version == null)
          {
-            throw new Exception("Version null");
+            throw new Exception("Search version null");
          }
          else
          {
+            if (cancelSearch != null)
+               cancelSearch.Dispose();
             // Construct Progress<T>, passing ReportProgress as the Action<T> 
             Progress<SearchProgressInfo> progressIndicator = new Progress<SearchProgressInfo>(ReportSearchProgress);
             cancelSearch = new CancellationTokenSource();
@@ -1007,27 +1041,35 @@ namespace BibleBrowserUWP
             // Handle the search being cancelled at any point
             if (task.IsCanceled)
             {
-               HideSearch();
-               lvSearchResults.ItemsSource = null;
+               StopSearch();
             }
             else
             {
+               var loader = Windows.ApplicationModel.Resources.ResourceLoader.GetForCurrentView();
+
                // Show the number of results as status
                if (m_SearchResults.Count == 0)
                {
-                  txtSearchStatus.Text = "No result for '" + task.Query + "'";
+                  txtSearchStatus.Text = loader.GetString("noResultFor") + " '" + task.Query + "'";
                }
                else if (m_SearchResults.Count == 1)
                {
-                  txtSearchStatus.Text = "One result for '" + task.Query + "'";
+                  txtSearchStatus.Text = loader.GetString("oneResultFor") + " '" + task.Query + "'";
                }
                else
                {
-                  txtSearchStatus.Text = task.Results.Count + " results for '" + task.Query + "'";
+                  txtSearchStatus.Text = task.Results.Count + " " + loader.GetString("manyResultsFor") + " '" + task.Query + "'";
                }
             }
             cancelSearch.Dispose();
          }
+      }
+
+      private void StopSearch()
+      {
+         HideSearch();
+         lvSearchResults.ItemsSource = null;
+         cancelSearch.Dispose();
       }
 
       #endregion
@@ -1156,8 +1198,9 @@ namespace BibleBrowserUWP
 
       private void ConstructReminderToast(DateTimeOffset time)
       {
-         string title = "Bible Reading";
-         string content = "Remember to do your Bible reading today!";
+         var loader = Windows.ApplicationModel.Resources.ResourceLoader.GetForCurrentView();
+         string title = loader.GetString("bibleReading");
+         string content = loader.GetString("rememberBibleReading");
 
          // Create the visual toast elements
          ToastVisual visual = new ToastVisual()
@@ -1186,6 +1229,14 @@ namespace BibleBrowserUWP
          //ToastNotification toast = new ToastNotification(toastContent.GetXml());
          //toast.ExpirationTime = DateTime.Now.AddHours(12);
          //ToastNotificationManager.CreateToastNotifier().Show(toast);
+      }
+
+      private void LvSearchResults_ItemClick(object sender, ItemClickEventArgs e)
+      {
+         BibleReference reference = ((SearchResult)e.ClickedItem).Reference;
+         Debug.WriteLine("Search to go to reference: " + reference);
+         BrowserTab.Selected.GoToReference(ref reference);
+         PrintChapter(reference);
       }
    }
 }

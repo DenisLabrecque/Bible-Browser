@@ -189,4 +189,19 @@
   <data name="tpNotificationTime.Header" xml:space="preserve">
     <value>Remind me at</value>
   </data>
+  <data name="bibleReading" xml:space="preserve">
+    <value>Reading Reminder</value>
+  </data>
+  <data name="manyResultsFor" xml:space="preserve">
+    <value>results for</value>
+  </data>
+  <data name="noResultFor" xml:space="preserve">
+    <value>No result for</value>
+  </data>
+  <data name="oneResultFor" xml:space="preserve">
+    <value>One result for</value>
+  </data>
+  <data name="rememberBibleReading" xml:space="preserve">
+    <value>Remember to do your Bible reading today!</value>
+  </data>
 </root>

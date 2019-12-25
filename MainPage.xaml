@@ -298,7 +298,7 @@
                            <Setter Property="Template">
                               <Setter.Value>
                                  <ControlTemplate TargetType="Button">
-                                    <Grid x:Name="ButtonLayoutGrid" Background="{ThemeResource TextControlButtonBackground}" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{ThemeResource TextControlButtonBorderBrush}">
+                                    <Grid x:Name="ButtonLayoutGrid" Background="Transparent" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{ThemeResource TextControlButtonBorderBrush}">
                                        <VisualStateManager.VisualStateGroups>
                                           <VisualStateGroup x:Name="CommonStates">
                                              <VisualState x:Name="Normal"/>
@@ -379,7 +379,7 @@
                                     <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource TextControlBorderBrushPointerOver}"/>
                                  </ObjectAnimationUsingKeyFrames>
                                  <ObjectAnimationUsingKeyFrames Storyboard.TargetName="BorderElement" Storyboard.TargetProperty="Background">
-                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource TextControlBackgroundPointerOver}"/>
+                                    <DiscreteObjectKeyFrame KeyTime="0" Value="Transparent"/>
                                  </ObjectAnimationUsingKeyFrames>
                                  <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PlaceholderTextContentPresenter" Storyboard.TargetProperty="Foreground">
                                     <DiscreteObjectKeyFrame KeyTime="0" Value="{Binding PlaceholderForeground, RelativeSource={RelativeSource Mode=TemplatedParent}, TargetNullValue={ThemeResource TextControlPlaceholderForegroundPointerOver}}"/>
@@ -395,7 +395,7 @@
                                     <DiscreteObjectKeyFrame KeyTime="0" Value="{Binding PlaceholderForeground, RelativeSource={RelativeSource Mode=TemplatedParent}, TargetNullValue={ThemeResource TextControlPlaceholderForegroundFocused}}"/>
                                  </ObjectAnimationUsingKeyFrames>
                                  <ObjectAnimationUsingKeyFrames Storyboard.TargetName="BorderElement" Storyboard.TargetProperty="Background">
-                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource TextControlBackgroundFocused}"/>
+                                    <DiscreteObjectKeyFrame KeyTime="0" Value="Transparent"/>
                                  </ObjectAnimationUsingKeyFrames>
                                  <ObjectAnimationUsingKeyFrames Storyboard.TargetName="BorderElement" Storyboard.TargetProperty="BorderBrush">
                                     <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource TextControlBorderBrushFocused}"/>
@@ -446,7 +446,7 @@
          <Setter Property="Template">
             <Setter.Value>
                <ControlTemplate TargetType="ButtonBase">
-                  <Grid Margin="0" Padding="5" Background="{TemplateBinding Background}">
+                  <Grid Margin="0" Padding="5" Background="Transparent">
                      <ContentPresenter x:Name="Text"
                             Content="{TemplateBinding Content}"
                             HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
@@ -463,7 +463,7 @@
                                     <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource HyperlinkButtonForegroundPointerOver}" />
                                  </ObjectAnimationUsingKeyFrames>
                                  <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Text" Storyboard.TargetProperty="Background">
-                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource HyperlinkButtonBackgroundPointerOver}" />
+                                    <DiscreteObjectKeyFrame KeyTime="0" Value="Transparent" />
                                  </ObjectAnimationUsingKeyFrames>
                                  <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Text" Storyboard.TargetProperty="BorderBrush">
                                     <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource HyperlinkButtonBorderBrushPointerOver}" />
@@ -478,7 +478,7 @@
                                     <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource HyperlinkButtonForegroundPressed}" />
                                  </ObjectAnimationUsingKeyFrames>
                                  <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Text" Storyboard.TargetProperty="Background">
-                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource HyperlinkButtonBackgroundPressed}" />
+                                    <DiscreteObjectKeyFrame KeyTime="0" Value="Transparent" />
                                  </ObjectAnimationUsingKeyFrames>
                                  <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Text" Storyboard.TargetProperty="BorderBrush">
                                     <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource HyperlinkButtonBorderBrushPressed}" />
@@ -493,7 +493,7 @@
                                     <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource HyperlinkButtonForegroundDisabled}" />
                                  </ObjectAnimationUsingKeyFrames>
                                  <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Text" Storyboard.TargetProperty="Background">
-                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource HyperlinkButtonBackgroundDisabled}" />
+                                    <DiscreteObjectKeyFrame KeyTime="0" Value="Transparent" />
                                  </ObjectAnimationUsingKeyFrames>
                                  <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Text" Storyboard.TargetProperty="BorderBrush">
                                     <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource HyperlinkButtonBorderBrushDisabled}" />
@@ -659,14 +659,23 @@
                   <!-- Search view -->
                   <ListView x:Name="lvSearchResults"
                             ItemsSource="{x:Bind SearchResults}"
-                            Width="500">
+                            SelectionMode="None"
+                            IsItemClickEnabled="True"
+                            ItemClick="LvSearchResults_ItemClick">
                      <ListView.ItemTemplate>
                         <DataTemplate>
                            <StackPanel>
-                              <RichTextBlock>
-                                 <Paragraph>
-                                    <Run Text="{Binding FullReference}"></Run>
-                                 </Paragraph>
+                              <!-- Reference -->
+                              <TextBlock FontSize="12"
+                                         FontWeight="Bold"
+                                         Foreground="Gray"
+                                         FontFamily="/Assets/Fonts/PalanquinDark.ttf#Palanquin Dark Regular"
+                                         Margin="0,8,0,0"
+                                         Text="{Binding FullReference}"></TextBlock>
+                              <!-- Search result -->
+                              <RichTextBlock Style="{ThemeResource ReadableText}"
+                                             IsTextSelectionEnabled="False"
+                                             Margin="0,0,0,5">
                                  <Paragraph>
                                     <Run Text="{Binding VerseText}"></Run>
                                  </Paragraph>
@@ -709,7 +718,7 @@
 
                               <!-- Compare verse text -->
                               <RichTextBlock Style="{ThemeResource ReadableText}"
-                                          Grid.Column="3">
+                                             Grid.Column="3">
                                  <Paragraph>
                                     <Run Text="{x:Bind SecondText}"/>
                                  </Paragraph>
@@ -730,7 +739,7 @@
                  VerticalAlignment="Center"
                  x:Uid="btnLeftPage"
                  ToolTipService.ToolTip="Previous chapter (Left arrow)">
-            <FontIcon Glyph="&#xE76B;" /><!-- Chevron left -->
+            <FontIcon Glyph="&#xE76B;" Foreground="{ThemeResource ReceptusGrey}" /><!-- Chevron left -->
             <Button.KeyboardAccelerators>
                <KeyboardAccelerator Modifiers="None" Key="Left"/>
             </Button.KeyboardAccelerators>
@@ -744,7 +753,7 @@
                  VerticalAlignment="Center"
                  x:Uid="btnRightPage"
                  ToolTipService.ToolTip="Next chapter (Right arrow)">
-            <FontIcon Glyph="&#xE76C;" /><!-- Chevron right -->
+            <FontIcon Glyph="&#xE76C;" Foreground="{ThemeResource ReceptusGrey}" /><!-- Chevron right -->
             <Button.KeyboardAccelerators>
                <KeyboardAccelerator Modifiers="None" Key="Right"/>
             </Button.KeyboardAccelerators>
@@ -983,6 +992,7 @@
                                       Style="{ThemeResource TitleTextBlockStyle}"
                                       x:Uid="SettingsTitle">Settings</TextBlock>
                            <ComboBox Name="cbDefaultVersion"
+                                     Margin="0,5,0,0"
                                      Header="Default version"
                                      HorizontalAlignment="Left"
                                      ItemsSource="{x:Bind Bibles}"
@@ -998,6 +1008,7 @@
                            <!-- Light/dark theme switch -->
                            <ToggleSwitch Name="tglAppTheme"
                                          Header="Theme"
+                                         Margin="0,5,0,0"
                                          OffContent="Light"
                                          OnContent="Dark"
                                          IsOn="False"
@@ -1006,6 +1017,7 @@
 
                            <!-- Toast notifications switch -->
                            <ToggleSwitch Name="tglNotifications"
+                                         Margin="0,5,0,0"
                                          Header="Remind me to do my reading"
                                          OffContent="Don't remind me"
                                          OnContent="Remind me"
@@ -1021,8 +1033,10 @@
                                        TimeChanged="TpNotificationTime_TimeChanged" />
 
                            <TextBlock Style="{ThemeResource TitleTextBlockStyle}"
-                                      x:Uid="txtCredits">Credits</TextBlock>
+                                      x:Uid="txtCredits"
+                                      Margin="0,5,0,0">Credits</TextBlock>
                            <RichTextBlock LineHeight="18"
+                                          Margin="0,5,0,0"
                                           x:Uid="rtbCredits">
                               <Paragraph Margin="0, 5">
                                  <Run x:Uid="appProgrammedBy">App programmed by</Run>
@@ -1078,7 +1092,7 @@
                                Grid.Row="0"/>
                   <TextBlock x:Name="txtSearchStatus"
                              Text="Status"
-                             Margin="5,0"
+                             Margin="5,3"
                              Grid.Row="1"
                              FontFamily="/Assets/Fonts/PalanquinDark.ttf#Palanquin Dark Regular"
                              Style="{StaticResource CaptionTextBlockStyle}"/>

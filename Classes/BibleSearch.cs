@@ -24,7 +24,6 @@ namespace BibleBrowserUWP
       /// <returns>The closest book name to the query string. Guaranteed to return something, no matter how unreasonable.</returns>
       public static string ClosestBookName(BibleVersion version, string query, out float levensteinPercent)
       {
-         Debug.WriteLine("NEW QUERY: " + query.ToLower().RemoveDiacritics());
          if (query == null || query.Length == 0)
          {
             levensteinPercent = 0.0f;
@@ -219,6 +218,11 @@ namespace BibleBrowserUWP
       {
          float levSimilarity;
 
+         foreach(var item in splitQuery)
+         {
+            Debug.WriteLine("ITEM: " + item);
+         }
+
          if(splitQuery.Count == 0)
          {
             return 0f;
@@ -226,12 +230,14 @@ namespace BibleBrowserUWP
          else if (QueryHasNumeral(ref splitQuery)) {
             book = ClosestBookName(version, splitQuery[0], out levSimilarity);
             Debug.WriteLine(book + " found from " + splitQuery[0] + " with lev distance of " + levSimilarity);
+            splitQuery.RemoveAt(0);
             return levSimilarity;
          }
          else
          {
             book = ClosestBookName(version, splitQuery[0], out levSimilarity);
             Debug.WriteLine(book + " found from " + splitQuery[0] + " with lev distance of " + levSimilarity);
+            splitQuery.RemoveAt(0);
             return levSimilarity;
          }
       }
@@ -243,12 +249,22 @@ namespace BibleBrowserUWP
       /// <param name="splitQuery">The original search query split between spaces and punctuation.
       /// Removes the BibleVersion parameter if it is found.</param>
       /// <param name="version">Changes to the correct BibleVersion if the version is found.</param>
-      /// <returns></returns>
-      public static bool QueryHasBibleVersion(ref List<string> splitQuery, ref BibleVersion version)
+      /// <returns>True if a version that is installed is found.</returns>
+      public static bool QueryHasBibleVersion(ref List<string> splitQuery, ref BibleVersion version, ref BibleVersion compareVersion)
       {
-         if (VersionByAbbreviation(splitQuery[0]) != null)
+         if (splitQuery.Count > 0 && VersionByAbbreviation(splitQuery[0]) != null)
          {
+            if (splitQuery.Count > 1 && VersionByAbbreviation(splitQuery[1]) != null)
+            {
+               version = VersionByAbbreviation(splitQuery[0]);
+               compareVersion = VersionByAbbreviation(splitQuery[1]);
+               splitQuery.RemoveAt(0);
+               splitQuery.RemoveAt(0);
+               return true;
+            }
+
             version = VersionByAbbreviation(splitQuery[0]);
+            compareVersion = null;
             splitQuery.RemoveAt(0);
             return true;
          }
@@ -295,6 +311,47 @@ namespace BibleBrowserUWP
             // Not a number
             else
             {
+               return false;
+            }
+         }
+      }
+
+
+      /// <summary>
+      /// Finds whether the first item in the query is a number. If so, that number gets assigned to the chapter number.
+      /// Otherwise, the chapter number is set as 1.
+      /// </summary>
+      /// <param name="splitQuery">The query, beginning with the chapter number.</param>
+      /// <param name="chapter">The chapter number found</param>
+      /// <returns>True if a chapter number was found.</returns>
+      public static bool QueryHasChapter(ref List<string> splitQuery, ref int chapter)
+      {
+         foreach(var item in splitQuery)
+         {
+            Debug.WriteLine("QUERY: " + item);
+         }
+
+         if(splitQuery.Count == 0)
+         {
+            Debug.WriteLine("No chapter found.");
+            return false;
+         }
+         else
+         {
+            int number = 1;
+
+            if(int.TryParse(splitQuery[0], out number))
+            {
+               Debug.WriteLine("Parsed chapter number " + number);
+               chapter = number;
+               splitQuery.RemoveAt(0);
+               return true;
+            }
+            else
+            {
+               Debug.WriteLine("Did not parse a chapter number");
+               chapter = 1;
+               splitQuery.RemoveAt(0);
                return false;
             }
          }
