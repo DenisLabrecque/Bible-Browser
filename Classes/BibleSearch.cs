@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,8 +9,9 @@ namespace BibleBrowserUWP
 {
    static class BibleSearch
    {
-      #region Methods
+      public const int TOOMANYRESULTS = 150;
 
+      #region Methods
 
       /// <summary>
       /// Return the Bible book name that most resembles the query according to Levenshtein distance (ignoring diacritics).
@@ -111,31 +108,42 @@ namespace BibleBrowserUWP
                // Go through each chapter of the book of the Bible
                for (int chapter = 1; chapter <= version.GetChapterCount(reference); chapter++)
                {
-                  // Continue if the search was not cancelled
-                  try
+                  // See if the search has hit too many results for the computer's good
+                  if (progressInfo.ResultCount > TOOMANYRESULTS)
                   {
-                     // Skip if the search was cancelled
-                     cancellation.ThrowIfCancellationRequested();
-                     BibleReference chapterReference = new BibleReference(version, null, (BibleBook)book, chapter);
-
-                     // Go through each verse of the chapter
-                     int verseNumber = 1;
-                     foreach (string verse in version.GetChapterVerses(chapterReference))
-                     {
-                        if (verse.ToLower().RemoveDiacritics().Contains(query))
-                        {
-                           BibleReference hit = new BibleReference(version, null, (BibleBook)book, chapter, verseNumber);
-                           Debug.WriteLine(hit + ":" + verseNumber + " -- " + verse);
-                           progressInfo.AddResult(new SearchResult(hit, verse));
-                        }
-
-                        verseNumber++;
-                     }
+                     progressInfo.Status = "Too many results.";
+                     progressInfo.Completion = 1f;
+                     progress.Report(progressInfo);
                   }
-                  // Handle the search being cancelled
-                  catch (OperationCanceledException e) {
-                     progressInfo.IsCanceled = true; // Let the user know that the operation has been ended unexpectedly
-                     return progressInfo;
+                  else
+                  {
+                     // Continue if the search was not cancelled
+                     try
+                     {
+                        // Skip if the search was cancelled
+                        cancellation.ThrowIfCancellationRequested();
+                        BibleReference chapterReference = new BibleReference(version, null, (BibleBook)book, chapter);
+
+                        // Go through each verse of the chapter
+                        int verseNumber = 1;
+                        foreach (string verse in version.GetChapterVerses(chapterReference))
+                        {
+                           if (verse.ToLower().RemoveDiacritics().Contains(query))
+                           {
+                              BibleReference hit = new BibleReference(version, null, (BibleBook)book, chapter, verseNumber);
+                              Debug.WriteLine(hit + ":" + verseNumber + " -- " + verse);
+                              progressInfo.AddResult(new SearchResult(hit, verse));
+                           }
+
+                           verseNumber++;
+                        }
+                     }
+                     // Handle the search being cancelled
+                     catch (OperationCanceledException e)
+                     {
+                        progressInfo.IsCanceled = true; // Let the user know that the operation has been ended unexpectedly
+                        return progressInfo;
+                     }
                   }
                }
             }
@@ -402,6 +410,39 @@ namespace BibleBrowserUWP
             default:
                return false;
          }
+      }
+
+      public static bool QuerySurroundedByQuotes(ref List<string> splitQuery)
+      {
+         if (splitQuery.Count >= 1)
+         {
+            if ((splitQuery.First().First() == '"' && splitQuery.Last().Last() == '"') ||
+                (splitQuery.First().First() == '\'' && splitQuery.Last().Last() == '\''))
+            {
+               return true;
+            }
+            else
+               return false;
+         }
+         else
+            return false;
+      }
+
+      public static string ReassembleSplitString(List<string> splitQuery, bool removeQuotes)
+      {
+         string query = string.Empty;
+
+         foreach(string item in splitQuery)
+         {
+            query += item + " ";
+         }
+
+         if (removeQuotes)
+         {
+            char[] charsToTrim = { '\'', '"', ' ' };
+            query = query.Trim(charsToTrim);
+         }
+         return query;
       }
 
       #endregion

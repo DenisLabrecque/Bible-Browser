@@ -25,6 +25,7 @@
                <SolidColorBrush x:Key="ReceptusRed" Color="#E23F47"/>
                <SolidColorBrush x:Key="ReceptusGrey" Color="#7FA1AB"/>
                <SolidColorBrush x:Key="ReceptusLight" Color="#F2F2F2"/>
+               <SolidColorBrush x:Key="ReceptusText" Color="Black"/>
                <SolidColorBrush x:Key="ReceptusLighGrey" Color="#D3DBDE"/>
                <SolidColorBrush x:Key="ButtonColour" Color="White"/>
                <SolidColorBrush x:Key="DisabledButtonColour" Color="#FF99BCC7"/>
@@ -62,6 +63,7 @@
                <SolidColorBrush x:Key="ReceptusRed" Color="#E23F47"/>
                <SolidColorBrush x:Key="ReceptusGrey" Color="#F2F2F2"/>
                <SolidColorBrush x:Key="ReceptusLight" Color="Black"/>
+               <SolidColorBrush x:Key="ReceptusText" Color="WhiteSmoke"/>
                <SolidColorBrush x:Key="ReceptusLighGrey" Color="#D3DBDE"/>
                <SolidColorBrush x:Key="ButtonColour" Color="WhiteSmoke"/>
                <SolidColorBrush x:Key="DisabledButtonColour" Color="#FF99BCC7"/>

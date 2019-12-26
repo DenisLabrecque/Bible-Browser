@@ -23,6 +23,7 @@ namespace BibleBrowserUWP
       private DateTime m_TimeStarted;
       private DateTime m_TimeEnded;
       private bool m_IsCanceled;
+      private int m_ResultCount;
 
 
       /// <summary>
@@ -32,6 +33,7 @@ namespace BibleBrowserUWP
       {
          m_Query = query;
          m_Progress = 0f;
+         m_ResultCount = 0;
          m_Task = string.Empty;
          m_Results = new List<SearchResult>();
          m_TimeStarted = DateTime.Now;
@@ -96,6 +98,7 @@ namespace BibleBrowserUWP
       public void AddResult(SearchResult match)
       {
          m_Results.Add(match);
+         m_ResultCount++;
       }
 
       /// <summary>
@@ -104,6 +107,13 @@ namespace BibleBrowserUWP
       public bool IsCanceled {
          get { return m_IsCanceled; }
          set { m_IsCanceled = value; }
+      }
+
+      /// <summary>
+      /// The number of matches that have been added to the list to date.
+      /// </summary>
+      public int ResultCount {
+         get { return m_ResultCount; }
       }
    }
 }

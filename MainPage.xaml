@@ -18,6 +18,14 @@
 
    <Page.Resources>
 
+      <Style x:Key="TitleTextBlockStyle" TargetType="TextBlock">
+         <Setter Property="Foreground" Value="{ThemeResource ReceptusText}" />
+         <Setter Property="FontFamily" Value="/Assets/Fonts/PalanquinDark.ttf#Palanquin Dark Regular" />
+         <Setter Property="Margin" Value="10,0,0,0" />
+         <Setter Property="FontSize" Value="18" />
+         <Setter Property="OpticalMarginAlignment" Value="TrimSideBearings" />
+      </Style>
+
       <Style x:Key="Flyout" TargetType="FlyoutPresenter">
          <Setter Property="ScrollViewer.HorizontalScrollMode" Value="Disabled"/>
          <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
@@ -279,7 +287,7 @@
       <Style x:Key="TabListViewItemContainer" BasedOn="{StaticResource ListViewItemRevealStyle}" TargetType="ListViewItem"/>
 
       <Style x:Key="BrowserSearchTextBox" TargetType="TextBox">
-         <Setter Property="Foreground" Value="{ThemeResource TextControlForeground}"/>
+         <Setter Property="Foreground" Value="{ThemeResource ReceptusText}"/>
          <Setter Property="SelectionHighlightColor" Value="{ThemeResource ReceptusRed}"/>
          <Setter Property="Background" Value="Transparent"/>
          <Setter Property="BorderThickness" Value="0"/>
@@ -516,7 +524,7 @@
       <Style x:Key="ReadableText" TargetType="RichTextBlock">
          <Setter Property="FontFamily" Value="/Assets/Fonts/Roboto.ttf#Roboto Slab"/>
          <Setter Property="FontSize" Value="16"/>
-         <Setter Property="LineHeight" Value="25"/>
+         <Setter Property="LineHeight" Value="30"/>
          <Setter Property="TextWrapping" Value="WrapWholeWords"/>
          <Setter Property="TextAlignment" Value="Left"/>
          <Setter Property="HorizontalAlignment" Value="Stretch"/>
@@ -978,7 +986,7 @@
                   <Button.KeyboardAccelerators>
                      <KeyboardAccelerator Modifiers="Control" Key="M"/>
                   </Button.KeyboardAccelerators>
-                  <FontIcon FontSize="15" Glyph="&#xE712;" FontFamily="Segoe MDL2 Assets"/>
+                  <FontIcon FontSize="15" Glyph="&#xE712;" FontFamily="Segoe MDL2 Assets" HorizontalAlignment="Stretch" Height="15" Margin="0.5,0,-0.5,0" VerticalAlignment="Top"/>
 
                   <!-- Settings menu -->
                   <Button.Flyout>
@@ -989,6 +997,7 @@
                            <TextBlock HorizontalAlignment="Left"
                                       HorizontalTextAlignment="Left"
                                       Margin="0,0"
+                                      Name="txtSettings"
                                       Style="{ThemeResource TitleTextBlockStyle}"
                                       x:Uid="SettingsTitle">Settings</TextBlock>
                            <ComboBox Name="cbDefaultVersion"
@@ -1037,7 +1046,8 @@
                                       Margin="0,5,0,0">Credits</TextBlock>
                            <RichTextBlock LineHeight="18"
                                           Margin="0,5,0,0"
-                                          x:Uid="rtbCredits">
+                                          x:Uid="rtbCredits"
+                                          Foreground="{ThemeResource ReceptusText}">
                               <Paragraph Margin="0, 5">
                                  <Run x:Uid="appProgrammedBy">App programmed by</Run>
                                  <Hyperlink NavigateUri="https://www.linkedin.com/in/denisglabrecque/">Denis Labrecque</Hyperlink>
