@@ -63,7 +63,7 @@
                <SolidColorBrush x:Key="ReceptusRed" Color="#E23F47"/>
                <SolidColorBrush x:Key="ReceptusGrey" Color="#F2F2F2"/>
                <SolidColorBrush x:Key="ReceptusLight" Color="Black"/>
-               <SolidColorBrush x:Key="ReceptusText" Color="WhiteSmoke"/>
+               <SolidColorBrush x:Key="ReceptusText" Color="#F2F2F2"/>
                <SolidColorBrush x:Key="ReceptusLighGrey" Color="#D3DBDE"/>
                <SolidColorBrush x:Key="ButtonColour" Color="WhiteSmoke"/>
                <SolidColorBrush x:Key="DisabledButtonColour" Color="#FF99BCC7"/>

@@ -126,7 +126,7 @@ namespace BibleBrowserUWP
 
          this.InitializeComponent();
          HideAllDropdowns(); // Don't show Genesis 1
-         SetCurrentView(CurrentView.Chapter);
+         ShowSearch(false);
 
          // Set theme for window root.
          FrameworkElement root = (FrameworkElement)Window.Current.Content;
@@ -148,7 +148,7 @@ namespace BibleBrowserUWP
       private void SetNotificationTime(TimeSpan notifyTime)
       {
          Debug.WriteLine("Notification time found as " + notifyTime);
-         tpNotificationTime.Time = notifyTime;
+         //tpNotificationTime.Time = notifyTime;
       }
 
       /// <summary>
@@ -169,13 +169,13 @@ namespace BibleBrowserUWP
       {
          if(notificationsAllowed)
          {
-            tglNotifications.IsOn = true;
-            tpNotificationTime.IsEnabled = true;
+            //tglNotifications.IsOn = true;
+            //tpNotificationTime.IsEnabled = true;
          }
          else
          {
-            tglNotifications.IsOn = false;
-            tpNotificationTime.IsEnabled = false;
+            //tglNotifications.IsOn = false;
+            //tpNotificationTime.IsEnabled = false;
          }
       }
 
@@ -571,11 +571,13 @@ namespace BibleBrowserUWP
       /// <param name="reference">The chapter to print. If null, this will simply erase page contents.</param>
       private void PrintChapter(BibleReference reference)
       {
+         ShowSearch(false);
+
          lvSearchResults.ItemsSource = null;
          if(m_cancelSearch != null)
             m_cancelSearch.Dispose();
 
-         SetCurrentView(CurrentView.Search);
+         ShowChapter(true);
 
          // New tab, leave blank
          if (BrowserTab.Selected.Reference == null)
@@ -601,29 +603,57 @@ namespace BibleBrowserUWP
          switch(view)
          {
             case CurrentView.Chapter:
-               // Show chapter
-               gvCompareVerses.Visibility = Visibility.Visible;
-               btnLeftPage.Visibility = Visibility.Visible;
-               btnRightPage.Visibility = Visibility.Visible;
-               // Hide search
-               lvSearchResults.Visibility = Visibility.Collapsed;
-               progSearchProgress.Visibility = Visibility.Collapsed;
-               txtSearchStatus.Visibility = Visibility.Collapsed;
-               btnCancelSearch.Visibility = Visibility.Collapsed;
+               ShowChapter(true);
+               ShowSearch(false);
                break;
             case CurrentView.Search:
-               // Hide chapter
-               gvCompareVerses.Visibility = Visibility.Collapsed;
-               btnLeftPage.Visibility = Visibility.Collapsed;
-               btnRightPage.Visibility = Visibility.Collapsed;
-               // Show search
-               lvSearchResults.Visibility = Visibility.Visible;
-               progSearchProgress.Visibility = Visibility.Visible;
-               txtSearchStatus.Visibility = Visibility.Visible;
-               btnCancelSearch.Visibility = Visibility.Visible;
+               ShowChapter(false);
+               ShowSearch(true);
                break;
             default:
                break;
+         }
+      }
+
+
+      /// <summary>
+      /// Show the chapter text. Does not print anything.
+      /// </summary>
+      private void ShowChapter(bool show)
+      {
+         if (show)
+         {
+            gvCompareVerses.Visibility = Visibility.Visible;
+            btnLeftPage.Visibility = Visibility.Visible;
+            btnRightPage.Visibility = Visibility.Visible;
+         }
+         else
+         {
+            gvCompareVerses.Visibility = Visibility.Collapsed;
+            btnLeftPage.Visibility = Visibility.Collapsed;
+            btnRightPage.Visibility = Visibility.Collapsed;
+         }
+      }
+
+
+      /// <summary>
+      /// Show the search results region and progress bar.
+      /// </summary>
+      private void ShowSearch(bool show)
+      {
+         if (show)
+         {
+            lvSearchResults.Visibility = Visibility.Visible;
+            progSearchProgress.Visibility = Visibility.Visible;
+            txtSearchStatus.Visibility = Visibility.Visible;
+            btnCancelSearch.Visibility = Visibility.Visible;
+         }
+         else
+         {
+            lvSearchResults.Visibility = Visibility.Collapsed;
+            progSearchProgress.Visibility = Visibility.Collapsed;
+            txtSearchStatus.Visibility = Visibility.Collapsed;
+            btnCancelSearch.Visibility = Visibility.Collapsed;
          }
       }
 
@@ -705,7 +735,7 @@ namespace BibleBrowserUWP
          if(m_wasSearchResultClicked == true)
          {
             m_wasSearchResultClicked = false;
-            SetCurrentView(CurrentView.Search);
+            ShowSearch(true);
          }
          else
             GoToPreviousReference();
@@ -923,7 +953,7 @@ namespace BibleBrowserUWP
          if (asbSearch.Text == string.Empty)
          {
             ShowAllDropdowns();
-            SetCurrentView(CurrentView.Chapter);
+            ShowChapter(true);
          }
       }
 
@@ -948,7 +978,6 @@ namespace BibleBrowserUWP
          }
          txtSearchStatus.Text = progress.Status;
       }
-
 
       /// <summary>
       /// Detect different keystrokes in the search bar.
@@ -1045,7 +1074,7 @@ namespace BibleBrowserUWP
          // Was a letter; erase the chapter
          else
          {
-            SetCurrentView(CurrentView.Search);
+            ShowChapter(true);
          }
       }
 
@@ -1055,7 +1084,7 @@ namespace BibleBrowserUWP
       /// </summary>
       private void Search(string query, BibleVersion version)
       {
-         SetCurrentView(CurrentView.Search);
+         ShowChapter(false);
          SearchAsync(query, version);
       }
 
@@ -1081,7 +1110,7 @@ namespace BibleBrowserUWP
             Progress<SearchProgressInfo> progressIndicator = new Progress<SearchProgressInfo>(ReportSearchProgress);
             m_cancelSearch = new CancellationTokenSource();
             // Call async method
-            SetCurrentView(CurrentView.Search);
+            ShowSearch(true);
             m_SearchResults.Clear(); // Empty from any previous search results
             SearchProgressInfo task = await BibleSearch.SearchAsync(version, query, progressIndicator, m_cancelSearch.Token);
             // Handle the search being cancelled at any point
@@ -1113,7 +1142,7 @@ namespace BibleBrowserUWP
 
       private void StopSearch()
       {
-         SetCurrentView(CurrentView.Search);
+         ShowSearch(false);
          lvSearchResults.ItemsSource = null;
          m_cancelSearch.Dispose();
       }
@@ -1210,7 +1239,7 @@ namespace BibleBrowserUWP
          catch (ObjectDisposedException)
          {
             // Close the search bar
-            SetCurrentView(CurrentView.Search);
+            ShowSearch(false);
          }
       }
 
@@ -1223,7 +1252,7 @@ namespace BibleBrowserUWP
          if (((ToggleSwitch)sender).IsOn)
          {
             AppSettings.ReadingNotifications = !AppSettings.NONOTIFICATIONS;
-            tpNotificationTime.IsEnabled = true;
+            //tpNotificationTime.IsEnabled = true;
             ConstructReminderToast(new DateTimeOffset(DateTime.Now.AddSeconds(2))); // TODO this should create a schedule
             //ConstructReminderToast(new DateTimeOffset(DateTime.Today.AddDays(1).AddHours(AppSettings.NotifyTime.Hours).AddMinutes(AppSettings.NotifyTime.Minutes)));
             Debug.WriteLine("Toast notifications " + AppSettings.ReadingNotifications);
@@ -1232,7 +1261,7 @@ namespace BibleBrowserUWP
          else
          {
             AppSettings.ReadingNotifications = AppSettings.NONOTIFICATIONS;
-            tpNotificationTime.IsEnabled = false;
+            //tpNotificationTime.IsEnabled = false;
             Debug.WriteLine("Toast notifications " + AppSettings.ReadingNotifications);
          }
       }

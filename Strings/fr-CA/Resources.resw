@@ -204,4 +204,19 @@
   <data name="rememberBibleReading" xml:space="preserve">
     <value>Souvenez-vous de faire votre lecture quotidienne aujourd'hui!</value>
   </data>
+  <data name="btnRemoveCompareView.Content" xml:space="preserve">
+    <value>Enlever la comparaison</value>
+  </data>
+  <data name="btnRemoveCompareView.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Enlever la présente version de comparaison biblique</value>
+  </data>
+  <data name="AppDescription" xml:space="preserve">
+    <value>Un lecteur biblique rapide avec une interface de navigateur. Les fonctions utiles comprennent une tabulation pratique, une vue pour comparer deux versions simultanément, la possibilité de rechercher ou de sauter vers une référence, et un mode foncé/clair.</value>
+  </data>
+  <data name="AppDisplayName" xml:space="preserve">
+    <value>Navigateur Biblique Réceptus</value>
+  </data>
+  <data name="txtCompareTo.Text" xml:space="preserve">
+    <value>Ajouter une comparaison</value>
+  </data>
 </root>
