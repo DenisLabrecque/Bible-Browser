@@ -1,5 +1,5 @@
 # Receptus
-This Windows universal app is an attempt to make a speedy Bible browser that can load [Zefania XML files](https://sourceforge.net/projects/zefania-sharp/files/) into a reader. This is an app in progress, but planned to be uploaded to the Windows Store as soon as a working draft is ready (probably after July 2019).
+This Windows universal app is an attempt to make a speedy Bible browser that can load [Zefania XML files](https://sourceforge.net/projects/zefania-sharp/files/) into a reader. [Available on the Windows Store.](https://www.microsoft.com/en-us/p/receptus/9mzwgfw6g8kx)
 
 ![Receptus pre-Alpha](https://i.pinimg.com/originals/b4/1a/d6/b41ad6a760800d3a54acbb6231556d49.jpg)
 
