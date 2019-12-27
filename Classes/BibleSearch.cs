@@ -106,7 +106,7 @@ namespace BibleBrowserUWP
                progress.Report(progressInfo);
 
                // Go through each chapter of the book of the Bible
-               for (int chapter = 1; chapter <= version.GetChapterCount(reference); chapter++)
+               Parallel.For(1, version.GetChapterCount(reference) + 1, chapter =>
                {
                   // See if the search has hit too many results for the computer's good
                   if (progressInfo.ResultCount > TOOMANYRESULTS)
@@ -142,10 +142,10 @@ namespace BibleBrowserUWP
                      catch (OperationCanceledException)
                      {
                         progressInfo.IsCanceled = true; // Let the user know that the operation has been ended unexpectedly
-                        return progressInfo;
+                        //return progressInfo;
                      }
                   }
-               }
+               });
             }
 
             return progressInfo;
