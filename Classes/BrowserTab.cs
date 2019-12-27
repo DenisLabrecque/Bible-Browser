@@ -18,6 +18,8 @@ namespace BibleBrowserUWP
    /// </summary>
    class BrowserTab : INotifyPropertyChanged
    {
+      public enum NavigationMode { Previous, Add, Next }
+
       #region Property Changed Implementation
 
       public event PropertyChangedEventHandler PropertyChanged;
@@ -173,15 +175,14 @@ namespace BibleBrowserUWP
          }
       }
 
-      public enum NavigationMode { Previous, Add, Next }
 
       /// <summary>
-      /// Navigate to a reference and add it to history as necessary.
+      /// Add a reference to history as necessary.
       /// </summary>
       /// <param name="reference">The reference to visit; do not pass in <c>null</c>.
       /// This <c>ref</c> parameter returns the navigation result (so it can be navigated to).</param>
       /// <param name="mode">When the <c>NavigationMode</c> is <c>Previous</c> or <c>Next</c>, the reference is moved to but not added in history.</param>
-      public void GoToReference(ref BibleReference reference, NavigationMode mode = NavigationMode.Add)
+      public void AddToHistory(ref BibleReference reference, NavigationMode mode = NavigationMode.Add)
       {
          if (reference == null)
             throw new Exception("Do not assign null to a Bible reference in history");

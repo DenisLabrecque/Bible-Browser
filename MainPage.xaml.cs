@@ -272,12 +272,10 @@ namespace BibleBrowserUWP
       {
          if (BrowserTab.Selected.Previous != null)
          {
-            Debug.WriteLine("Previous reference called!");
             BibleReference reference = BrowserTab.Selected.Reference;
             reference.VerticalScrollOffset = svPageScroller.VerticalOffset;
-            BrowserTab.Selected.GoToReference(ref reference, BrowserTab.NavigationMode.Previous);
+            BrowserTab.Selected.AddToHistory(ref reference, BrowserTab.NavigationMode.Previous);
             PrintChapter(reference);
-            ActivateButtons();
             svPageScroller.ChangeView(null, reference.VerticalScrollOffset, null);
          }
       }
@@ -289,12 +287,10 @@ namespace BibleBrowserUWP
       {
          if (BrowserTab.Selected.Next != null)
          {
-            Debug.WriteLine("Next reference called!");
             BibleReference reference = BrowserTab.Selected.Reference;
             reference.VerticalScrollOffset = svPageScroller.VerticalOffset;
-            BrowserTab.Selected.GoToReference(ref reference, BrowserTab.NavigationMode.Next);
+            BrowserTab.Selected.AddToHistory(ref reference, BrowserTab.NavigationMode.Next);
             PrintChapter(reference);
-            ActivateButtons();
             svPageScroller.ChangeView(null, reference.VerticalScrollOffset, null);
          }
       }
@@ -324,7 +320,7 @@ namespace BibleBrowserUWP
             }
 
             BibleReference newReference = new BibleReference(oldReference.Version, oldReference.ComparisonVersion, book, chapter);
-            BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
+            BrowserTab.Selected.AddToHistory(ref newReference, BrowserTab.NavigationMode.Add);
             svPageScroller.ChangeView(null, 0, null, true);
          }
       }
@@ -353,7 +349,7 @@ namespace BibleBrowserUWP
             }
 
             BibleReference newReference = new BibleReference(oldReference.Version, oldReference.ComparisonVersion, book, chapter);
-            BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
+            BrowserTab.Selected.AddToHistory(ref newReference, BrowserTab.NavigationMode.Add);
             svPageScroller.ChangeView(null, 0, null, true);
          }
       }
@@ -697,7 +693,7 @@ namespace BibleBrowserUWP
       private void AddCompareToVersion(BibleVersion compareVersion, BibleReference oldReference)
       {
          BibleReference newReference = new BibleReference(oldReference.Version, compareVersion, oldReference.Book, oldReference.Chapter, oldReference.Verse);
-         BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
+         BrowserTab.Selected.AddToHistory(ref newReference, BrowserTab.NavigationMode.Add);
          Debug.WriteLine("Compare version added as " + newReference.ComparisonVersion);
       }
 
@@ -709,7 +705,7 @@ namespace BibleBrowserUWP
          if (oldReference.ComparisonVersion != null)
          {
             BibleReference newReference = new BibleReference(oldReference.Version, null, oldReference.Book, oldReference.Chapter, oldReference.Verse);
-            BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
+            BrowserTab.Selected.AddToHistory(ref newReference, BrowserTab.NavigationMode.Add);
             Debug.WriteLine("Compare version removed.");
          }
       }
@@ -744,13 +740,7 @@ namespace BibleBrowserUWP
       /// </summary>
       private void BtnPrevious_Click(object sender, RoutedEventArgs e)
       {
-         if(m_wasSearchResultClicked == true)
-         {
-            m_wasSearchResultClicked = false;
-            ShowSearch(true);
-         }
-         else
-            GoToPreviousReference();
+         GoToPreviousReference();
       }
 
       /// <summary>
@@ -893,7 +883,7 @@ namespace BibleBrowserUWP
          else {
             newReference = new BibleReference(version, oldReference.ComparisonVersion, oldReference.Book, oldReference.Chapter);
          }
-         BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
+         BrowserTab.Selected.AddToHistory(ref newReference, BrowserTab.NavigationMode.Add);
 
          flyVersion.Hide();
       }
@@ -922,7 +912,7 @@ namespace BibleBrowserUWP
          {
             reference = m_previousReference;
          }
-         BrowserTab.Selected.GoToReference(ref reference, BrowserTab.NavigationMode.Add);
+         BrowserTab.Selected.AddToHistory(ref reference, BrowserTab.NavigationMode.Add);
 
          flyBook.Hide();
          flyChapter.ShowAt(ddbChapter);
@@ -939,7 +929,7 @@ namespace BibleBrowserUWP
          // Go to the book in the present reference
          BibleReference oldReference = BrowserTab.Selected.Reference;
          BibleReference newReference = new BibleReference(oldReference.Version, oldReference.ComparisonVersion, oldReference.Book, chapter);
-         BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
+         BrowserTab.Selected.AddToHistory(ref newReference, BrowserTab.NavigationMode.Add);
 
          flyChapter.Hide();
       }
@@ -1043,7 +1033,7 @@ namespace BibleBrowserUWP
                         BibleSearch.QueryHasChapter(ref splitQuery, ref chapter);
 
                         BibleReference newReference = new BibleReference(version, comparison, book, chapter);
-                        BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
+                        BrowserTab.Selected.AddToHistory(ref newReference, BrowserTab.NavigationMode.Add);
                         ShowSearchDropdowns(true);
                      }
                   }
@@ -1053,7 +1043,7 @@ namespace BibleBrowserUWP
                      if (version != BrowserTab.Selected.Reference.Version || comparison != BrowserTab.Selected.Reference.ComparisonVersion)
                      {
                         BibleReference newReference = new BibleReference(version, comparison, BrowserTab.Selected.Reference.Book, BrowserTab.Selected.Reference.Chapter);
-                        BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
+                        BrowserTab.Selected.AddToHistory(ref newReference, BrowserTab.NavigationMode.Add);
                         ShowSearchDropdowns(true);
                      }
                   }
@@ -1068,7 +1058,7 @@ namespace BibleBrowserUWP
                   {
                      BibleSearch.QueryHasChapter(ref splitQuery, ref chapter);
                      BibleReference newReference = new BibleReference(version, comparison, book, chapter);
-                     BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
+                     BrowserTab.Selected.AddToHistory(ref newReference, BrowserTab.NavigationMode.Add);
                      ShowSearchDropdowns(true);
                   }
                   // Not sure whether this is a search or go to. Show both.
@@ -1087,17 +1077,22 @@ namespace BibleBrowserUWP
          // Select the search box text on backspace if the dropdowns are being displayed
          else if(e.Key == Windows.System.VirtualKey.Back)
          {
-            if (m_areDropdownsDisplayed)
+            // Hide the dropdowns to let the user write a query
+            if (m_currentView == CurrentView.Chapter)
             {
-               ShowSearchDropdowns(false);
+               // Let the second delete remove text
+               if(m_areDropdownsDisplayed)
+                  ShowSearchDropdowns(false);
             }
-
-            CancelSearch();
+            // A search was taking place that the user cancels by deleting backwards
+            else
+            {
+               CancelSearch();
+            }
          }
-         // Was a letter; erase the chapter
+         // Was a letter
          else
          {
-            ShowChapter(false);
          }
       }
 
@@ -1249,6 +1244,7 @@ namespace BibleBrowserUWP
       private void BtnCancelSearch_Click(object sender, RoutedEventArgs e)
       {
          CancelSearch();
+         SetCurrentView(CurrentView.Chapter);
       }
 
       private void CancelSearch()
@@ -1259,11 +1255,7 @@ namespace BibleBrowserUWP
          }
          catch (NullReferenceException) { }
          // The search is finished, so it can no longer be cancelled
-         catch (ObjectDisposedException)
-         {
-            // Close the search bar
-            SetCurrentView(CurrentView.Chapter);
-         }
+         catch (ObjectDisposedException) { }
       }
 
       /// <summary>
@@ -1340,7 +1332,7 @@ namespace BibleBrowserUWP
          m_wasSearchResultClicked = true;
          BibleReference reference = ((SearchResult)e.ClickedItem).Reference;
          Debug.WriteLine("Search to go to reference: " + reference);
-         BrowserTab.Selected.GoToReference(ref reference);
+         BrowserTab.Selected.AddToHistory(ref reference);
          PrintChapter(reference);
       }
    }
