@@ -139,7 +139,7 @@ namespace BibleBrowserUWP
                         }
                      }
                      // Handle the search being cancelled
-                     catch (OperationCanceledException e)
+                     catch (OperationCanceledException)
                      {
                         progressInfo.IsCanceled = true; // Let the user know that the operation has been ended unexpectedly
                         return progressInfo;

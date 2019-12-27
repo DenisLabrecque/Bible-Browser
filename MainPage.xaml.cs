@@ -436,7 +436,6 @@ namespace BibleBrowserUWP
                ddbBook.Visibility = Visibility.Visible;
                ddbChapter.Visibility = Visibility.Visible;
 
-               txtSearchStatus.Focus(FocusState.Programmatic); // Focus away from the search box
                m_areDropdownsDisplayed = true;
             }
          }
@@ -508,6 +507,7 @@ namespace BibleBrowserUWP
          titleBar.IsVisibleChanged += CoreTitleBar_IsVisibleChanged;
       }
 
+
       /// <summary>
       /// Get the size of the caption controls area and back button 
       /// (returned in logical pixels), and move content around as necessary.
@@ -524,6 +524,7 @@ namespace BibleBrowserUWP
          // Update title bar control size as needed to account for system size changes.
          grdTitleBar.Height = coreTitleBar.Height;
       }
+
 
       /// <summary>
       /// Based on the current tab, decide whether the Previous, Next, and Play commands should be clickable.
@@ -564,6 +565,7 @@ namespace BibleBrowserUWP
          }
       }
 
+
       /// <summary>
       /// Print a chapter of the Bible to the app page according to the reference sent.
       /// Stop a search if it is in progress.
@@ -598,15 +600,23 @@ namespace BibleBrowserUWP
          }
       }
 
+
+      /// <summary>
+      /// Choose whether to show the chapter view or the search view.
+      /// All UI elements relating to one view will be shown, and the other will be hidden.
+      /// </summary>
+      /// <param name="view">The wanted view</param>
       private void SetCurrentView(CurrentView view)
       {
          switch(view)
          {
             case CurrentView.Chapter:
+               m_currentView = CurrentView.Chapter;
                ShowChapter(true);
                ShowSearch(false);
                break;
             case CurrentView.Search:
+               m_currentView = CurrentView.Search;
                ShowChapter(false);
                ShowSearch(true);
                break;
@@ -950,10 +960,11 @@ namespace BibleBrowserUWP
 
       private void AsbSearch_LostFocus(object sender, RoutedEventArgs e)
       {
-         if (asbSearch.Text == string.Empty)
+         // The user deleted all text from the search bar and clicked away
+         if (asbSearch.Text == string.Empty && m_currentView == CurrentView.Search)
          {
+            SetCurrentView(CurrentView.Chapter);
             ShowAllDropdowns();
-            ShowChapter(true);
          }
       }
 
@@ -987,77 +998,89 @@ namespace BibleBrowserUWP
          if(e.Key == Windows.System.VirtualKey.Enter)
          {
             m_SearchResults = new ObservableCollection<SearchResult>(); // Erase previous search results
+
+            // Hitting Enter with nothing in the search box returns to the original reference
             string query = ((TextBox)sender).Text;
-            query = query.Trim().RemoveDiacritics();
-            if (string.IsNullOrWhiteSpace(query))
-               return;
-
-            List<string> splitQuery = query.Split(new char[] { ' ', ':', ';', '.', ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
-            BibleVersion version = BrowserTab.Selected.Reference.Version;
-            BibleVersion comparison = BrowserTab.Selected.Reference.ComparisonVersion;
-            string book = BrowserTab.Selected.Reference.BookName;
-            int chapter = 1;
-
-            // The whole query is surrounded by quotes
-            if(BibleSearch.QuerySurroundedByQuotes(ref splitQuery))
+            if(query == string.Empty)
             {
-               string search = BibleSearch.ReassembleSplitString(splitQuery, true);
-               Search(search, version);
+               ShowAllDropdowns();
+               SetCurrentView(CurrentView.Chapter);
             }
-            // The query has a version prefix (like KJV), so it is treated as a go to reference
-            else if(BibleSearch.QueryHasBibleVersion(ref splitQuery, ref version, ref comparison))
+
+            // The user has asked for a search
+            else
             {
-               // There is additional information
-               if (splitQuery.Count > 0)
+               query = query.Trim().RemoveDiacritics();
+               if (string.IsNullOrWhiteSpace(query))
+                  return;
+
+               List<string> splitQuery = query.Split(new char[] { ' ', ':', ';', '.', ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+               BibleVersion version = BrowserTab.Selected.Reference.Version;
+               BibleVersion comparison = BrowserTab.Selected.Reference.ComparisonVersion;
+               string book = BrowserTab.Selected.Reference.BookName;
+               int chapter = 1;
+
+               // The whole query is surrounded by quotes
+               if (BibleSearch.QuerySurroundedByQuotes(ref splitQuery))
                {
-                  if (BibleSearch.QuerySurroundedByQuotes(ref splitQuery))
+                  string search = BibleSearch.ReassembleSplitString(splitQuery, true);
+                  Search(search, version);
+               }
+               // The query has a version prefix (like KJV), so it is treated as a go to reference
+               else if (BibleSearch.QueryHasBibleVersion(ref splitQuery, ref version, ref comparison))
+               {
+                  // There is additional information
+                  if (splitQuery.Count > 0)
                   {
-                     string search = BibleSearch.ReassembleSplitString(splitQuery, true);
-                     Search(search, version);
+                     if (BibleSearch.QuerySurroundedByQuotes(ref splitQuery))
+                     {
+                        string search = BibleSearch.ReassembleSplitString(splitQuery, true);
+                        Search(search, version);
+                     }
+                     else
+                     {
+                        BibleSearch.QueryHasBibleBook(ref splitQuery, version, ref book);
+                        BibleSearch.QueryHasChapter(ref splitQuery, ref chapter);
+
+                        BibleReference newReference = new BibleReference(version, comparison, book, chapter);
+                        BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
+                        ShowAllDropdowns();
+                     }
                   }
+                  // A version prefix like KJV only
                   else
                   {
-                     BibleSearch.QueryHasBibleBook(ref splitQuery, version, ref book);
-                     BibleSearch.QueryHasChapter(ref splitQuery, ref chapter);
+                     if (version != BrowserTab.Selected.Reference.Version || comparison != BrowserTab.Selected.Reference.ComparisonVersion)
+                     {
+                        BibleReference newReference = new BibleReference(version, comparison, BrowserTab.Selected.Reference.Book, BrowserTab.Selected.Reference.Chapter);
+                        BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
+                        ShowAllDropdowns();
+                     }
+                  }
+               }
+               // The query does not have a version prefix, so decide whether it is a go to reference or a search
+               else
+               {
+                  float similarity = BibleSearch.QueryHasBibleBook(ref splitQuery, version, ref book);
 
+                  // This is a reference for sure
+                  if (similarity > 0.25f)
+                  {
+                     BibleSearch.QueryHasChapter(ref splitQuery, ref chapter);
                      BibleReference newReference = new BibleReference(version, comparison, book, chapter);
                      BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
                      ShowAllDropdowns();
                   }
-               }
-               // A version prefix like KJV only
-               else
-               {
-                  if(version != BrowserTab.Selected.Reference.Version || comparison != BrowserTab.Selected.Reference.ComparisonVersion)
+                  // Not sure whether this is a search or go to. Show both.
+                  else if (0.25f > similarity && similarity > 0.1f)
                   {
-                     BibleReference newReference = new BibleReference(version, comparison, BrowserTab.Selected.Reference.Book, BrowserTab.Selected.Reference.Chapter);
-                     BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
-                     ShowAllDropdowns();
+                     Search(query, version);
                   }
-               }
-            }
-            // The query does not have a version prefix, so decide whether it is a go to reference or a search
-            else
-            {
-               float similarity = BibleSearch.QueryHasBibleBook(ref splitQuery, version, ref book);
-
-               // This is a reference for sure
-               if (similarity > 0.25f)
-               {
-                  BibleSearch.QueryHasChapter(ref splitQuery, ref chapter);
-                  BibleReference newReference = new BibleReference(version, comparison, book, chapter);
-                  BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
-                  ShowAllDropdowns();
-               }
-               // Not sure whether this is a search or go to. Show both.
-               else if(0.25f > similarity && similarity > 0.1f)
-               {
-                  Search(query, version);
-               }
-               // This is a search
-               else
-               {
-                  Search(query, version);
+                  // This is a search
+                  else
+                  {
+                     Search(query, version);
+                  }
                }
             }
          }
@@ -1074,7 +1097,7 @@ namespace BibleBrowserUWP
          // Was a letter; erase the chapter
          else
          {
-            ShowChapter(true);
+            ShowChapter(false);
          }
       }
 
@@ -1084,7 +1107,7 @@ namespace BibleBrowserUWP
       /// </summary>
       private void Search(string query, BibleVersion version)
       {
-         ShowChapter(false);
+         SetCurrentView(CurrentView.Search);
          SearchAsync(query, version);
       }
 
