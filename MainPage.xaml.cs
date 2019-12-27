@@ -125,7 +125,7 @@ namespace BibleBrowserUWP
          Application.Current.LeavingBackground += new LeavingBackgroundEventHandler(App_LeavingBackground);
 
          this.InitializeComponent();
-         HideAllDropdowns(); // Don't show Genesis 1
+         ShowSearchDropdowns(false); // Don't show Genesis 1
          ShowSearch(false);
 
          // Set theme for window root.
@@ -358,88 +358,92 @@ namespace BibleBrowserUWP
          }
       }
 
-      /// <summary>
-      /// Set version, book, and chapter selection boxes to be hidden.
-      /// </summary>
-      private void HideAllDropdowns()
-      {
-         if (BrowserTab.Selected != null)
-         {
-            BibleReference reference = BrowserTab.Selected.Reference;
-            if (reference == null)
-            {
-               asbSearch.PlaceholderText = "Search or enter reference";
-            }
-            else if(reference.ComparisonVersion == null)
-            {
-               asbSearch.Text = reference.Version + ": " + reference.ToString();
-               asbSearch.SelectAll();
-            }
-            else
-            {
-               asbSearch.Text = reference.Version + ":" + reference.ComparisonVersion + " " + reference.ToString();
-               asbSearch.SelectAll();
-            }
-         }
-
-         ddbVersion.Visibility = Visibility.Collapsed;
-         ddbBook.Visibility = Visibility.Collapsed;
-         ddbChapter.Visibility = Visibility.Collapsed;
-         m_areDropdownsDisplayed = false;
-      }
 
       /// <summary>
-      /// Set version, book, and chapter selection boxes to be visible.
+      /// Fill version, book, and chapter search box dropdowns with the value of the current reference and make them visible.
+      /// If they are hidden, the search box gets filled with the reference text.
       /// </summary>
-      private void ShowAllDropdowns()
+      private void ShowSearchDropdowns(bool show)
       {
-         if (BrowserTab.Selected != null)
+         // Show the search box dropdowns
+         if (show)
          {
-            BibleReference reference = BrowserTab.Selected.Reference;
-
-            if (reference == null)
+            if (BrowserTab.Selected != null)
             {
-               gvBooks.ItemsSource = m_previousReference.Version.BookNames;
-               lvChapters.ItemsSource = m_previousReference.Chapters;
+               BibleReference reference = BrowserTab.Selected.Reference;
 
-               asbSearch.Text = string.Empty;
-               asbSearch.PlaceholderText = string.Empty;
-
-               ddbVersion.Visibility = Visibility.Visible;
-               ddbBook.Visibility = Visibility.Visible;
-               ddbChapter.Visibility = Visibility.Collapsed;
-               m_areDropdownsDisplayed = true;
-            }
-            else
-            {
-               // Fill dropdowns with content
-               gvBooks.ItemsSource = reference.Version.BookNames;
-               lvChapters.ItemsSource = reference.Chapters;
-
-               asbSearch.Text = string.Empty;
-               asbSearch.PlaceholderText = string.Empty;
-
-               if (reference.ComparisonVersion == null)
+               if (reference == null)
                {
-                  btnRemoveCompareView.Visibility = Visibility.Collapsed;
-                  ddbVersion.Content = reference.Version;
+                  gvBooks.ItemsSource = m_previousReference.Version.BookNames;
+                  lvChapters.ItemsSource = m_previousReference.Chapters;
+
+                  asbSearch.Text = string.Empty;
+                  asbSearch.PlaceholderText = string.Empty;
+
+                  ddbVersion.Visibility = Visibility.Visible;
+                  ddbBook.Visibility = Visibility.Visible;
+                  ddbChapter.Visibility = Visibility.Collapsed;
+                  m_areDropdownsDisplayed = true;
                }
                else
                {
-                  btnRemoveCompareView.Visibility = Visibility.Visible;
-                  ddbVersion.Content = reference.Version + ":" + reference.ComparisonVersion;
+                  // Fill dropdowns with content
+                  gvBooks.ItemsSource = reference.Version.BookNames;
+                  lvChapters.ItemsSource = reference.Chapters;
+
+                  asbSearch.Text = string.Empty;
+                  asbSearch.PlaceholderText = string.Empty;
+
+                  if (reference.ComparisonVersion == null)
+                  {
+                     btnRemoveCompareView.Visibility = Visibility.Collapsed;
+                     ddbVersion.Content = reference.Version;
+                  }
+                  else
+                  {
+                     btnRemoveCompareView.Visibility = Visibility.Visible;
+                     ddbVersion.Content = reference.Version + ":" + reference.ComparisonVersion;
+                  }
+                  ddbBook.Content = reference.BookName;
+                  ddbChapter.Content = reference.Chapter;
+
+                  ddbVersion.Visibility = Visibility.Visible;
+                  ddbBook.Visibility = Visibility.Visible;
+                  ddbChapter.Visibility = Visibility.Visible;
+
+                  m_areDropdownsDisplayed = true;
                }
-               ddbBook.Content = reference.BookName;
-               ddbChapter.Content = reference.Chapter;
-
-               ddbVersion.Visibility = Visibility.Visible;
-               ddbBook.Visibility = Visibility.Visible;
-               ddbChapter.Visibility = Visibility.Visible;
-
-               m_areDropdownsDisplayed = true;
             }
          }
+         // Hide search dropdowns
+         else
+         {
+            if (BrowserTab.Selected != null)
+            {
+               BibleReference reference = BrowserTab.Selected.Reference;
+               if (reference == null)
+               {
+                  asbSearch.PlaceholderText = "Search or enter reference";
+               }
+               else if (reference.ComparisonVersion == null)
+               {
+                  asbSearch.Text = reference.Version + ": " + reference.ToString();
+                  asbSearch.SelectAll();
+               }
+               else
+               {
+                  asbSearch.Text = reference.Version + ":" + reference.ComparisonVersion + " " + reference.ToString();
+                  asbSearch.SelectAll();
+               }
+            }
+
+            ddbVersion.Visibility = Visibility.Collapsed;
+            ddbBook.Visibility = Visibility.Collapsed;
+            ddbChapter.Visibility = Visibility.Collapsed;
+            m_areDropdownsDisplayed = false;
+         }
       }
+
 
       /// <summary>
       /// Get the main text and begin reading it asynchronously.
@@ -573,13 +577,11 @@ namespace BibleBrowserUWP
       /// <param name="reference">The chapter to print. If null, this will simply erase page contents.</param>
       private void PrintChapter(BibleReference reference)
       {
-         ShowSearch(false);
+         SetCurrentView(CurrentView.Chapter);
 
          lvSearchResults.ItemsSource = null;
          if(m_cancelSearch != null)
             m_cancelSearch.Dispose();
-
-         ShowChapter(true);
 
          // New tab, leave blank
          if (BrowserTab.Selected.Reference == null)
@@ -771,7 +773,7 @@ namespace BibleBrowserUWP
          lvTabs.SelectedIndex = Tabs.Count - 1;
          asbSearch.Text = string.Empty;
          ActivateButtons();
-         ShowAllDropdowns();
+         ShowSearchDropdowns(true);
 
          //if(IsKeyboardAttached)
          //   asbSearch.Focus(FocusState.Programmatic); // TODO this seem to always execute
@@ -857,7 +859,7 @@ namespace BibleBrowserUWP
             }
             else
             {
-               ShowAllDropdowns();
+               ShowSearchDropdowns(true);
                PrintChapter(BrowserTab.Selected.Reference);
             }
          }
@@ -949,22 +951,20 @@ namespace BibleBrowserUWP
 
       private void AsbSearch_GotFocus(object sender, RoutedEventArgs e)
       {
-         if(m_isAppNewlyOpened)
+         if (m_isAppNewlyOpened)
          {
             // Ignore the first interaction so that the search bar doesn't get focus on app opening
             m_isAppNewlyOpened = false;
          }
          else
-            HideAllDropdowns();
+            ShowSearchDropdowns(false);
       }
 
       private void AsbSearch_LostFocus(object sender, RoutedEventArgs e)
       {
-         // The user deleted all text from the search bar and clicked away
-         if (asbSearch.Text == string.Empty && m_currentView == CurrentView.Search)
+         if(m_currentView == CurrentView.Chapter)
          {
-            SetCurrentView(CurrentView.Chapter);
-            ShowAllDropdowns();
+            ShowSearchDropdowns(true);
          }
       }
 
@@ -1003,7 +1003,7 @@ namespace BibleBrowserUWP
             string query = ((TextBox)sender).Text;
             if(query == string.Empty)
             {
-               ShowAllDropdowns();
+               ShowSearchDropdowns(true);
                SetCurrentView(CurrentView.Chapter);
             }
 
@@ -1044,7 +1044,7 @@ namespace BibleBrowserUWP
 
                         BibleReference newReference = new BibleReference(version, comparison, book, chapter);
                         BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
-                        ShowAllDropdowns();
+                        ShowSearchDropdowns(true);
                      }
                   }
                   // A version prefix like KJV only
@@ -1054,7 +1054,7 @@ namespace BibleBrowserUWP
                      {
                         BibleReference newReference = new BibleReference(version, comparison, BrowserTab.Selected.Reference.Book, BrowserTab.Selected.Reference.Chapter);
                         BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
-                        ShowAllDropdowns();
+                        ShowSearchDropdowns(true);
                      }
                   }
                }
@@ -1069,7 +1069,7 @@ namespace BibleBrowserUWP
                      BibleSearch.QueryHasChapter(ref splitQuery, ref chapter);
                      BibleReference newReference = new BibleReference(version, comparison, book, chapter);
                      BrowserTab.Selected.GoToReference(ref newReference, BrowserTab.NavigationMode.Add);
-                     ShowAllDropdowns();
+                     ShowSearchDropdowns(true);
                   }
                   // Not sure whether this is a search or go to. Show both.
                   else if (0.25f > similarity && similarity > 0.1f)
@@ -1089,7 +1089,7 @@ namespace BibleBrowserUWP
          {
             if (m_areDropdownsDisplayed)
             {
-               HideAllDropdowns();
+               ShowSearchDropdowns(false);
             }
 
             CancelSearch();
@@ -1262,7 +1262,7 @@ namespace BibleBrowserUWP
          catch (ObjectDisposedException)
          {
             // Close the search bar
-            ShowSearch(false);
+            SetCurrentView(CurrentView.Chapter);
          }
       }
 
