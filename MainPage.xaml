@@ -949,7 +949,8 @@
                            GotFocus="AsbSearch_GotFocus"
                            KeyDown="AsbSearch_KeyDown"
                            LostFocus="AsbSearch_LostFocus"
-                           IsTapEnabled="True">
+                           IsTapEnabled="True"
+                           Tapped="asbSearch_Tapped">
                   </TextBox>
                </Grid>
             </StackPanel>
@@ -1079,7 +1080,7 @@
                                  <Run x:Uid="freeToUse">The Bible versions used in this application have expired their copyright and are therefore free to use.</Run>
                               </Paragraph>
                            </RichTextBlock>
-                           <Image Source="/Assets/General-Receptus-mark.png" MaxWidth="250" Margin="20"/>
+                           <Image Style="{ThemeResource ReceptusMark}" MaxWidth="250" Margin="20"/>
                         </StackPanel>
                      </Flyout>
                   </Button.Flyout>

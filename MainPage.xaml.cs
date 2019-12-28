@@ -21,6 +21,7 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 using Microsoft.Toolkit.Uwp.Notifications; // Notifications library
 using Windows.UI.Notifications;
+using Windows.UI.Xaml.Input;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -141,6 +142,9 @@ namespace BibleBrowserUWP
          // Ensure the text remains within the window size
          this.SizeChanged += MainPage_SizeChanged;
 
+         // Prevent clicks from being eaten by textbox
+         asbSearch.AddHandler(TappedEvent, new TappedEventHandler(asbSearch_Tapped), true);
+
          // Save tabs when the app closes
          Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
       }
@@ -233,6 +237,7 @@ namespace BibleBrowserUWP
          }
 
          SetWidth();
+         LoseFocus(asbSearch);
       }
 
       /// <summary>
@@ -951,7 +956,10 @@ namespace BibleBrowserUWP
             ShowSearchDropdowns(false);
 
          if (m_currentView == CurrentView.Search)
+         {
             asbSearch.Text = m_originalQuery;
+            asbSearch.SelectAll();
+         }
       }
 
       private void AsbSearch_LostFocus(object sender, RoutedEventArgs e)
@@ -1038,7 +1046,10 @@ namespace BibleBrowserUWP
       {
          // Don't search for the same thing twice
          if (m_originalQuery == rawQuery)
+         {
+            SetCurrentView(CurrentView.Search);
             return;
+         }
 
          // Hitting Enter with nothing in the search box returns to the original reference
          else if (string.IsNullOrWhiteSpace(rawQuery))
@@ -1368,6 +1379,19 @@ namespace BibleBrowserUWP
       {
          asbSearch.Text = sender.Text;
          ProcessRawUserSearchQuery(sender.Text);
+      }
+
+      private void asbSearch_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
+      {
+         if (m_currentView == CurrentView.Search)
+         {
+            asbSearch.Text = m_originalQuery;
+            asbSearch.SelectAll();
+         }
+         else
+         {
+            ShowSearchDropdowns(false);
+         }
       }
    }
 }
