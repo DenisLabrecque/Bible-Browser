@@ -140,6 +140,8 @@
     <PRIResource Include="Strings\en-CA\Resources.resw" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\General-Receptus-dark.png" />
+    <Content Include="Assets\General-Receptus-light.png" />
     <Content Include="Assets\General-Receptus-mark.png" />
     <Content Include="Assets\LargeTile.scale-100.png" />
     <Content Include="Assets\LargeTile.scale-125.png" />
