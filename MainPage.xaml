@@ -663,15 +663,7 @@
                              HorizontalScrollMode="Disabled"
                              HorizontalScrollBarVisibility="Hidden">
                <StackPanel Margin="0, 80">
-
-                  <TextBox Name="txtTest" Visibility="Collapsed"></TextBox>
                   
-                  <!-- Welcome screen -->
-                  <!--<StackPanel Visibility="Visible">
-                     <Image Style="{ThemeResource ReceptusMark}" Width="300" Margin="50" />
-                     <AutoSuggestBox Name="asbWelcome" PlaceholderText="Search" Width="400" QuerySubmitted="asbWelcome_QuerySubmitted"></AutoSuggestBox>
-                  </StackPanel>-->
-
                   <!-- Search view -->
                   <ListView x:Name="lvSearchResults"
                             ItemsSource="{x:Bind SearchResults}"
@@ -948,8 +940,7 @@
                            PlaceholderText="Reference or word search"
                            GotFocus="AsbSearch_GotFocus"
                            KeyDown="AsbSearch_KeyDown"
-                           LostFocus="AsbSearch_LostFocus"
-                           IsTapEnabled="True">
+                           LostFocus="AsbSearch_LostFocus">
                   </TextBox>
                </Grid>
             </StackPanel>
