@@ -50,6 +50,10 @@
                              TintColor="#7FA1AB"
                              TintOpacity="0.4"
                              FallbackColor="#7FA1AB"/>
+
+               <Style x:Key="ReceptusMark" TargetType="Image">
+                  <Setter Property="Source" Value="/Assets/General-Receptus-dark.png"/>
+               </Style>
             </ResourceDictionary>
 
 
@@ -88,6 +92,12 @@
                              TintColor="#7FA1AB"
                              TintOpacity="0.4"
                              FallbackColor="#D87FA1AB"/>
+
+               <Style x:Key="ReceptusMark" TargetType="Image">
+                  <Setter Property="Source" Value="/Assets/General-Receptus-light.png"/>
+                  <Setter Property="Height" Value="50" />
+                  <Setter Property="Margin" Value="50"/>
+               </Style>
             </ResourceDictionary>
 
 

@@ -35,7 +35,7 @@ namespace BibleBrowserUWP
    {
       #region Constants
 
-      const int MINMARGIN = 90;
+      const int MINMARGIN = 10;
       const int MAXTEXTWIDTH = 400;
       const int VERSECOLUMN = 30;
       const int MIDDLCOLUMN = 30;
@@ -57,6 +57,8 @@ namespace BibleBrowserUWP
       bool m_areTabsLoaded = false;
       bool m_isAppNewlyOpened = true;
       bool m_areDropdownsDisplayed = false;
+      string m_searchQuery = null;
+      string m_originalQuery = string.Empty;
       CancellationTokenSource m_cancelSearch;
       private BibleReference m_previousReference = new BibleReference(BibleVersion.DefaultVersion, null);
       ObservableCollection<SearchResult> m_SearchResults = new ObservableCollection<SearchResult>();
@@ -124,10 +126,9 @@ namespace BibleBrowserUWP
          // Load previous tabs when the app opens
          Application.Current.LeavingBackground += new LeavingBackgroundEventHandler(App_LeavingBackground);
 
+         // Create the UI
          this.InitializeComponent();
-         ShowSearchDropdowns(false); // Don't show Genesis 1
-         ShowSearch(false);
-
+         
          // Set theme for window root.
          FrameworkElement root = (FrameworkElement)Window.Current.Content;
          root.RequestedTheme = AppSettings.Theme;
@@ -948,6 +949,9 @@ namespace BibleBrowserUWP
          }
          else
             ShowSearchDropdowns(false);
+
+         if (m_currentView == CurrentView.Search)
+            asbSearch.Text = m_originalQuery;
       }
 
       private void AsbSearch_LostFocus(object sender, RoutedEventArgs e)
@@ -955,6 +959,10 @@ namespace BibleBrowserUWP
          if(m_currentView == CurrentView.Chapter)
          {
             ShowSearchDropdowns(true);
+         }
+         else
+         {
+            asbSearch.Text = m_originalQuery;
          }
       }
 
@@ -969,7 +977,8 @@ namespace BibleBrowserUWP
          Debug.WriteLine("Progress reported from search with values: " + " task: " + progress.Status + ", percent: " + progress.Completion * 100);
          progSearchProgress.Value = progress.Completion;
          lvSearchResults.ItemsSource = m_SearchResults;
-         if(m_SearchResults.Count < progress.Results.Count) // A new result was found since last time
+         txtSearchStatus.Text = progress.Status;
+         if (m_SearchResults.Count < progress.Results.Count) // A new result was found since last time
          {
             // Add the new results that were found
             for (int i = Math.Clamp(m_SearchResults.Count, 0, int.MaxValue); i < Math.Clamp(progress.Results.Count, 0, int.MaxValue); i++)
@@ -977,102 +986,17 @@ namespace BibleBrowserUWP
                m_SearchResults.Add(progress.Results[i]);
             }
          }
-         txtSearchStatus.Text = progress.Status;
       }
 
       /// <summary>
       /// Detect different keystrokes in the search bar.
       /// </summary>
-      private async void AsbSearch_KeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+      private void AsbSearch_KeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
       {
          if(e.Key == Windows.System.VirtualKey.Enter)
          {
-            m_SearchResults = new ObservableCollection<SearchResult>(); // Erase previous search results
-
-            // Hitting Enter with nothing in the search box returns to the original reference
-            string query = ((TextBox)sender).Text;
-            if(query == string.Empty)
-            {
-               ShowSearchDropdowns(true);
-               SetCurrentView(CurrentView.Chapter);
-            }
-
-            // The user has asked for a search
-            else
-            {
-               query = query.Trim().RemoveDiacritics();
-               if (string.IsNullOrWhiteSpace(query))
-                  return;
-
-               List<string> splitQuery = query.Split(new char[] { ' ', ':', ';', '.', ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
-               BibleVersion version = BrowserTab.Selected.Reference.Version;
-               BibleVersion comparison = BrowserTab.Selected.Reference.ComparisonVersion;
-               string book = BrowserTab.Selected.Reference.BookName;
-               int chapter = 1;
-
-               // The whole query is surrounded by quotes
-               if (BibleSearch.QuerySurroundedByQuotes(ref splitQuery))
-               {
-                  string search = BibleSearch.ReassembleSplitString(splitQuery, true);
-                  Search(search, version);
-               }
-               // The query has a version prefix (like KJV), so it is treated as a go to reference
-               else if (BibleSearch.QueryHasBibleVersion(ref splitQuery, ref version, ref comparison))
-               {
-                  // There is additional information
-                  if (splitQuery.Count > 0)
-                  {
-                     if (BibleSearch.QuerySurroundedByQuotes(ref splitQuery))
-                     {
-                        string search = BibleSearch.ReassembleSplitString(splitQuery, true);
-                        Search(search, version);
-                     }
-                     else
-                     {
-                        BibleSearch.QueryHasBibleBook(ref splitQuery, version, ref book);
-                        BibleSearch.QueryHasChapter(ref splitQuery, ref chapter);
-
-                        BibleReference newReference = new BibleReference(version, comparison, book, chapter);
-                        BrowserTab.Selected.AddToHistory(ref newReference, BrowserTab.NavigationMode.Add);
-                        ShowSearchDropdowns(true);
-                     }
-                  }
-                  // A version prefix like KJV only
-                  else
-                  {
-                     if (version != BrowserTab.Selected.Reference.Version || comparison != BrowserTab.Selected.Reference.ComparisonVersion)
-                     {
-                        BibleReference newReference = new BibleReference(version, comparison, BrowserTab.Selected.Reference.Book, BrowserTab.Selected.Reference.Chapter);
-                        BrowserTab.Selected.AddToHistory(ref newReference, BrowserTab.NavigationMode.Add);
-                        ShowSearchDropdowns(true);
-                     }
-                  }
-               }
-               // The query does not have a version prefix, so decide whether it is a go to reference or a search
-               else
-               {
-                  float similarity = BibleSearch.QueryHasBibleBook(ref splitQuery, version, ref book);
-
-                  // This is a reference for sure
-                  if (similarity > 0.25f)
-                  {
-                     BibleSearch.QueryHasChapter(ref splitQuery, ref chapter);
-                     BibleReference newReference = new BibleReference(version, comparison, book, chapter);
-                     BrowserTab.Selected.AddToHistory(ref newReference, BrowserTab.NavigationMode.Add);
-                     ShowSearchDropdowns(true);
-                  }
-                  // Not sure whether this is a search or go to. Show both.
-                  else if (0.25f > similarity && similarity > 0.1f)
-                  {
-                     Search(query, version);
-                  }
-                  // This is a search
-                  else
-                  {
-                     Search(query, version);
-                  }
-               }
-            }
+            ProcessRawUserSearchQuery(((TextBox)sender).Text);
+            LoseFocus((TextBox)sender);
          }
          // Select the search box text on backspace if the dropdowns are being displayed
          else if(e.Key == Windows.System.VirtualKey.Back)
@@ -1084,11 +1008,6 @@ namespace BibleBrowserUWP
                if(m_areDropdownsDisplayed)
                   ShowSearchDropdowns(false);
             }
-            // A search was taking place that the user cancels by deleting backwards
-            else
-            {
-               CancelSearch();
-            }
          }
          // Was a letter
          else
@@ -1098,43 +1017,148 @@ namespace BibleBrowserUWP
 
 
       /// <summary>
-      /// Start a Bible search, doing all the things that need to be done in the layout as well.
+      /// Makes virtual keyboard disappear
       /// </summary>
-      private void Search(string query, BibleVersion version)
+      /// <param name="sender">The control to lose focus</param>
+      private static void LoseFocus(Control control)
       {
-         SetCurrentView(CurrentView.Search);
-         SearchAsync(query, version);
+         bool isTabStop = control.IsTabStop;
+         control.IsTabStop = false;
+         control.IsEnabled = false;
+         control.IsEnabled = true;
+         control.IsTabStop = isTabStop;
       }
 
 
       /// <summary>
-      /// Start a search for a particular phrase.
+      /// Parse the user query into its components and start a search if one can be done.
+      /// </summary>
+      /// <param name="rawQuery">The exact input the user made.</param>
+      private void ProcessRawUserSearchQuery(string rawQuery)
+      {
+         // Don't search for the same thing twice
+         if (m_originalQuery == rawQuery)
+            return;
+
+         // Hitting Enter with nothing in the search box returns to the original reference
+         else if (string.IsNullOrWhiteSpace(rawQuery))
+         {
+            m_searchQuery = null;
+            ShowSearchDropdowns(true);
+            SetCurrentView(CurrentView.Chapter);
+            return;
+         }
+
+         // The user has asked for a search
+         else
+         {
+            m_originalQuery = rawQuery.Trim();
+            m_searchQuery = rawQuery.RemoveDiacritics(); // TODO remove punctuation
+            List<string> splitQuery = m_searchQuery.Split(new char[] { ' ', ':', ';', '.', ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            BibleVersion version = BrowserTab.Selected.Reference.Version;
+            BibleVersion comparison = BrowserTab.Selected.Reference.ComparisonVersion;
+            string book = BrowserTab.Selected.Reference.BookName;
+            int chapter = 1;
+
+            // The whole query is surrounded by quotes
+            if (BibleSearch.QuerySurroundedByQuotes(ref splitQuery))
+            {
+               string search = BibleSearch.ReassembleSplitString(splitQuery, true);
+               _ = SearchAsync(search, version);
+            }
+            // The query has a version prefix (like KJV), so it is treated as a go to reference
+            else if (BibleSearch.QueryHasBibleVersion(ref splitQuery, ref version, ref comparison))
+            {
+               // There is additional information
+               if (splitQuery.Count > 0)
+               {
+                  if (BibleSearch.QuerySurroundedByQuotes(ref splitQuery))
+                  {
+                     string search = BibleSearch.ReassembleSplitString(splitQuery, true);
+                     _ = SearchAsync(search, version);
+                  }
+                  else
+                  {
+                     BibleSearch.QueryHasBibleBook(ref splitQuery, version, ref book);
+                     BibleSearch.QueryHasChapter(ref splitQuery, ref chapter);
+
+                     BibleReference newReference = new BibleReference(version, comparison, book, chapter);
+                     BrowserTab.Selected.AddToHistory(ref newReference, BrowserTab.NavigationMode.Add);
+                     ShowSearchDropdowns(true);
+                  }
+               }
+               // A version prefix like KJV only
+               else
+               {
+                  if (version != BrowserTab.Selected.Reference.Version || comparison != BrowserTab.Selected.Reference.ComparisonVersion)
+                  {
+                     BibleReference newReference = new BibleReference(version, comparison, BrowserTab.Selected.Reference.Book, BrowserTab.Selected.Reference.Chapter);
+                     BrowserTab.Selected.AddToHistory(ref newReference, BrowserTab.NavigationMode.Add);
+                     ShowSearchDropdowns(true);
+                  }
+               }
+            }
+            // The query does not have a version prefix, so decide whether it is a go to reference or a search
+            else
+            {
+               float similarity = BibleSearch.QueryHasBibleBook(ref splitQuery, version, ref book);
+
+               // This is a reference for sure
+               if (similarity > 0.25f)
+               {
+                  BibleSearch.QueryHasChapter(ref splitQuery, ref chapter);
+                  BibleReference newReference = new BibleReference(version, comparison, book, chapter);
+                  BrowserTab.Selected.AddToHistory(ref newReference, BrowserTab.NavigationMode.Add);
+                  ShowSearchDropdowns(true);
+               }
+               // Not sure whether this is a search or go to. Show both.
+               else if (0.25f > similarity && similarity > 0.1f)
+               {
+                  _ = SearchAsync(m_searchQuery, version);
+               }
+               // This is a search
+               else
+               {
+                  _ = SearchAsync(m_searchQuery, version);
+               }
+            }
+         }
+      }
+
+
+      /// <summary>
+      /// Start a search for a particular query.
       /// </summary>
       /// <param name="query">The non-diacritic, simplified query the user has typed.</param>
       /// <param name="version">The version of the Bible to search in.</param>
-      /// <returns></returns>
       private async Task SearchAsync(string query, BibleVersion version)
       {
          if (version == null)
-         {
             throw new Exception("Search version null");
-         }
+         else if (string.IsNullOrEmpty(query))
+            throw new Exception("Cannot search for a null or empty string");
          else
          {
             if (m_cancelSearch != null)
-               m_cancelSearch.Dispose();
+            {
+               CancelSearch();
+               m_SearchResults.Clear(); // Empty from any previous search results
+            }
+
+            SetCurrentView(CurrentView.Search);
 
             // Construct Progress<T>, passing ReportProgress as the Action<T> 
             Progress<SearchProgressInfo> progressIndicator = new Progress<SearchProgressInfo>(ReportSearchProgress);
             m_cancelSearch = new CancellationTokenSource();
-            // Call async method
-            ShowSearch(true);
-            m_SearchResults.Clear(); // Empty from any previous search results
+
+            // Start the async search
             SearchProgressInfo task = await BibleSearch.SearchAsync(version, query, progressIndicator, m_cancelSearch.Token);
+
             // Handle the search being cancelled at any point
             if (task.IsCanceled)
             {
-               StopSearch();
+               CancelSearch();
+               return;
             }
             else
             {
@@ -1158,17 +1182,9 @@ namespace BibleBrowserUWP
          }
       }
 
-      private void StopSearch()
-      {
-         ShowSearch(false);
-         lvSearchResults.ItemsSource = null;
-         m_cancelSearch.Dispose();
-      }
-
       #endregion
 
 
-      #region Accelerators
 
       private void KeyboardAccelerator_Search(Windows.UI.Xaml.Input.KeyboardAccelerator sender, Windows.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args)
       {
@@ -1176,7 +1192,6 @@ namespace BibleBrowserUWP
          args.Handled = true;
       }
 
-      #endregion
 
       private void CbDefaultVersion_SelectionChanged(object sender, SelectionChangedEventArgs e)
       {
@@ -1184,6 +1199,7 @@ namespace BibleBrowserUWP
          BibleVersion.SetDefaultVersion(defaultVersion.FileName);
          Debug.WriteLine("Default version setting being set to " + defaultVersion.FileName);
       }
+
 
       private void DdbVersion_Click(object sender, RoutedEventArgs e)
       {
@@ -1229,12 +1245,14 @@ namespace BibleBrowserUWP
          Debug.WriteLine("Previous chapter invoke ended");
       }
 
+
       private void SwipeItem_NextChapter(SwipeItem sender, SwipeItemInvokedEventArgs args)
       {
          Debug.WriteLine("Next chapter invoked");
          NextChapter();
          Debug.WriteLine("Next chapter ended");
       }
+
 
       private void BtnRemoveCompareView_Click(object sender, RoutedEventArgs e)
       {
@@ -1247,6 +1265,10 @@ namespace BibleBrowserUWP
          SetCurrentView(CurrentView.Chapter);
       }
 
+
+      /// <summary>
+      /// Stop the cancellation token source within error checking.
+      /// </summary>
       private void CancelSearch()
       {
          try
@@ -1256,7 +1278,13 @@ namespace BibleBrowserUWP
          catch (NullReferenceException) { }
          // The search is finished, so it can no longer be cancelled
          catch (ObjectDisposedException) { }
+         finally
+         {
+            m_cancelSearch.Dispose();
+            lvSearchResults.ItemsSource = null;
+         }
       }
+
 
       /// <summary>
       /// Toggle toast notification remeinders every day for doing your Bible reading.
@@ -1281,11 +1309,10 @@ namespace BibleBrowserUWP
          }
       }
 
+
       /// <summary>
       /// Save the new notification time.
       /// </summary>
-      /// <param name="sender"></param>
-      /// <param name="e"></param>
       private void TpNotificationTime_TimeChanged(object sender, TimePickerValueChangedEventArgs e)
       {
          AppSettings.NotifyTime = e.NewTime;
@@ -1327,13 +1354,20 @@ namespace BibleBrowserUWP
          //ToastNotificationManager.CreateToastNotifier().Show(toast);
       }
 
+
       private void LvSearchResults_ItemClick(object sender, ItemClickEventArgs e)
       {
          m_wasSearchResultClicked = true;
          BibleReference reference = ((SearchResult)e.ClickedItem).Reference;
-         Debug.WriteLine("Search to go to reference: " + reference);
          BrowserTab.Selected.AddToHistory(ref reference);
          PrintChapter(reference);
+      }
+
+
+      private void asbWelcome_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+      {
+         asbSearch.Text = sender.Text;
+         ProcessRawUserSearchQuery(sender.Text);
       }
    }
 }
