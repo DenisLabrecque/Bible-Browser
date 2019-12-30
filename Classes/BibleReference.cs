@@ -20,16 +20,27 @@ namespace BibleBrowserUWP
    {
       #region Members
 
-      public static char[] WordSeparators = {
+      public static char[] s_wordSeparators = {
          ' ',
          '*'
       };
+
+      private string m_rawQuery = null;
 
       #endregion
 
 
       #region Properties
 
+      public string RawQuery {
+         get { return m_rawQuery; }
+         set {
+            if (string.IsNullOrEmpty(value))
+               throw new Exception("Only accept a query that has an actual value. Please error check.");
+            else
+               m_rawQuery = value;
+         }
+      }
       public BibleVersion Version { get; private set; }
       public BibleVersion ComparisonVersion { get; private set; } // Null by default
       public BookNumeral Numeral { get; private set; }

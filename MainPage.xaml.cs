@@ -53,13 +53,12 @@ namespace BibleBrowserUWP
       SpeechSynthesizer m_synth = new SpeechSynthesizer();
 
       CurrentView m_currentView = CurrentView.Chapter;
-      bool m_wasSearchResultClicked = false;
       bool m_isPlaybackStarted = false;
       bool m_areTabsLoaded = false;
       bool m_isAppNewlyOpened = true;
       bool m_areDropdownsDisplayed = false;
       string m_searchQuery = null;
-      string m_originalQuery = string.Empty;
+      string m_originalQuery = null;
       CancellationTokenSource m_cancelSearch;
       private BibleReference m_previousReference = new BibleReference(BibleVersion.DefaultVersion, null);
       ObservableCollection<SearchResult> m_SearchResults = new ObservableCollection<SearchResult>();
@@ -276,7 +275,13 @@ namespace BibleBrowserUWP
       /// </summary>
       private void GoToPreviousReference()
       {
-         if (BrowserTab.Selected.Previous != null)
+         if(BrowserTab.Selected.Previous.RawQuery != null && BrowserTab.Selected.Previous.RawQuery.Count() >= 2)
+         {
+            Debug.WriteLine("```````````````````````````````````");
+            Debug.WriteLine("Previous was a raw query: "+ BrowserTab.Selected.Reference.RawQuery);
+            ProcessRawUserSearchQuery(BrowserTab.Selected.Previous.RawQuery);
+         }
+         else if (BrowserTab.Selected.Previous != null)
          {
             BibleReference reference = BrowserTab.Selected.Reference;
             reference.VerticalScrollOffset = svPageScroller.VerticalOffset;
@@ -615,11 +620,13 @@ namespace BibleBrowserUWP
          switch(view)
          {
             case CurrentView.Chapter:
+               Debug.WriteLine("View being set to chapter");
                m_currentView = CurrentView.Chapter;
                ShowChapter(true);
                ShowSearch(false);
                break;
             case CurrentView.Search:
+               Debug.WriteLine("View being set to search");
                m_currentView = CurrentView.Search;
                ShowChapter(false);
                ShowSearch(true);
@@ -746,6 +753,7 @@ namespace BibleBrowserUWP
       /// </summary>
       private void BtnPrevious_Click(object sender, RoutedEventArgs e)
       {
+         Debug.WriteLine("Fired!");
          GoToPreviousReference();
       }
 
@@ -996,6 +1004,7 @@ namespace BibleBrowserUWP
          }
       }
 
+
       /// <summary>
       /// Detect different keystrokes in the search bar.
       /// </summary>
@@ -1020,6 +1029,7 @@ namespace BibleBrowserUWP
          // Was a letter
          else
          {
+            // TODO autocomplete
          }
       }
 
@@ -1047,7 +1057,9 @@ namespace BibleBrowserUWP
          // Don't search for the same thing twice
          if (m_originalQuery == rawQuery)
          {
+            Debug.WriteLine("Original query is the same as this one: " + m_originalQuery + rawQuery);
             SetCurrentView(CurrentView.Search);
+            lvSearchResults.ItemsSource = m_SearchResults;
             return;
          }
 
@@ -1075,7 +1087,7 @@ namespace BibleBrowserUWP
             if (BibleSearch.QuerySurroundedByQuotes(ref splitQuery))
             {
                string search = BibleSearch.ReassembleSplitString(splitQuery, true);
-               _ = SearchAsync(search, version);
+               _ = SearchAsync(search, rawQuery, version);
             }
             // The query has a version prefix (like KJV), so it is treated as a go to reference
             else if (BibleSearch.QueryHasBibleVersion(ref splitQuery, ref version, ref comparison))
@@ -1086,7 +1098,7 @@ namespace BibleBrowserUWP
                   if (BibleSearch.QuerySurroundedByQuotes(ref splitQuery))
                   {
                      string search = BibleSearch.ReassembleSplitString(splitQuery, true);
-                     _ = SearchAsync(search, version);
+                     _ = SearchAsync(search, rawQuery, version);
                   }
                   else
                   {
@@ -1125,12 +1137,12 @@ namespace BibleBrowserUWP
                // Not sure whether this is a search or go to. Show both.
                else if (0.25f > similarity && similarity > 0.1f)
                {
-                  _ = SearchAsync(m_searchQuery, version);
+                  _ = SearchAsync(m_searchQuery, rawQuery, version);
                }
                // This is a search
                else
                {
-                  _ = SearchAsync(m_searchQuery, version);
+                  _ = SearchAsync(m_searchQuery, rawQuery, version);
                }
             }
          }
@@ -1142,7 +1154,7 @@ namespace BibleBrowserUWP
       /// </summary>
       /// <param name="query">The non-diacritic, simplified query the user has typed.</param>
       /// <param name="version">The version of the Bible to search in.</param>
-      private async Task SearchAsync(string query, BibleVersion version)
+      private async Task SearchAsync(string query, string rawQuery, BibleVersion version)
       {
          if (version == null)
             throw new Exception("Search version null");
@@ -1156,6 +1168,8 @@ namespace BibleBrowserUWP
                m_SearchResults.Clear(); // Empty from any previous search results
             }
 
+            BrowserTab.Selected.Reference.RawQuery = rawQuery;
+            Debug.WriteLine("Raw query as: " + BrowserTab.Selected.Reference.RawQuery);
             SetCurrentView(CurrentView.Search);
 
             // Construct Progress<T>, passing ReportProgress as the Action<T> 
@@ -1368,7 +1382,6 @@ namespace BibleBrowserUWP
 
       private void LvSearchResults_ItemClick(object sender, ItemClickEventArgs e)
       {
-         m_wasSearchResultClicked = true;
          BibleReference reference = ((SearchResult)e.ClickedItem).Reference;
          BrowserTab.Selected.AddToHistory(ref reference);
          PrintChapter(reference);
