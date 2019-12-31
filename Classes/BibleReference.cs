@@ -25,34 +25,67 @@ namespace BibleBrowserUWP
          '*'
       };
 
-      private string m_rawQuery = null;
+      SearchItem m_search;
 
       #endregion
 
 
       #region Properties
 
-      public string RawQuery {
-         get { return m_rawQuery; }
+      public SearchItem Search { 
+         get {
+            return m_search;
+         }
          set {
-            if (string.IsNullOrEmpty(value))
-               throw new Exception("Only accept a query that has an actual value. Please error check.");
+            if (value == null)
+               throw new ArgumentNullException("The search must be set to a value");
             else
-               m_rawQuery = value;
+               m_search = value;
          }
       }
+
+      /// <summary>
+      /// The original user's query. May return <c>null</c>.
+      /// </summary>
+      public string RawQuery {
+         get {
+            if (m_search == null)
+               return null;
+            else
+               return m_search.RawQuery;
+         }
+      }
+
+      public bool IsSearch {
+         get {
+            if (m_search == null)
+               return false;
+            else
+               return true;
+         }
+      }
+
       public BibleVersion Version { get; private set; }
+
+      /// <summary>
+      /// May return null.
+      /// </summary>
       public BibleVersion ComparisonVersion { get; private set; } // Null by default
+
       public BookNumeral Numeral { get; private set; }
+
       public BibleBook Book { get; private set; }
+
       /// <summary>
       /// Book chapter
       /// </summary>
       public string SimplifiedReference { get => BookName + " " + Chapter; }
+
       /// <summary>
       /// Book chapter:verse
       /// </summary>
       public string FullReference { get => BookName + " " + Chapter + ":" + Verse; }
+
       public double VerticalScrollOffset = 0; // How much of the chapter has been seen; default to zero to start at the top
 
       /// <summary>
@@ -171,6 +204,7 @@ namespace BibleBrowserUWP
                             int chapter = 1, int verse = 1,
                             double verticalOffset = 0)
       {
+         m_search = null;
          Version = version ?? throw new ArgumentNullException("A BibleReference cannot be created with a null BibleVersion");
          Book = book;
          ComparisonVersion = compare;
@@ -364,78 +398,15 @@ namespace BibleBrowserUWP
          return builder.ToString();
       }
 
-
       /// <summary>
-      /// Cast a string to a Bible reference.
+      /// Create a copy of this reference.
       /// </summary>
-      /// <param name="reference">The original string</param>
-      /// <returns>A reference if the string can be parsed, or null if not</returns>
-      //public static BibleReference ToReference(string reference)
-      //{
-      //   string[] splitUpReference;
+      /// <returns>A new clone of this reference.</returns>
+      public BibleReference Copy()
+      {
+         return new BibleReference(this.Version, this.ComparisonVersion, this.BookName, this.Chapter, this.Verse, this.VerticalScrollOffset);
+      }
 
-      //   int bookPrefix = 0;
-      //   string bookName = null;
-      //   ChapterVerse startChapter = null;
-      //   ChapterVerse endChapter = null;
-
-      //   splitUpReference = SplitUpReference(reference);
-
-      //   // Got through each word or number group in a Bible reference
-      //   for(int i = 0; i < splitUpReference.Length; i++)
-      //   {
-      //      // When the first word is a number, it denotes one of multiple books (eg. 1 John)
-      //      // The array element after this will be the book name
-      //      try
-      //      {
-      //         bookPrefix = int.Parse(splitUpReference[0]);
-      //      }
-      //      catch
-      //      {
-      //         bookPrefix = 0;
-      //      }
-
-      //      // Get the first element that can be a book name
-      //      if(bookName == null && !ChapterVerse.IsChapterVerse(splitUpReference[i]))
-      //      {
-      //         bookName = splitUpReference[i];
-      //      }
-
-      //      // Get the first element that can be a chapter and verse
-      //      else if(startChapter == null)
-      //      {
-      //         startChapter = new ChapterVerse(splitUpReference[i]);
-      //      }
-      //      else if(endChapter == null)
-      //      {
-      //         endChapter = new ChapterVerse(splitUpReference[i]);
-
-      //         // Stop the loop at this point
-      //         break;
-      //      }
-      //   }
-
-      //   // Return a reference if it has been successfully parsed out
-      //   if(bookName != null)
-      //   {
-      //      return new BibleReference();
-      //   }
-      //   else
-      //   {
-      //      return null;
-      //   }
-      //}
-
-      /// <summary>
-      /// Separate words and numbers that are stuck together
-      /// </summary>
-      /// <param name="lookupString">The user's reference search string</param>
-      /// <returns>An array of strings representing words and number groups</returns>
-      //public static string[] SplitUpReference(string lookupString)
-      //{
-      //   lookupString = SpaceOutNumbers(lookupString, "*");
-      //   return lookupString.Split(WordSeparators, MAX_REFERENCE_WORDS, StringSplitOptions.RemoveEmptyEntries);
-      //}
       #endregion
 
 

@@ -57,8 +57,6 @@ namespace BibleBrowserUWP
       bool m_areTabsLoaded = false;
       bool m_isAppNewlyOpened = true;
       bool m_areDropdownsDisplayed = false;
-      string m_searchQuery = null;
-      string m_originalQuery = null;
       CancellationTokenSource m_cancelSearch;
       private BibleReference m_previousReference = new BibleReference(BibleVersion.DefaultVersion, null);
       ObservableCollection<SearchResult> m_SearchResults = new ObservableCollection<SearchResult>();
@@ -275,11 +273,11 @@ namespace BibleBrowserUWP
       /// </summary>
       private void GoToPreviousReference()
       {
-         if(BrowserTab.Selected.Previous.RawQuery != null && BrowserTab.Selected.Previous.RawQuery.Count() >= 2)
+         if(BrowserTab.Selected.Previous.IsSearch)
          {
             Debug.WriteLine("```````````````````````````````````");
-            Debug.WriteLine("Previous was a raw query: "+ BrowserTab.Selected.Reference.RawQuery);
-            ProcessRawUserSearchQuery(BrowserTab.Selected.Previous.RawQuery);
+            Debug.WriteLine("Previous was a raw query: "+ BrowserTab.Selected.Previous.Search.RawQuery);
+            ProcessRawUserSearchQuery(BrowserTab.Selected.Previous.Search.RawQuery, BrowserTab.Selected.Previous);
          }
          else if (BrowserTab.Selected.Previous != null)
          {
@@ -748,8 +746,7 @@ namespace BibleBrowserUWP
       }
 
       /// <summary>
-      /// Go to the previous reference in the current tab's history.
-      /// Go to the previous search result if that is the case.
+      /// Go to the previous reference or search result in the current tab's history.
       /// </summary>
       private void BtnPrevious_Click(object sender, RoutedEventArgs e)
       {
@@ -758,7 +755,7 @@ namespace BibleBrowserUWP
       }
 
       /// <summary>
-      /// Go to the next reference in the current tab's history.
+      /// Go to the next reference or search result in the current tab's history.
       /// </summary>
       private void BtnNext_Click(object sender, RoutedEventArgs e)
       {
@@ -965,7 +962,15 @@ namespace BibleBrowserUWP
 
          if (m_currentView == CurrentView.Search)
          {
-            asbSearch.Text = m_originalQuery;
+            if (BrowserTab.Selected.Reference == null)
+               throw new Exception();
+            else if (BrowserTab.Selected.Reference.Search == null)
+               throw new Exception();
+            else if (BrowserTab.Selected.Reference.IsSearch == false)
+               throw new Exception();
+            else if (BrowserTab.Selected.Reference.RawQuery == null)
+               throw new Exception();
+            asbSearch.Text = BrowserTab.Selected.Reference.Search.RawQuery;
             asbSearch.SelectAll();
          }
       }
@@ -978,7 +983,7 @@ namespace BibleBrowserUWP
          }
          else
          {
-            asbSearch.Text = m_originalQuery;
+            ///asbSearch.Text = BrowserTab.Selected.Reference.Search.RawQuery;
          }
       }
 
@@ -1010,9 +1015,10 @@ namespace BibleBrowserUWP
       /// </summary>
       private void AsbSearch_KeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
       {
-         if(e.Key == Windows.System.VirtualKey.Enter)
+         string text = ((TextBox)sender).Text;
+         if (e.Key == Windows.System.VirtualKey.Enter && !string.IsNullOrWhiteSpace(text))
          {
-            ProcessRawUserSearchQuery(((TextBox)sender).Text);
+            ProcessRawUserSearchQuery(text, BrowserTab.Selected.Reference.Copy());
             LoseFocus((TextBox)sender);
          }
          // Select the search box text on backspace if the dropdowns are being displayed
@@ -1052,12 +1058,15 @@ namespace BibleBrowserUWP
       /// Parse the user query into its components and start a search if one can be done.
       /// </summary>
       /// <param name="rawQuery">The exact input the user made.</param>
-      private void ProcessRawUserSearchQuery(string rawQuery)
+      private void ProcessRawUserSearchQuery(string rawQuery, BibleReference originalReference)
       {
+         if (string.IsNullOrWhiteSpace(rawQuery))
+            throw new ArgumentException("Check the query for being empty.");
+
          // Don't search for the same thing twice
-         if (m_originalQuery == rawQuery)
+         if (originalReference.IsSearch && originalReference.Search.RawQuery == rawQuery)
          {
-            Debug.WriteLine("Original query is the same as this one: " + m_originalQuery + rawQuery);
+            Debug.WriteLine("Original query is the same as this one: " + originalReference.Search.RawQuery + rawQuery);
             SetCurrentView(CurrentView.Search);
             lvSearchResults.ItemsSource = m_SearchResults;
             return;
@@ -1066,7 +1075,6 @@ namespace BibleBrowserUWP
          // Hitting Enter with nothing in the search box returns to the original reference
          else if (string.IsNullOrWhiteSpace(rawQuery))
          {
-            m_searchQuery = null;
             ShowSearchDropdowns(true);
             SetCurrentView(CurrentView.Chapter);
             return;
@@ -1075,9 +1083,10 @@ namespace BibleBrowserUWP
          // The user has asked for a search
          else
          {
-            m_originalQuery = rawQuery.Trim();
-            m_searchQuery = rawQuery.RemoveDiacritics(); // TODO remove punctuation
-            List<string> splitQuery = m_searchQuery.Split(new char[] { ' ', ':', ';', '.', ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            originalReference.Search = new SearchItem(rawQuery);
+            BrowserTab.Selected.AddToHistory(ref originalReference, BrowserTab.NavigationMode.Add);
+            string searchQuery = rawQuery.Trim().RemoveDiacritics(); // TODO remove punctuation
+            List<string> splitQuery = searchQuery.Split(new char[] { ' ', ':', ';', '.', ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
             BibleVersion version = BrowserTab.Selected.Reference.Version;
             BibleVersion comparison = BrowserTab.Selected.Reference.ComparisonVersion;
             string book = BrowserTab.Selected.Reference.BookName;
@@ -1137,12 +1146,12 @@ namespace BibleBrowserUWP
                // Not sure whether this is a search or go to. Show both.
                else if (0.25f > similarity && similarity > 0.1f)
                {
-                  _ = SearchAsync(m_searchQuery, rawQuery, version);
+                  _ = SearchAsync(searchQuery, rawQuery, version);
                }
                // This is a search
                else
                {
-                  _ = SearchAsync(m_searchQuery, rawQuery, version);
+                  _ = SearchAsync(searchQuery, rawQuery, version);
                }
             }
          }
@@ -1168,8 +1177,9 @@ namespace BibleBrowserUWP
                m_SearchResults.Clear(); // Empty from any previous search results
             }
 
-            BrowserTab.Selected.Reference.RawQuery = rawQuery;
-            Debug.WriteLine("Raw query as: " + BrowserTab.Selected.Reference.RawQuery);
+            SearchItem searchItem = new SearchItem(rawQuery);
+            BrowserTab.Selected.Reference.Search = searchItem;
+            Debug.WriteLine("Raw query as: " + BrowserTab.Selected.Reference.Search.RawQuery);
             SetCurrentView(CurrentView.Search);
 
             // Construct Progress<T>, passing ReportProgress as the Action<T> 
@@ -1303,6 +1313,7 @@ namespace BibleBrowserUWP
          catch (NullReferenceException) { }
          // The search is finished, so it can no longer be cancelled
          catch (ObjectDisposedException) { }
+         catch (Exception) { }
          finally
          {
             m_cancelSearch.Dispose();
@@ -1387,18 +1398,11 @@ namespace BibleBrowserUWP
          PrintChapter(reference);
       }
 
-
-      private void asbWelcome_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
-      {
-         asbSearch.Text = sender.Text;
-         ProcessRawUserSearchQuery(sender.Text);
-      }
-
       private void asbSearch_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
       {
          if (m_currentView == CurrentView.Search)
          {
-            asbSearch.Text = m_originalQuery;
+            asbSearch.Text = BrowserTab.Selected.Reference.Search.RawQuery;
             asbSearch.SelectAll();
          }
          else

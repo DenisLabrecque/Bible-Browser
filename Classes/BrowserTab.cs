@@ -214,6 +214,11 @@ namespace BibleBrowserUWP
                   NotifyPropertyChanged();
                   return;
             }
+
+            foreach(var item in History)
+            {
+               Debug.WriteLine("History item: " + item.FullReference + " " + item.IsSearch);
+            }
          }
       }
 

@@ -111,6 +111,7 @@
     <Compile Include="Classes\BibleVersion.cs" />
     <Compile Include="Classes\BrowserTab.cs" />
     <Compile Include="Classes\DGLUtility.cs" />
+    <Compile Include="Classes\SearchItem.cs" />
     <Compile Include="Classes\SearchProgress.cs" />
     <Compile Include="Classes\SearchResult.cs" />
     <Compile Include="Classes\Text.cs" />
