@@ -25,7 +25,7 @@ namespace BibleBrowserUWP
          '*'
       };
 
-      SearchItem m_search;
+      SearchItem m_search = null;
 
       #endregion
 

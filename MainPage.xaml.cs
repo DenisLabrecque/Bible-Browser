@@ -273,19 +273,25 @@ namespace BibleBrowserUWP
       /// </summary>
       private void GoToPreviousReference()
       {
-         if(BrowserTab.Selected.Previous.IsSearch)
-         {
-            Debug.WriteLine("```````````````````````````````````");
-            Debug.WriteLine("Previous was a raw query: "+ BrowserTab.Selected.Previous.Search.RawQuery);
-            ProcessRawUserSearchQuery(BrowserTab.Selected.Previous.Search.RawQuery, BrowserTab.Selected.Previous);
-         }
-         else if (BrowserTab.Selected.Previous != null)
+         if (BrowserTab.Selected.Previous != null)
          {
             BibleReference reference = BrowserTab.Selected.Reference;
             reference.VerticalScrollOffset = svPageScroller.VerticalOffset;
             BrowserTab.Selected.AddToHistory(ref reference, BrowserTab.NavigationMode.Previous);
-            PrintChapter(reference);
-            svPageScroller.ChangeView(null, reference.VerticalScrollOffset, null);
+            if(BrowserTab.Selected.Reference.IsSearch)
+            {
+               Debug.WriteLine("```````````````````````````````````");
+               Debug.WriteLine("Previous was a raw query: " + BrowserTab.Selected.Reference.Search.RawQuery);
+               if (string.IsNullOrWhiteSpace(BrowserTab.Selected.Reference.Search.RawQuery))
+                  throw new Exception("String null or white space");
+
+               ProcessRawUserSearchQuery(BrowserTab.Selected.Reference.Search.RawQuery, BrowserTab.Selected.Reference);
+            }
+            else
+            {
+               PrintChapter(reference);
+               svPageScroller.ChangeView(null, reference.VerticalScrollOffset, null);
+            }
          }
       }
 
@@ -1167,8 +1173,10 @@ namespace BibleBrowserUWP
       {
          if (version == null)
             throw new Exception("Search version null");
-         else if (string.IsNullOrEmpty(query))
+         else if (string.IsNullOrWhiteSpace(query))
             throw new Exception("Cannot search for a null or empty string");
+         else if (string.IsNullOrWhiteSpace(rawQuery))
+            throw new Exception("Cannot have a null or empty raw query");
          else
          {
             if (m_cancelSearch != null)
