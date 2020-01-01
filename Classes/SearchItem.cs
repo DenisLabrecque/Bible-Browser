@@ -12,7 +12,7 @@ namespace BibleBrowserUWP
    /// </summary>
    public class SearchItem
    {
-      private string m_rawQuery;
+      private string m_rawQuery = null;
       ObservableCollection<SearchResult> m_results = null;
 
       /// <summary>
@@ -24,7 +24,7 @@ namespace BibleBrowserUWP
          if (string.IsNullOrEmpty(rawQuery))
             throw new ArgumentNullException("A raw query cannot be null or empty");
          else
-            m_rawQuery = RawQuery;
+            m_rawQuery = rawQuery;
       }
 
       /// <summary>

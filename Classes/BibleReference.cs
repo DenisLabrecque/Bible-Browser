@@ -26,6 +26,7 @@ namespace BibleBrowserUWP
       };
 
       SearchItem m_search = null;
+      bool m_isSearch = false;
 
       #endregion
 
@@ -40,7 +41,10 @@ namespace BibleBrowserUWP
             if (value == null)
                throw new ArgumentNullException("The search must be set to a value");
             else
+            {
+               m_isSearch = true;
                m_search = value;
+            }
          }
       }
 
@@ -56,12 +60,12 @@ namespace BibleBrowserUWP
          }
       }
 
+      /// <summary>
+      /// Whether a search item has been set.
+      /// </summary>
       public bool IsSearch {
          get {
-            if (m_search == null)
-               return false;
-            else
-               return true;
+            return m_isSearch;
          }
       }
 

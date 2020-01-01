@@ -281,7 +281,9 @@ namespace BibleBrowserUWP
             if(BrowserTab.Selected.Reference.IsSearch)
             {
                Debug.WriteLine("```````````````````````````````````");
-               Debug.WriteLine("Previous was a raw query: " + BrowserTab.Selected.Reference.Search.RawQuery);
+               Debug.WriteLine("Is search: " + BrowserTab.Selected.Reference.IsSearch);
+               Debug.WriteLine("Search itm: " + BrowserTab.Selected.Reference.Search);
+               Debug.WriteLine("Raw query: " + BrowserTab.Selected.Reference.Search.RawQuery);
                if (string.IsNullOrWhiteSpace(BrowserTab.Selected.Reference.Search.RawQuery))
                   throw new Exception("String null or white space");
 
@@ -305,8 +307,22 @@ namespace BibleBrowserUWP
             BibleReference reference = BrowserTab.Selected.Reference;
             reference.VerticalScrollOffset = svPageScroller.VerticalOffset;
             BrowserTab.Selected.AddToHistory(ref reference, BrowserTab.NavigationMode.Next);
-            PrintChapter(reference);
-            svPageScroller.ChangeView(null, reference.VerticalScrollOffset, null);
+            if(BrowserTab.Selected.Reference.IsSearch)
+            {
+               Debug.WriteLine("-------------------------------------");
+               Debug.WriteLine("Is search: " + BrowserTab.Selected.Reference.IsSearch);
+               Debug.WriteLine("Search itm: " + BrowserTab.Selected.Reference.Search);
+               Debug.WriteLine("Raw query: " + BrowserTab.Selected.Reference.Search.RawQuery);
+               if (string.IsNullOrWhiteSpace(BrowserTab.Selected.Reference.Search.RawQuery))
+                  throw new Exception("String null or white space");
+
+               ProcessRawUserSearchQuery(BrowserTab.Selected.Reference.Search.RawQuery, BrowserTab.Selected.Reference);
+            }
+            else
+            {
+               PrintChapter(reference);
+               svPageScroller.ChangeView(null, reference.VerticalScrollOffset, null);
+            }
          }
       }
 
