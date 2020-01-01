@@ -452,15 +452,16 @@ namespace BibleBrowserUWP
                {
                   asbSearch.PlaceholderText = "Search or enter reference";
                }
+               else if (reference.IsSearch)
+               {
+                  asbSearch.Text = reference.Search.RawQuery;
+               }
                else if (reference.ComparisonVersion == null)
                {
                   asbSearch.Text = reference.Version + ": " + reference.ToString();
-                  asbSearch.SelectAll();
                }
-               else
-               {
+               else {
                   asbSearch.Text = reference.Version + ":" + reference.ComparisonVersion + " " + reference.ToString();
-                  asbSearch.SelectAll();
                }
             }
 
@@ -649,6 +650,7 @@ namespace BibleBrowserUWP
                Debug.WriteLine("View being set to search");
                m_currentView = CurrentView.Search;
                ShowChapter(false);
+               ShowSearchDropdowns(false);
                ShowSearch(true);
                break;
             default:
@@ -974,25 +976,33 @@ namespace BibleBrowserUWP
 
       private void AsbSearch_GotFocus(object sender, RoutedEventArgs e)
       {
-         if (m_isAppNewlyOpened)
+         Debug.WriteLine("GOT FOCUS fired");
+         //if (m_isAppNewlyOpened)
+         //{
+         //   // Ignore the first interaction so that the search bar doesn't get focus on app opening
+         //   m_isAppNewlyOpened = false;
+         //}
+         //else
+         //   ShowSearchDropdowns(false);
+
+         //if (m_currentView == CurrentView.Search)
+         //{
+         //   asbSearch.Text = BrowserTab.Selected.Reference.Search.RawQuery;
+         //   asbSearch.SelectAll();
+         //}
+      }
+
+      private void asbSearch_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
+      {
+         Debug.WriteLine("TAPPED fired");
+         if (BrowserTab.Selected.Reference.IsSearch)
          {
-            // Ignore the first interaction so that the search bar doesn't get focus on app opening
-            m_isAppNewlyOpened = false;
+            asbSearch.Text = BrowserTab.Selected.Reference.Search.RawQuery;
+            asbSearch.SelectAll();
          }
          else
-            ShowSearchDropdowns(false);
-
-         if (m_currentView == CurrentView.Search)
          {
-            if (BrowserTab.Selected.Reference == null)
-               throw new Exception();
-            else if (BrowserTab.Selected.Reference.Search == null)
-               throw new Exception();
-            else if (BrowserTab.Selected.Reference.IsSearch == false)
-               throw new Exception();
-            else if (BrowserTab.Selected.Reference.RawQuery == null)
-               throw new Exception();
-            asbSearch.Text = BrowserTab.Selected.Reference.Search.RawQuery;
+            ShowSearchDropdowns(false);
             asbSearch.SelectAll();
          }
       }
@@ -1320,8 +1330,9 @@ namespace BibleBrowserUWP
 
       private void BtnCancelSearch_Click(object sender, RoutedEventArgs e)
       {
-         CancelSearch();
-         SetCurrentView(CurrentView.Chapter);
+         GoToPreviousReference();
+         //CancelSearch();
+         //SetCurrentView(CurrentView.Chapter);
       }
 
 
@@ -1420,19 +1431,6 @@ namespace BibleBrowserUWP
          BibleReference reference = ((SearchResult)e.ClickedItem).Reference;
          BrowserTab.Selected.AddToHistory(ref reference);
          PrintChapter(reference);
-      }
-
-      private void asbSearch_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
-      {
-         if (m_currentView == CurrentView.Search)
-         {
-            asbSearch.Text = BrowserTab.Selected.Reference.Search.RawQuery;
-            asbSearch.SelectAll();
-         }
-         else
-         {
-            ShowSearchDropdowns(false);
-         }
       }
    }
 }
