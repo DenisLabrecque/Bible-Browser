@@ -1029,6 +1029,7 @@ namespace BibleBrowserUWP
          // Update the UI to reflect the progress value that is passed back.
          Debug.WriteLine("Progress reported from search with values: " + " task: " + progress.Status + ", percent: " + progress.Completion * 100);
          progSearchProgress.Value = progress.Completion;
+         m_SearchResults.BubbleSort();
          lvSearchResults.ItemsSource = m_SearchResults;
          txtSearchStatus.Text = progress.Status;
          if (m_SearchResults.Count < progress.Results.Count) // A new result was found since last time
@@ -1060,8 +1061,11 @@ namespace BibleBrowserUWP
             if (m_currentView == CurrentView.Chapter)
             {
                // Let the second delete remove text
-               if(m_areDropdownsDisplayed)
+               if (m_areDropdownsDisplayed)
+               {
                   ShowSearchDropdowns(false);
+                  asbSearch.SelectAll();
+               }
             }
          }
          // Was a letter
