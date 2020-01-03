@@ -22,6 +22,7 @@ using Windows.UI.Xaml.Media;
 using Microsoft.Toolkit.Uwp.Notifications; // Notifications library
 using Windows.UI.Notifications;
 using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Documents;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -202,16 +203,16 @@ namespace BibleBrowserUWP
          {
             contentWidth = pageWidth - (2 * MINMARGIN) - VERSECOLUMN - MIDDLCOLUMN;
             ChapterWidth = contentWidth;
-            gvCompareVerses.Width = contentWidth;
-            lvSearchResults.Width = contentWidth;
          }
          else
          {
             contentWidth = (MAXTEXTWIDTH * 2) - VERSECOLUMN - MIDDLCOLUMN;
             ChapterWidth = contentWidth;
-            gvCompareVerses.Width = contentWidth;
-            lvSearchResults.Width = contentWidth;
          }
+
+         gvCompareVerses.Width = contentWidth;
+         lvSearchResults.Width = contentWidth;
+         grdMainText.Width = contentWidth;
 
          // Set the maximum width of the tab area
          CoreApplicationViewTitleBar titleBar = CoreApplication.GetCurrentView().TitleBar;
@@ -615,18 +616,23 @@ namespace BibleBrowserUWP
          if (BrowserTab.Selected.Reference == null)
          {
             gvCompareVerses.ItemsSource = null;
+            EraseVerseText();
          }
          // Single version
          else if (reference.ComparisonVersion == null)
          {
             gvCompareVerses.ItemsSource = null;
             gvCompareVerses.ItemsSource = reference.Verses;
+            EraseVerseText();
+            FillVerseText(reference);
          }
          // With comparison version
          else
          {
             gvCompareVerses.ItemsSource = null;
             gvCompareVerses.ItemsSource = reference.Verses;
+            EraseVerseText();
+            FillVerseText(reference);
          }
       }
 
@@ -1435,6 +1441,67 @@ namespace BibleBrowserUWP
          BibleReference reference = ((SearchResult)e.ClickedItem).Reference;
          BrowserTab.Selected.AddToHistory(ref reference);
          PrintChapter(reference);
+      }
+
+
+      /// <summary>
+      /// Fill the main text grid with the verses to be read.
+      /// </summary>
+      /// <param name="reference">The reference from which to fill the text.</param>
+      private void FillVerseText(BibleReference reference)
+      {
+         // No text
+         if (reference == null)
+            return;
+         
+         // Only one version
+         else if (reference.ComparisonVersion == null)
+         {
+            foreach (Verse verse in reference.Verses)
+            {
+               UIManipulation.AddTextToStackPanel(spLeftCompare, verse.MainText);
+            }
+         }
+
+         // Comparison view
+         else
+         {
+            foreach (Verse verse in reference.Verses)
+            {
+               UIManipulation.AddTextToStackPanel(spLeftCompare, verse.MainText);
+               UIManipulation.AddTextToStackPanel(spRightCompare, verse.SecondText);
+            }
+         }
+      }
+
+
+      /// <summary>
+      /// Empty the main text paragraphs from any text.
+      /// </summary>
+      private void EraseVerseText()
+      {
+         //UIManipulation.RemoveAllBlocks(bLeftCompare);
+         //UIManipulation.RemoveAllBlocks(rtbRightCompare);
+      }
+
+
+      private void EqualizeVerseParagraphHeights()
+      {
+         int count;
+
+         //// Both versions have the same number of verses
+         //if (rtbLeftCompare.Blocks.Count == rtbRightCompare.Blocks.Count)
+         //   count = rtbLeftCompare.Blocks.Count;
+         //else if (rtbLeftCompare.Blocks.Count < rtbRightCompare.Blocks.Count)
+         //   count = rtbLeftCompare.Blocks.Count;
+         //else
+         //   count = rtbRightCompare.Blocks.Count;
+
+         //// Go through each paragraph in the comparison view
+         //for(int i = 1; i <= count; i++)
+         //{
+         //   if((DependencyObject)rtbLeftCompare.Blocks.ElementAt(i). )
+         //}
       }
    }
 }

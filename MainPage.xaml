@@ -701,6 +701,52 @@
                      </ListView.ItemTemplate>
                   </ListView>
 
+                  <Grid HorizontalAlignment="Center"
+                        Name="grdMainText"
+                        Width="500">
+                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                     </Grid.ColumnDefinitions>
+
+                     <StackPanel Grid.Column="0"
+                                 Name="spLeftCompare">
+                        <TextBlock Name="txtLeftCompare"
+                                   TextWrapping="WrapWholeWords"
+                                   IsTextSelectionEnabled="True">
+                           
+                           <Run >The first paragraph.</Run>
+                           <LineBreak/><Run>This is the test text that will possibly overflow and so on.</Run>
+                           </TextBlock>
+                     </StackPanel>
+                     <StackPanel Grid.Column="1"
+                                 Name="spRightCompare">
+                        
+                     </StackPanel>
+                     <!--<RichTextBlock Grid.Column="0"
+                                    Name="rtbLeftCompare" Visibility="Collapsed">
+                        
+                        <Paragraph>
+                           This is the first paragraph.</Paragraph>
+                        <Paragraph>
+                           This is the other paragraph. This has more text.</Paragraph>
+                        <Paragraph>
+                          This is the other paragraph.</Paragraph>
+                        <Paragraph>
+                           This is the other paragraph. A sentence is also found here.</Paragraph>
+                        <Paragraph>
+                           This is the other paragraph.</Paragraph>
+                     </RichTextBlock>
+                     <RichTextBlock Grid.Column="1"
+                                    Name="rtbRightCompare">
+                        <Paragraph>This is the first paragraph. And we have another sentence here.</Paragraph>
+                        <Paragraph>This is the other paragraph. More text.</Paragraph>
+                        <Paragraph>This is the other paragraph.</Paragraph>
+                        <Paragraph>This is the other paragraph.</Paragraph>
+                        <Paragraph>This is the other paragraph. This has more.</Paragraph>
+                     </RichTextBlock>-->
+                  </Grid>
+
                   <!-- Compare view (main content) -->
                   <muxc:ItemsRepeater Name="gvCompareVerses">
                      <muxc:ItemsRepeater.ItemTemplate>
