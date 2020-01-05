@@ -9,7 +9,7 @@ namespace BibleBrowserUWP
 {
    static class BibleSearch
    {
-      public const int TOOMANYRESULTS = 150;
+      public const int TOOMANYRESULTS = 200;
 
       #region Methods
 
@@ -90,7 +90,7 @@ namespace BibleBrowserUWP
       /// Asynchronously search the Bible for every verse that contains a certain text as a substring.
       /// </summary>
       /// <param name="query">The string to be matched in the Bible reference for the verse to be returned.</param>
-      public static async Task<SearchProgressInfo> SearchAsync(BibleVersion version, string query, IProgress<SearchProgressInfo> progress, CancellationToken cancellation)
+      public static async Task<SearchProgressInfo> SearchAsync(BibleVersion version, string query, IProgress<SearchProgressInfo> progress, CancellationTokenSource cancellation)
       {
          SearchProgressInfo progressInfo = new SearchProgressInfo(query);
          query = query.ToLower().RemoveDiacritics();
@@ -100,27 +100,33 @@ namespace BibleBrowserUWP
             // Go through each book of the Bible
             for (int book = 0; book < version.BookNumbers.Count; book++)
             {
-               BibleReference reference = new BibleReference(version, null, (BibleBook)book);
-               progressInfo.Completion = DGL.Math.Percent(book + 1, version.BookNumbers.Count);
-               progressInfo.Status = version.BookNames[book];
-               progress.Report(progressInfo);
-
-               // Go through each chapter of the book of the Bible
-               Parallel.For(1, version.GetChapterCount(reference) + 1, chapter =>
+               // Throw an exception if cancellation was requested
+               try
                {
-                  // See if the search has hit too many results for the computer's good
-                  if (progressInfo.ResultCount > TOOMANYRESULTS)
+                  BibleReference reference = new BibleReference(version, null, (BibleBook)book);
+                  progressInfo.Completion = DGL.Math.Percent(book + 1, version.BookNumbers.Count);
+                  progressInfo.Status = version.BookNames[book];
+
+                  // Go through each chapter of the book of the Bible
+                  Parallel.For(1, version.GetChapterCount(reference) + 1, chapter =>
                   {
-                     progressInfo.Completion = 1f;
-                     progress.Report(progressInfo);
-                  }
-                  else
-                  {
-                     // Continue if the search was not cancelled
-                     try
+                     // See if the search has hit too many results for the computer's good
+                     if (progressInfo.ResultCount > TOOMANYRESULTS)
                      {
-                        // Skip if the search was cancelled
-                        cancellation.ThrowIfCancellationRequested();
+                        cancellation.Cancel();
+                        Debug.WriteLine("******************* TOO MANY RESULTS");
+                        progress.Report(progressInfo);
+                        throw new OperationCanceledException();
+                     }
+                     else if (cancellation.IsCancellationRequested)
+                     {
+                        cancellation.Cancel();
+                        Debug.WriteLine("******************* CANCELLATION REQUESTED");
+                        progress.Report(progressInfo);
+                        throw new OperationCanceledException();
+                     }
+                     else
+                     {
                         BibleReference chapterReference = new BibleReference(version, null, (BibleBook)book, chapter);
 
                         // Go through each verse of the chapter
@@ -136,15 +142,20 @@ namespace BibleBrowserUWP
 
                            verseNumber++;
                         }
+                        progress.Report(progressInfo);
                      }
-                     // Handle the search being cancelled
-                     catch (OperationCanceledException)
-                     {
-                        progressInfo.IsCanceled = true; // Let the user know that the operation has been ended unexpectedly
-                        //return progressInfo;
-                     }
-                  }
-               });
+                  });
+               }
+               catch (OperationCanceledException)
+               {
+                  progressInfo.IsCanceled = true;
+                  return progressInfo;
+               }
+               catch(Exception)
+               {
+                  progressInfo.IsCanceled = true;
+                  return progressInfo;
+               }
             }
 
             return progressInfo;

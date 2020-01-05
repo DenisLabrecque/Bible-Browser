@@ -81,11 +81,11 @@ namespace BibleBrowserUWP
                {
                   return loader.GetString("noResultFor") + " " + loader.GetString("quoteLeft") + m_Query + loader.GetString("quoteRight");
                }
-               else if (m_Results.Count == 1)
+               else if (m_ResultCount == 1)
                {
                   return loader.GetString("oneResultFor") + " " + loader.GetString("quoteLeft") + m_Query + loader.GetString("quoteRight");
                }
-               else if(m_ResultCount > BibleSearch.TOOMANYRESULTS)
+               else if(m_ResultCount >= BibleSearch.TOOMANYRESULTS)
                {
                   return loader.GetString("tooManyResultsFor") + " " + loader.GetString("quoteLeft") + m_Query + loader.GetString("quoteRight");
                }

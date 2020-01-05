@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BibleBrowserUWP
@@ -15,7 +16,7 @@ namespace BibleBrowserUWP
    {
       private string m_rawQuery = null;
       SearchProgressInfo m_progress = null;
-
+      CancellationTokenSource m_cancel = null;
       public Progress<SearchProgressInfo> Progress { get; set; }
 
       /// <summary>
@@ -65,5 +66,7 @@ namespace BibleBrowserUWP
                return m_progress.IsComplete;
          }
       }
+
+      public CancellationTokenSource Cancellation { get; set; }
    }
 }

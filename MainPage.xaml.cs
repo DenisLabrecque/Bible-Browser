@@ -57,7 +57,6 @@ namespace BibleBrowserUWP
       bool m_areTabsLoaded = false;
       bool m_isAppNewlyOpened = true;
       bool m_areDropdownsDisplayed = false;
-      CancellationTokenSource m_cancelSearch;
       private BibleReference m_previousReference = new BibleReference(BibleVersion.DefaultVersion, null);
       ObservableCollection<SearchResult> m_SearchResults = new ObservableCollection<SearchResult>();
 
@@ -629,8 +628,8 @@ namespace BibleBrowserUWP
          SetCurrentView(CurrentView.Chapter);
 
          lvSearchResults.ItemsSource = null;
-         if(m_cancelSearch != null)
-            m_cancelSearch.Dispose();
+         if(reference.IsSearch && reference.Search.Cancellation != null)
+            reference.Search.Cancellation.Dispose();
 
          // New tab, leave blank
          if (BrowserTab.Selected.Reference == null)
@@ -1040,29 +1039,6 @@ namespace BibleBrowserUWP
          }
       }
 
-      /// <summary>
-      /// Called every time search reports progress.
-      /// Put code that manages new search results in here.
-      /// https://devblogs.microsoft.com/dotnet/async-in-4-5-enabling-progress-and-cancellation-in-async-apis/
-      /// </summary>
-      private void ReportSearchProgress(SearchProgressInfo progress)
-      {
-         // Update the UI to reflect the progress value that is passed back.
-         Debug.WriteLine("Progress reported from search with values: " + " task: " + progress.Status + ", percent: " + progress.Completion * 100);
-         progSearchProgress.Value = progress.Completion;
-         m_SearchResults.BubbleSort();
-         lvSearchResults.ItemsSource = m_SearchResults;
-         txtSearchStatus.Text = progress.Status;
-         if (m_SearchResults.Count < progress.Results.Count) // A new result was found since last time
-         {
-            // Add the new results that were found
-            for (int i = Math.Clamp(m_SearchResults.Count, 0, int.MaxValue); i < Math.Clamp(progress.Results.Count, 0, int.MaxValue); i++)
-            {
-               m_SearchResults.Add(progress.Results[i]);
-            }
-         }
-      }
-
 
       /// <summary>
       /// Detect different keystrokes in the search bar.
@@ -1194,7 +1170,7 @@ namespace BibleBrowserUWP
                float similarity = BibleSearch.QueryHasBibleBook(ref splitQuery, version, ref book);
 
                // This is a reference for sure
-               if (similarity > 0.25f)
+               if (similarity > 0.5f)
                {
                   BibleSearch.QueryHasChapter(ref splitQuery, ref chapter);
                   BibleReference newReference = new BibleReference(version, comparison, book, chapter);
@@ -1231,12 +1207,8 @@ namespace BibleBrowserUWP
             throw new Exception("Cannot have a null or empty raw query");
          else
          {
-            if (m_cancelSearch != null)
-            {
-               CancelSearch();
-               m_SearchResults.Clear(); // Empty from any previous search results
-            }
-
+            m_SearchResults.Clear(); // Empty from any previous search results
+            
             SearchItem searchItem = new SearchItem(rawQuery);
             BrowserTab.Selected.Reference.Search = searchItem;
             Debug.WriteLine("Raw query as: " + BrowserTab.Selected.Reference.Search.RawQuery);
@@ -1244,18 +1216,42 @@ namespace BibleBrowserUWP
 
             // Construct Progress<T>, passing ReportProgress as the Action<T>
             searchItem.Progress = new Progress<SearchProgressInfo>(ReportSearchProgress);
-            m_cancelSearch = new CancellationTokenSource();
+            searchItem.Cancellation = new CancellationTokenSource();
 
-            // Start the async search
-            searchItem.SearchProgressInfo = await BibleSearch.SearchAsync(version, query, searchItem.Progress, m_cancelSearch.Token);
-
-            // Handle the search being cancelled at any point
-            if (searchItem.SearchProgressInfo.IsCanceled)
+            try
             {
-               CancelSearch();
-               return;
+               // Start the async search
+               searchItem.SearchProgressInfo = await BibleSearch.SearchAsync(version, query, searchItem.Progress, searchItem.Cancellation);
             }
-            m_cancelSearch.Dispose();
+            catch (OperationCanceledException)
+            {
+               lvSearchResults.ItemsSource = searchItem.SearchProgressInfo.Results;
+
+            }
+         }
+      }
+
+
+      /// <summary>
+      /// Called every time search reports progress.
+      /// Put code that manages new search results in here.
+      /// https://devblogs.microsoft.com/dotnet/async-in-4-5-enabling-progress-and-cancellation-in-async-apis/
+      /// </summary>
+      private void ReportSearchProgress(SearchProgressInfo progress)
+      {
+         // Update the UI to reflect the progress value that is passed back.
+         Debug.WriteLine("<ReportSearchProgress> " + " task: " + progress.Status + ", percent: " + progress.Completion * 100);
+         progSearchProgress.Value = progress.Completion;
+         m_SearchResults.BubbleSort();
+         lvSearchResults.ItemsSource = m_SearchResults;
+         txtSearchStatus.Text = progress.Status;
+         if (m_SearchResults.Count < progress.Results.Count) // A new result was found since last time
+         {
+            // Add the new results that were found
+            for (int i = Math.Clamp(m_SearchResults.Count, 0, int.MaxValue); i < Math.Clamp(progress.Results.Count, 0, int.MaxValue); i++)
+            {
+               m_SearchResults.Add(progress.Results[i]);
+            }
          }
       }
 
@@ -1347,11 +1343,11 @@ namespace BibleBrowserUWP
       /// <summary>
       /// Stop the cancellation token source within error checking.
       /// </summary>
-      private void CancelSearch()
+      private void CancelSearch(SearchItem search)
       {
          try
          {
-            m_cancelSearch.Cancel();
+            search.Cancellation.Cancel();
          }
          catch (NullReferenceException) { }
          // The search is finished, so it can no longer be cancelled
@@ -1359,7 +1355,7 @@ namespace BibleBrowserUWP
          catch (Exception) { }
          finally
          {
-            m_cancelSearch.Dispose();
+            search.Cancellation.Dispose();
             lvSearchResults.ItemsSource = null;
          }
       }
