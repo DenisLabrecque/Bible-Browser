@@ -1,18 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BibleBrowserUWP
 {
    /// <summary>
    /// Hold some metadata about a search (degree of completion, current task, etc.)
-   /// Notifies that properties change.
    /// </summary>
    public class SearchProgressInfo
    {
@@ -114,6 +107,10 @@ namespace BibleBrowserUWP
       /// </summary>
       public int ResultCount {
          get { return m_ResultCount; }
+      }
+
+      public bool IsComplete {
+         get { Debug.WriteLine("Progress was::::::: " + m_Progress + (m_Progress >= 1.0f ? true : false)); return m_Progress >= 1.0f ? true : false; }
       }
    }
 }

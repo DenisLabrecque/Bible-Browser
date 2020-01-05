@@ -9,12 +9,28 @@ using System.Threading.Tasks;
 namespace BibleBrowserUWP
 {
    /// <summary>
-   /// A search query item in history.
+   /// Represents a search that a user has fired.
    /// </summary>
    public class SearchItem
    {
       private string m_rawQuery = null;
-      ObservableCollection<SearchResult> m_results = null;
+      SearchProgressInfo m_progress = null;
+
+      public Progress<SearchProgressInfo> Progress { get; set; }
+
+      /// <summary>
+      /// This needs to be done during search.
+      /// If not set, the search will mark as being incomplete.
+      /// </summary>
+      public SearchProgressInfo SearchProgressInfo {
+         get { return m_progress; } 
+         set {
+            if (value == null)
+               throw new ArgumentNullException();
+            else
+               m_progress = value;
+         }
+      }
 
       /// <summary>
       /// Constructor.
@@ -36,16 +52,17 @@ namespace BibleBrowserUWP
       }
 
       /// <summary>
-      /// The search results caused by the query.
+      /// Whether the search has successfully ended with all possible results being found.
       /// </summary>
-      public ObservableCollection<SearchResult> Results {
+      public bool IsComplete {
          get {
-            return m_results;
-         }
-         set {
-            if (value == null)
-               throw new ArgumentNullException("The results need to be set to a value, and not null.");
-            m_results = value;
+            if (m_progress == null)
+            {
+               Debug.WriteLine("Progress is null");
+               return false;
+            }
+            else
+               return m_progress.IsComplete;
          }
       }
    }

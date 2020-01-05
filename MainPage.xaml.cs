@@ -278,7 +278,7 @@ namespace BibleBrowserUWP
             BibleReference reference = BrowserTab.Selected.Reference;
             reference.VerticalScrollOffset = svPageScroller.VerticalOffset;
             BrowserTab.Selected.AddToHistory(ref reference, BrowserTab.NavigationMode.Previous);
-            if(BrowserTab.Selected.Reference.IsSearch)
+            if(reference.IsSearch)
             {
                Debug.WriteLine("```````````````````````````````````");
                Debug.WriteLine("Is search: " + BrowserTab.Selected.Reference.IsSearch);
@@ -287,7 +287,18 @@ namespace BibleBrowserUWP
                if (string.IsNullOrWhiteSpace(BrowserTab.Selected.Reference.Search.RawQuery))
                   throw new Exception("String null or white space");
 
-               ProcessRawUserSearchQuery(BrowserTab.Selected.Reference.Search.RawQuery, BrowserTab.Selected.Reference);
+               m_SearchResults.Clear();
+
+               // Search was already done
+               if (reference.Search.IsComplete)
+               {
+                  ReportSearchProgress(reference.Search.SearchProgressInfo);
+                  SetCurrentView(CurrentView.Search);
+               }
+               else
+               {
+                  ProcessRawUserSearchQuery(BrowserTab.Selected.Reference.Search.RawQuery, BrowserTab.Selected.Reference);
+               }
             }
             else
             {
@@ -316,7 +327,17 @@ namespace BibleBrowserUWP
                if (string.IsNullOrWhiteSpace(BrowserTab.Selected.Reference.Search.RawQuery))
                   throw new Exception("String null or white space");
 
-               ProcessRawUserSearchQuery(BrowserTab.Selected.Reference.Search.RawQuery, BrowserTab.Selected.Reference);
+               m_SearchResults.Clear();
+
+               if(reference.Search.IsComplete)
+               {
+                  ReportSearchProgress(reference.Search.SearchProgressInfo);
+                  SetCurrentView(CurrentView.Search);
+               }
+               else
+               {
+                  ProcessRawUserSearchQuery(BrowserTab.Selected.Reference.Search.RawQuery, BrowserTab.Selected.Reference);
+               }
             }
             else
             {
@@ -1104,7 +1125,8 @@ namespace BibleBrowserUWP
          {
             Debug.WriteLine("Original query is the same as this one: " + originalReference.Search.RawQuery + rawQuery);
             SetCurrentView(CurrentView.Search);
-            lvSearchResults.ItemsSource = m_SearchResults;
+            ReportSearchProgress(originalReference.Search.SearchProgressInfo);
+            //lvSearchResults.ItemsSource = m_SearchResults;
             return;
          }
 
@@ -1220,15 +1242,15 @@ namespace BibleBrowserUWP
             Debug.WriteLine("Raw query as: " + BrowserTab.Selected.Reference.Search.RawQuery);
             SetCurrentView(CurrentView.Search);
 
-            // Construct Progress<T>, passing ReportProgress as the Action<T> 
-            Progress<SearchProgressInfo> progressIndicator = new Progress<SearchProgressInfo>(ReportSearchProgress);
+            // Construct Progress<T>, passing ReportProgress as the Action<T>
+            searchItem.Progress = new Progress<SearchProgressInfo>(ReportSearchProgress);
             m_cancelSearch = new CancellationTokenSource();
 
             // Start the async search
-            SearchProgressInfo task = await BibleSearch.SearchAsync(version, query, progressIndicator, m_cancelSearch.Token);
+            searchItem.SearchProgressInfo = await BibleSearch.SearchAsync(version, query, searchItem.Progress, m_cancelSearch.Token);
 
             // Handle the search being cancelled at any point
-            if (task.IsCanceled)
+            if (searchItem.SearchProgressInfo.IsCanceled)
             {
                CancelSearch();
                return;
@@ -1240,15 +1262,15 @@ namespace BibleBrowserUWP
                // Show the number of results as status
                if (m_SearchResults.Count == 0)
                {
-                  txtSearchStatus.Text = loader.GetString("noResultFor") + " '" + task.Query + "'";
+                  txtSearchStatus.Text = loader.GetString("noResultFor") + " '" + searchItem.SearchProgressInfo.Query + "'";
                }
                else if (m_SearchResults.Count == 1)
                {
-                  txtSearchStatus.Text = loader.GetString("oneResultFor") + " '" + task.Query + "'";
+                  txtSearchStatus.Text = loader.GetString("oneResultFor") + " '" + searchItem.SearchProgressInfo.Query + "'";
                }
                else
                {
-                  txtSearchStatus.Text = task.Results.Count + " " + loader.GetString("manyResultsFor") + " '" + task.Query + "'";
+                  txtSearchStatus.Text = searchItem.SearchProgressInfo.Results.Count + " " + loader.GetString("manyResultsFor") + " '" + searchItem.SearchProgressInfo.Query + "'";
                }
             }
             m_cancelSearch.Dispose();
