@@ -1255,24 +1255,6 @@ namespace BibleBrowserUWP
                CancelSearch();
                return;
             }
-            else
-            {
-               var loader = Windows.ApplicationModel.Resources.ResourceLoader.GetForCurrentView();
-
-               // Show the number of results as status
-               if (m_SearchResults.Count == 0)
-               {
-                  txtSearchStatus.Text = loader.GetString("noResultFor") + " '" + searchItem.SearchProgressInfo.Query + "'";
-               }
-               else if (m_SearchResults.Count == 1)
-               {
-                  txtSearchStatus.Text = loader.GetString("oneResultFor") + " '" + searchItem.SearchProgressInfo.Query + "'";
-               }
-               else
-               {
-                  txtSearchStatus.Text = searchItem.SearchProgressInfo.Results.Count + " " + loader.GetString("manyResultsFor") + " '" + searchItem.SearchProgressInfo.Query + "'";
-               }
-            }
             m_cancelSearch.Dispose();
          }
       }

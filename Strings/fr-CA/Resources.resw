@@ -219,4 +219,13 @@
   <data name="txtCompareTo.Text" xml:space="preserve">
     <value>Ajouter une comparaison</value>
   </data>
+  <data name="quoteLeft" xml:space="preserve">
+    <value>«</value>
+  </data>
+  <data name="quoteRight" xml:space="preserve">
+    <value>»</value>
+  </data>
+  <data name="tooManyResultsFor" xml:space="preserve">
+    <value>Recherche terminée. Trop de résultats pour</value>
+  </data>
 </root>

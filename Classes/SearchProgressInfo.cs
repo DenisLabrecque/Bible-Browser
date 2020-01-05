@@ -10,7 +10,7 @@ namespace BibleBrowserUWP
    public class SearchProgressInfo
    {
       private float m_Progress;
-      private string m_Task;
+      private string m_status;
       private List<SearchResult> m_Results;
       private string m_Query;
       private DateTime m_TimeStarted;
@@ -27,7 +27,7 @@ namespace BibleBrowserUWP
          m_Query = query;
          m_Progress = 0f;
          m_ResultCount = 0;
-         m_Task = string.Empty;
+         m_status = string.Empty;
          m_Results = new List<SearchResult>();
          m_TimeStarted = DateTime.Now;
          m_TimeEnded = DateTime.Now;
@@ -70,10 +70,32 @@ namespace BibleBrowserUWP
       /// </summary>
       public string Status {
          get {
-            return m_Task;
+            if(m_Progress < 1f)
+               return m_status;
+            else
+            {
+               var loader = Windows.ApplicationModel.Resources.ResourceLoader.GetForCurrentView();
+
+               // Show the number of results as status
+               if (m_ResultCount == 0)
+               {
+                  return loader.GetString("noResultFor") + " " + loader.GetString("quoteLeft") + m_Query + loader.GetString("quoteRight");
+               }
+               else if (m_Results.Count == 1)
+               {
+                  return loader.GetString("oneResultFor") + " " + loader.GetString("quoteLeft") + m_Query + loader.GetString("quoteRight");
+               }
+               else if(m_ResultCount > BibleSearch.TOOMANYRESULTS)
+               {
+                  return loader.GetString("tooManyResultsFor") + " " + loader.GetString("quoteLeft") + m_Query + loader.GetString("quoteRight");
+               }
+               {
+                  return m_ResultCount + " " + loader.GetString("manyResultsFor") + " " + loader.GetString("quoteLeft") + m_Query + loader.GetString("quoteRight");
+               }
+            }
          }
          set {
-            m_Task = value;
+            m_status = value;
          }
       }
 

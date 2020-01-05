@@ -111,7 +111,6 @@ namespace BibleBrowserUWP
                   // See if the search has hit too many results for the computer's good
                   if (progressInfo.ResultCount > TOOMANYRESULTS)
                   {
-                     progressInfo.Status = "Too many results.";
                      progressInfo.Completion = 1f;
                      progress.Report(progressInfo);
                   }
@@ -151,7 +150,6 @@ namespace BibleBrowserUWP
             return progressInfo;
          });
 
-         progressInfo.Status = "Search complete.";
          return progressInfo;
       }
 
