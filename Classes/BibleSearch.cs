@@ -137,7 +137,7 @@ namespace BibleBrowserUWP
                            {
                               BibleReference hit = new BibleReference(version, null, (BibleBook)book, chapter, verseNumber);
                               Debug.WriteLine(hit + ":" + verseNumber + " -- " + verse);
-                              progressInfo.AddResult(new SearchResult(hit, verse));
+                              progressInfo.AddResult(new SearchResult(hit, verse, 0, 1));
                            }
 
                            verseNumber++;
@@ -245,7 +245,7 @@ namespace BibleBrowserUWP
             return 0f;
          }
          else if (QueryHasNumeral(ref splitQuery)) {
-            book = ClosestBookName(version, splitQuery[0], out levSimilarity);
+            book = ClosestBookName(version, CutQueryAtNumber(ref splitQuery), out levSimilarity);
             Debug.WriteLine(book + " found from " + splitQuery[0] + " with lev distance of " + levSimilarity);
             splitQuery.RemoveAt(0);
             return levSimilarity;
@@ -253,10 +253,49 @@ namespace BibleBrowserUWP
          else
          {
             book = ClosestBookName(version, splitQuery[0], out levSimilarity);
-            Debug.WriteLine(book + " found from " + splitQuery[0] + " with lev distance of " + levSimilarity);
+            Debug.WriteLine(book + " found from " + CutQueryAtNumber(ref splitQuery) + " with lev distance of " + levSimilarity);
             splitQuery.RemoveAt(0);
             return levSimilarity;
          }
+      }
+
+
+      private static string CutQueryAtNumber(ref List<string> splitQuery)
+      {
+         // Go through the query elements to find the one that has a number
+         int index = 0;
+         bool numberFound = false;
+         for(int i = 0; i < splitQuery.Count; i++)
+         {
+            bool success = int.TryParse(splitQuery[i], out _);
+            if (success)
+            {
+               index = i - 1;
+               numberFound = true;
+               break;
+            }
+         }
+         if (numberFound == false)
+            index = splitQuery.Count - 1;
+
+         // Put the elements together in one string, leaving the number alone
+         string text = string.Empty;
+         for(int i = 0; i <= index; i++)
+         {
+            text += splitQuery[0] + " ";
+            Debug.WriteLine("---->>>> text is: " + text);
+            if(i < index)
+               splitQuery.RemoveAt(0);
+         }
+
+         text = text.Trim();
+         splitQuery[0] = text;
+
+         foreach (string item in splitQuery)
+         {
+            Debug.WriteLine(">>>>>>>>>>>>>>>> Item in query: " + item);
+         }
+         return text;
       }
 
 

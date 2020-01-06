@@ -4,11 +4,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.UI.Xaml.Documents;
 
 namespace BibleBrowserUWP
 {
    public class SearchResult : IComparable
    {
+      private int m_startIndx = 0;
+      private int m_endIndx = 0;
+
       public BibleReference Reference { get; set; }
       public string Text { get; set; }
 
@@ -22,30 +26,46 @@ namespace BibleBrowserUWP
          }
       }
 
-      /// <summary>
-      /// Constructor.
-      /// </summary>
-      public SearchResult(BibleReference reference, string verse)
-      {
-         if(reference == null)
-         {
-            throw new ArgumentNullException("The reference passed was null");
-         }
-         else
-         {
-            Reference = reference;
-         }
-
-         if(verse == null)
-         {
-            throw new ArgumentNullException("The verse text passed was null");
-         }
-         else
-         {
-            Text = verse;
+      public TextHighlighter Highlighter {
+         get {
+            TextHighlighter highlight = new TextHighlighter();
+            TextRange range = new TextRange();
+            range.StartIndex = m_startIndx;
+            range.Length = m_endIndx - m_startIndx;
+            highlight.Ranges.Add(range);
+            return highlight;
          }
       }
 
+      /// <summary>
+      /// Constructor.
+      /// </summary>
+      public SearchResult(BibleReference reference, string verse, int start, int end)
+      {
+         if(reference == null)
+            throw new ArgumentNullException("The reference passed was null");
+         else
+            Reference = reference;
+
+         if(verse == null)
+            throw new ArgumentNullException("The verse text passed was null");
+         else
+            Text = verse;
+
+         if(start > end)
+         {
+            int temp = start;
+            start = end;
+            end = temp;
+         }
+
+         m_startIndx = start;
+         m_endIndx = end;
+      }
+
+      /// <summary>
+      /// Used for sorting.
+      /// </summary>
       public int CompareTo(object obj)
       {
          SearchResult other = obj as SearchResult;
@@ -78,6 +98,9 @@ namespace BibleBrowserUWP
       }
    }
 
+   /// <summary>
+   /// Extension methods to allow lists to be sorted.
+   /// </summary>
    public static class ListExtension
    {
       public static void BubbleSort(this IList o)

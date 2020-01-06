@@ -672,7 +672,7 @@
                      <AutoSuggestBox Name="asbWelcome" PlaceholderText="Search" Width="400" QuerySubmitted="asbWelcome_QuerySubmitted"></AutoSuggestBox>
                   </StackPanel>-->
 
-                  <!-- Search view -->
+                  <!-- Search results view -->
                   <ListView x:Name="lvSearchResults"
                             ItemsSource="{x:Bind SearchResults}"
                             SelectionMode="None"
@@ -692,6 +692,14 @@
                               <RichTextBlock Style="{ThemeResource ReadableText}"
                                              IsTextSelectionEnabled="False"
                                              Margin="0,0,0,5">
+                                 <RichTextBlock.TextHighlighters>
+                                    <TextHighlighter>
+                                       <TextHighlighter.Ranges>
+                                          <!-- Add the bound range here-->
+                                          <!-- {Binding Range} or text highlighter or something -->
+                                       </TextHighlighter.Ranges>
+                                    </TextHighlighter>
+                                 </RichTextBlock.TextHighlighters>
                                  <Paragraph>
                                     <Run Text="{Binding VerseText}"></Run>
                                  </Paragraph>

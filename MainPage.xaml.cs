@@ -1177,11 +1177,6 @@ namespace BibleBrowserUWP
                   BrowserTab.Selected.AddToHistory(ref newReference, BrowserTab.NavigationMode.Add);
                   ShowSearchDropdowns(true);
                }
-               // Not sure whether this is a search or go to. Show both.
-               else if (0.25f > similarity && similarity > 0.1f)
-               {
-                  _ = SearchAsync(searchQuery, rawQuery, version);
-               }
                // This is a search
                else
                {
@@ -1251,6 +1246,8 @@ namespace BibleBrowserUWP
             for (int i = Math.Clamp(m_SearchResults.Count, 0, int.MaxValue); i < Math.Clamp(progress.Results.Count, 0, int.MaxValue); i++)
             {
                m_SearchResults.Add(progress.Results[i]);
+               Debug.WriteLine(lvSearchResults.Items[i].GetType() + "is type of element");
+              // m_SearchResults[i].Highlighter = progress.Results[i].Highlighter;
             }
          }
       }
