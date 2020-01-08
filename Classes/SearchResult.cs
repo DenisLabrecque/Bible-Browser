@@ -26,21 +26,18 @@ namespace BibleBrowserUWP
          }
       }
 
-      public TextHighlighter Highlighter {
+      public string DisplayText {
          get {
-            TextHighlighter highlight = new TextHighlighter();
-            TextRange range = new TextRange();
-            range.StartIndex = m_startIndx;
-            range.Length = m_endIndx - m_startIndx;
-            highlight.Ranges.Add(range);
-            return highlight;
+            return Text;
          }
       }
+
+      public string HighlightText { get; set; }
 
       /// <summary>
       /// Constructor.
       /// </summary>
-      public SearchResult(BibleReference reference, string verse, int start, int end)
+      public SearchResult(BibleReference reference, string verse, string highlight)
       {
          if(reference == null)
             throw new ArgumentNullException("The reference passed was null");
@@ -52,15 +49,7 @@ namespace BibleBrowserUWP
          else
             Text = verse;
 
-         if(start > end)
-         {
-            int temp = start;
-            start = end;
-            end = temp;
-         }
-
-         m_startIndx = start;
-         m_endIndx = end;
+         HighlightText = highlight;
       }
 
       /// <summary>

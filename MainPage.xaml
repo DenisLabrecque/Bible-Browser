@@ -679,32 +679,8 @@
                             IsItemClickEnabled="True"
                             ItemClick="LvSearchResults_ItemClick">
                      <ListView.ItemTemplate>
-                        <DataTemplate>
-                           <StackPanel>
-                              <!-- Reference -->
-                              <TextBlock FontSize="12"
-                                         FontWeight="Bold"
-                                         Foreground="Gray"
-                                         FontFamily="/Assets/Fonts/PalanquinDark.ttf#Palanquin Dark Regular"
-                                         Margin="0,8,0,0"
-                                         Text="{Binding FullReference}"></TextBlock>
-                              <!-- Search result -->
-                              <RichTextBlock Style="{ThemeResource ReadableText}"
-                                             IsTextSelectionEnabled="False"
-                                             Margin="0,0,0,5">
-                                 <RichTextBlock.TextHighlighters>
-                                    <TextHighlighter>
-                                       <TextHighlighter.Ranges>
-                                          <!-- Add the bound range here-->
-                                          <!-- {Binding Range} or text highlighter or something -->
-                                       </TextHighlighter.Ranges>
-                                    </TextHighlighter>
-                                 </RichTextBlock.TextHighlighters>
-                                 <Paragraph>
-                                    <Run Text="{Binding VerseText}"></Run>
-                                 </Paragraph>
-                              </RichTextBlock>
-                           </StackPanel>
+                        <DataTemplate x:DataType="local1:SearchResult"  x:Key="local1:ResultItemTemplate">
+                           <local1:SearchResultBlock Result="{Binding}"/>
                         </DataTemplate>
                      </ListView.ItemTemplate>
                   </ListView>

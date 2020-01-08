@@ -137,7 +137,7 @@ namespace BibleBrowserUWP
                            {
                               BibleReference hit = new BibleReference(version, null, (BibleBook)book, chapter, verseNumber);
                               Debug.WriteLine(hit + ":" + verseNumber + " -- " + verse);
-                              progressInfo.AddResult(new SearchResult(hit, verse, 0, 1));
+                              progressInfo.AddResult(new SearchResult(hit, verse, query));
                            }
 
                            verseNumber++;
