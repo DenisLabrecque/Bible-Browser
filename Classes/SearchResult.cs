@@ -10,8 +10,7 @@ namespace BibleBrowserUWP
 {
    public class SearchResult : IComparable
    {
-      private int m_startIndx = 0;
-      private int m_endIndx = 0;
+      string m_highlightText = string.Empty;
 
       public BibleReference Reference { get; set; }
       public string Text { get; set; }
@@ -32,7 +31,24 @@ namespace BibleBrowserUWP
          }
       }
 
-      public string HighlightText { get; set; }
+      public string HighlightText { get { return m_highlightText; }
+         set {
+            if (string.IsNullOrWhiteSpace(VerseText))
+               throw new ArgumentException("Highlight text cannot be set before the verse text is known");
+            else
+            {
+               string highlight = value.ToLower().RemoveDiacritics();
+               string verse = VerseText.ToLower().RemoveDiacritics();
+               int startIndex = verse.IndexOf(highlight);
+               string substring = VerseText.Substring(startIndex, highlight.Length);
+
+               if (string.IsNullOrWhiteSpace(substring))
+                  m_highlightText = string.Empty;
+               else
+                  m_highlightText = substring;
+            }
+         }
+      }
 
       /// <summary>
       /// Constructor.

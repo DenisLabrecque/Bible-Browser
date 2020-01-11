@@ -252,8 +252,9 @@ namespace BibleBrowserUWP
          }
          else
          {
-            book = ClosestBookName(version, splitQuery[0], out levSimilarity);
-            Debug.WriteLine(book + " found from " + CutQueryAtNumber(ref splitQuery) + " with lev distance of " + levSimilarity);
+            string bookName = CutQueryAtNumber(ref splitQuery);
+            book = ClosestBookName(version, bookName, out levSimilarity);
+            Debug.WriteLine(book + " found from " + bookName + " with lev distance of " + levSimilarity);
             splitQuery.RemoveAt(0);
             return levSimilarity;
          }

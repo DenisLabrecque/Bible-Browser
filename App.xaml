@@ -5,6 +5,7 @@
     xmlns:local="using:BibleBrowserUWP">
 
    <Application.Resources>
+
       <ResourceDictionary>
 
          <ResourceDictionary.MergedDictionaries>
@@ -122,5 +123,4 @@
          </ResourceDictionary.ThemeDictionaries>
       </ResourceDictionary>
    </Application.Resources>
-
 </Application>

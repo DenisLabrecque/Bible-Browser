@@ -29,12 +29,15 @@ namespace BibleBrowserUWP
          if (e.NewValue != null && e.NewValue is SearchResult data)
          {
             SearchResultBlock result = dependencyObject as SearchResultBlock;
-            result.ResultBlock.Inlines.Clear();
+
+            // Add the reference
+            result.Reference.Text = data.FullReference;
 
             // Create runs for the normal text and the highlighted text
+            result.ResultBlock.Inlines.Clear();
             string[] resultText = data.DisplayText.Split(data.HighlightText);
             result.ResultBlock.Inlines.Add(new Run { Text = resultText.First() });
-            result.ResultBlock.Inlines.Add(new Run { Text = data.HighlightText, Foreground = new SolidColorBrush(Colors.Red) });
+            result.ResultBlock.Inlines.Add(new Run { Text = data.HighlightText, Foreground = new SolidColorBrush(Color.FromArgb(255,226,63,71)) });
             if (resultText.Length > 1)
                result.ResultBlock.Inlines.Add(new Run { Text = resultText.Last() });
          }
