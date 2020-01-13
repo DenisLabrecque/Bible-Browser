@@ -175,6 +175,15 @@ namespace BibleBrowserUWP
          }
       }
 
+      /// <summary>
+      /// Get the language code of the current version, like "en" or "fr"
+      /// </summary>
+      public string LanguageCode {
+         get {
+            return Reference.Version.Language.ToLower();
+         }
+      }
+
 
       /// <summary>
       /// Add a reference to history as necessary.

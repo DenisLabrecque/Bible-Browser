@@ -59,6 +59,7 @@ namespace BibleBrowserUWP
       bool m_areDropdownsDisplayed = false;
       private BibleReference m_previousReference = new BibleReference(BibleVersion.DefaultVersion, null);
       ObservableCollection<SearchResult> m_SearchResults = new ObservableCollection<SearchResult>();
+      SpeechSynthesisStream m_speechStream;
 
       #endregion
 
@@ -496,7 +497,7 @@ namespace BibleBrowserUWP
       /// <summary>
       /// Get the main text and begin reading it asynchronously.
       /// </summary>
-      async private void ReadMainTextAloud()
+      async private void ReadChapterText()
       {
          if(m_isPlaybackStarted)
          {
@@ -504,19 +505,18 @@ namespace BibleBrowserUWP
          }
          else
          {
-            BibleReference reference = BrowserTab.Selected.Reference;
-            string languageCode = reference.Version.Language.ToLower();
+            BrowserTab tab = BrowserTab.Selected;
 
             // Detect the voice for the language
             try
             {
-               m_synth.Voice = SpeechSynthesizer.AllVoices.Where(p => p.Language.Contains(languageCode)).First();
-
+               m_synth.Voice = SpeechSynthesizer.AllVoices.Where(p => p.Language.Contains(tab.LanguageCode)).First();
+               
                // Generate the audio stream from plain text.
-               SpeechSynthesisStream stream = await m_synth.SynthesizeTextToStreamAsync(reference.GetChapterPlainText());
-
+               m_speechStream = await m_synth.SynthesizeTextToStreamAsync(tab.Reference.GetChapterPlainText());
+               
                // Send the stream to the media object
-               m_mediaElement.SetSource(stream, stream.ContentType);
+               m_mediaElement.SetSource(m_speechStream, m_speechStream.ContentType);
                m_mediaElement.Play();
                m_isPlaybackStarted = true;
             }
@@ -524,7 +524,7 @@ namespace BibleBrowserUWP
             catch (InvalidOperationException)
             {
                // Show an error message
-               var messageDialog = new MessageDialog("Please install the language pack for this language (" + new CultureInfo(languageCode)  + ").");
+               var messageDialog = new MessageDialog("Please install the language pack for this language (" + new CultureInfo(tab.LanguageCode)  + ").");
                messageDialog.Commands.Add(new UICommand("Close"));
                messageDialog.DefaultCommandIndex = 0;
                messageDialog.CancelCommandIndex = 0;
@@ -626,6 +626,7 @@ namespace BibleBrowserUWP
       private void PrintChapter(BibleReference reference)
       {
          SetCurrentView(CurrentView.Chapter);
+         BindReadingVoices(reference);
 
          lvSearchResults.ItemsSource = null;
          if(reference.IsSearch && reference.Search.Cancellation != null)
@@ -647,6 +648,25 @@ namespace BibleBrowserUWP
          {
             gvCompareVerses.ItemsSource = null;
             gvCompareVerses.ItemsSource = reference.Verses;
+         }
+      }
+
+      private void BindReadingVoices(BibleReference reference)
+      {
+         try
+         {
+            string code = BrowserTab.Selected.LanguageCode;
+            IEnumerable<VoiceInformation> voices = SpeechSynthesizer.AllVoices.Where(voice => voice.Language.Contains(code));
+            List<string> voiceNames = new List<string>();
+            foreach (VoiceInformation voice in voices)
+            {
+               voiceNames.Add(voice.DisplayName);
+            }
+            cbSelectVoice.ItemsSource = voiceNames;
+            cbSelectVoice.SelectedItem = voiceNames.FirstOrDefault();
+         }
+         catch {
+            cbSelectVoice.Visibility = Visibility.Collapsed;
          }
       }
 
@@ -745,7 +765,7 @@ namespace BibleBrowserUWP
       /// <summary>
       /// Add a version to compare to the original reference, and print the new layout.
       /// </summary>
-      private void AddCompareToVersion(BibleVersion compareVersion, BibleReference oldReference)
+      private static void AddCompareToVersion(BibleVersion compareVersion, BibleReference oldReference)
       {
          BibleReference newReference = new BibleReference(oldReference.Version, compareVersion, oldReference.Book, oldReference.Chapter, oldReference.Verse);
          BrowserTab.Selected.AddToHistory(ref newReference, BrowserTab.NavigationMode.Add);
@@ -755,7 +775,7 @@ namespace BibleBrowserUWP
       /// <summary>
       /// Remove a version to compare to the original reference, and print the new layout.
       /// </summary>
-      private void RemoveCompareToVersion(BibleReference oldReference)
+      private static void RemoveCompareToVersion(BibleReference oldReference)
       {
          if (oldReference.ComparisonVersion != null)
          {
@@ -777,7 +797,7 @@ namespace BibleBrowserUWP
 
       private void BtnPlay_Click(object sender, RoutedEventArgs e)
       {
-         ReadMainTextAloud();
+         ReadChapterText();
          //btnPlay.Visibility = Visibility.Collapsed;
          //btnPause.Visibility = Visibility.Visible;
       }
@@ -1391,7 +1411,7 @@ namespace BibleBrowserUWP
          Debug.WriteLine("Time changed to " + AppSettings.NotifyTime);
       }
 
-      private void ConstructReminderToast(DateTimeOffset time)
+      private static void ConstructReminderToast(DateTimeOffset time)
       {
          var loader = Windows.ApplicationModel.Resources.ResourceLoader.GetForCurrentView();
          string title = loader.GetString("bibleReading");
@@ -1432,6 +1452,33 @@ namespace BibleBrowserUWP
          BibleReference reference = ((SearchResult)e.ClickedItem).Reference;
          BrowserTab.Selected.AddToHistory(ref reference);
          PrintChapter(reference);
+      }
+
+      private void btnCloseTextToSpeech_Click(object sender, RoutedEventArgs e)
+      {
+         spTextToSpeech.Visibility = Visibility.Collapsed;
+      }
+
+      private void Slider_ValueChanged(object sender, Windows.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
+      {
+         Debug.WriteLine("Volume changed: " + ((Slider)sender).Value);
+         m_synth = new SpeechSynthesizer();
+         m_synth.Options.SpeakingRate = ((Slider)sender).Value;
+        
+      }
+
+      private void cbSelectVoice_SelectionChanged(object sender, SelectionChangedEventArgs e)
+      {
+         try
+         {
+            string name = cbSelectVoice.SelectedValue as string;
+            
+            m_synth = new SpeechSynthesizer();
+            m_synth.Voice = SpeechSynthesizer.AllVoices.Where(voice => voice.DisplayName.Contains(name)).First();
+         }
+         catch {
+            cbSelectVoice.Visibility = Visibility.Collapsed;
+         }
       }
    }
 }

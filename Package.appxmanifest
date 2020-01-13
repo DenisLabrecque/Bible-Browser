@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
-  <Identity Name="9474DenisLabrecque.Receptus" Publisher="CN=9D6474E3-193C-45E0-A076-27D83594EB4B" Version="0.9.27.0" />
+  <Identity Name="9474DenisLabrecque.Receptus" Publisher="CN=9D6474E3-193C-45E0-A076-27D83594EB4B" Version="0.9.30.0" />
   <mp:PhoneIdentity PhoneProductId="3d049a1a-6da5-4845-a65c-5a0e845e9de8" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>Receptus</DisplayName>

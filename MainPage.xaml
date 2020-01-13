@@ -584,13 +584,6 @@
                      Background="Transparent"
                      Grid.Column="1">
 
-            <!-- Home Button -->
-            <!--<Button Style="{StaticResource TabBarButton}"
-                    Name="Home" Click="Home_Click"
-                    >
-               <FontIcon FontSize="15" Glyph="&#xE80F;"/>
-            </Button>-->
-
             <!-- Tab List -->
             <ListView ItemContainerStyle="{StaticResource TabListViewItemContainer}"
                       x:Name="lvTabs"
@@ -663,8 +656,6 @@
                              HorizontalScrollMode="Disabled"
                              HorizontalScrollBarVisibility="Hidden">
                <StackPanel Margin="0, 80">
-
-                  <TextBox Name="txtTest" Visibility="Collapsed"></TextBox>
                   
                   <!-- Welcome screen -->
                   <!--<StackPanel Visibility="Visible">
@@ -679,7 +670,7 @@
                             IsItemClickEnabled="True"
                             ItemClick="LvSearchResults_ItemClick">
                      <ListView.ItemTemplate>
-                        <DataTemplate x:DataType="local1:SearchResult"  x:Key="local1:ResultItemTemplate">
+                        <DataTemplate x:DataType="local1:SearchResult">
                            <local1:SearchResultBlock Result="{Binding}"/>
                         </DataTemplate>
                      </ListView.ItemTemplate>
@@ -771,6 +762,7 @@
             <Grid.RowDefinitions>
                <RowDefinition></RowDefinition>
                <RowDefinition></RowDefinition>
+               <RowDefinition></RowDefinition>
             </Grid.RowDefinitions>
 
             <!-- Previous and Next buttons -->
@@ -802,32 +794,6 @@
                   </Button.KeyboardAccelerators>
                   <FontIcon FontSize="15" Glyph="&#xE72A;"/>
                </Button>
-
-               <!-- Compare view button -->
-               <!--<Button Style="{ThemeResource CommandButton}"
-                       Name="btnCompare"
-                       ToolTipService.ToolTip="Compare view"
-                       Click="BtnCompare_Click">
-                  <Button.KeyboardAccelerators>
-                  </Button.KeyboardAccelerators>
-                  <FontIcon FontSize="15" Glyph="&#xF164;"/>
-                  --><!-- Explore content single --><!--
-                  <Button.Flyout>
-                     <Flyout x:Name="flyCompare" FlyoutPresenterStyle="{ThemeResource Flyout}">
-                        <ListView Name="lvCompareVersions"
-                                  SelectionMode="None"
-                                  ItemsSource="{x:Bind Bibles}"
-                                  IsItemClickEnabled="True"
-                                  ItemClick="LvCompareVersions_ItemClicked">
-                           <ListView.ItemTemplate>
-                              <DataTemplate x:DataType="local1:BibleVersion">
-                                 <TextBlock Text="{x:Bind Title}"/>
-                              </DataTemplate>
-                           </ListView.ItemTemplate>
-                        </ListView>
-                     </Flyout>
-                  </Button.Flyout>
-               </Button>-->
             </StackPanel>
 
             <!-- Search -->
@@ -947,30 +913,6 @@
                         Width="90"
                         FlowDirection="RightToLeft"
                         HorizontalAlignment="Right">
-
-               <!-- Play (read out loud) -->
-               <!--<Button Name="btnPlay"
-                       Style="{StaticResource CommandButton}"
-                       ToolTipService.ToolTip="Read aloud (Ctrl+P)"
-                       Click="BtnPlay_Click"
-                       Margin="7,0,0,0">
-                  <Button.KeyboardAccelerators>
-                     <KeyboardAccelerator Modifiers="Control" Key="P"/>
-                  </Button.KeyboardAccelerators>
-                  <FontIcon FontSize="15" Glyph="&#xE768;"/>
-               </Button>-->
-               <!-- Pause (read out loud) -->
-               <!--<Button Name="btnPause"
-                       Style="{StaticResource CommandButton}"
-                       Visibility="Collapsed"
-                       ToolTipService.ToolTip="Pause reading (Space)"
-                       Click="BtnPause_Click"
-                       Margin="7,0,0,0">
-                  <Button.KeyboardAccelerators>
-                     <KeyboardAccelerator Modifiers="None" Key="Space"/>
-                  </Button.KeyboardAccelerators>
-                  <FontIcon FontSize="15" Glyph="&#xE769;"/>
-               </Button>-->
                
                <!-- More hamburger menu -->
                <Button Name="btnMore"
@@ -1086,8 +1028,78 @@
                </Button>
             </StackPanel>
 
+
+            <!-- Text to speech reading area -->
+            <StackPanel x:Name="spTextToSpeech"
+                        Grid.ColumnSpan="3"
+                        Grid.Row="1"
+                        Background="{ThemeResource ReceptusGrey}"
+                        HorizontalAlignment="Right"
+                        Orientation="Horizontal">
+
+               <Button x:Name="btnPlay"
+                       Click="BtnPlay_Click"
+                       Style="{StaticResource CommandButton}"
+                       ToolTipService.ToolTip="Read aloud (Ctrl+P)">
+                  <Button.KeyboardAccelerators>
+                     <KeyboardAccelerator Modifiers="Control" Key="P"/>
+                  </Button.KeyboardAccelerators>
+                  <FontIcon FontSize="15" Glyph="&#xE768;"/>
+               </Button>
+               
+               <Button Name="btnPause"
+                       Style="{StaticResource CommandButton}"
+                       ToolTipService.ToolTip="Pause reading (Space)"
+                       Click="BtnPause_Click">
+                  <Button.KeyboardAccelerators>
+                     <KeyboardAccelerator Modifiers="None" Key="Space"/>
+                  </Button.KeyboardAccelerators>
+                  <FontIcon FontSize="15" Glyph="&#xE769;"/>
+               </Button>
+
+               <Button x:Name="btnVoiceSettings"
+                       Style="{StaticResource CommandButton}"
+                       ToolTipService.ToolTip="Voice settings">
+                  <Button.Flyout>
+                     <Flyout x:Name="flyTextToSpeedMenu" FlyoutPresenterStyle="{StaticResource Flyout}">
+                        <StackPanel HorizontalAlignment="Left"
+                                    Padding="20,5"
+                                    FlowDirection="LeftToRight">
+                           <Slider AutomationProperties.Name="Reading speed"
+                                   Header="Speed"
+                                   Value="1"
+                                   StepFrequency="0.5"
+                                   TickFrequency="0.5"
+                                   Minimum="0.5"
+                                   Maximum="2"
+                                   TickPlacement="Outside"
+                                   Width="200"
+                                   ValueChanged="Slider_ValueChanged"/>
+                           <ComboBox x:Name="cbSelectVoice"
+                                     Header="Voice"
+                                     SelectionChanged="cbSelectVoice_SelectionChanged"></ComboBox>
+                        </StackPanel>
+                     </Flyout>
+                  </Button.Flyout>
+                  <FontIcon FontSize="15" Glyph="&#xEFA9;" />
+               </Button>
+
+               <Button Name="btnCloseTextToSpeech"
+                       Style="{StaticResource CommandButton}"
+                       Background="{ThemeResource ReceptusRed}"
+                       ToolTipService.ToolTip="Close reading area"
+                       Click="btnCloseTextToSpeech_Click">
+                  <Button.KeyboardAccelerators>
+                     <KeyboardAccelerator Modifiers="None" Key="Escape"/>
+                  </Button.KeyboardAccelerators>
+                  <FontIcon FontSize="15" Glyph="&#xE8BB;"/>
+               </Button>
+            </StackPanel>
+
+            
+            <!-- Progress bar -->
             <StackPanel Grid.ColumnSpan="3"
-                        Grid.Row="1">
+                        Grid.Row="2">
                <Grid>
                   <Grid.RowDefinitions>
                      <RowDefinition/>
