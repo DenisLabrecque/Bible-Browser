@@ -1138,7 +1138,6 @@ namespace BibleBrowserUWP
          else
          {
             originalReference.Search = new SearchItem(rawQuery);
-            BrowserTab.Selected.AddToHistory(ref originalReference, BrowserTab.NavigationMode.Add);
             string searchQuery = rawQuery.Trim().RemoveDiacritics(); // TODO remove punctuation
             List<string> splitQuery = searchQuery.Split(new char[] { ' ', ':', ';', '.', ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
             BibleVersion version = BrowserTab.Selected.Reference.Version;
@@ -1149,6 +1148,7 @@ namespace BibleBrowserUWP
             // The whole query is surrounded by quotes
             if (BibleSearch.QuerySurroundedByQuotes(ref splitQuery))
             {
+               BrowserTab.Selected.AddToHistory(ref originalReference, BrowserTab.NavigationMode.Add);
                string search = BibleSearch.ReassembleSplitString(splitQuery, true);
                _ = SearchAsync(search, rawQuery, version);
             }
@@ -1160,6 +1160,7 @@ namespace BibleBrowserUWP
                {
                   if (BibleSearch.QuerySurroundedByQuotes(ref splitQuery))
                   {
+                     BrowserTab.Selected.AddToHistory(ref originalReference, BrowserTab.NavigationMode.Add);
                      string search = BibleSearch.ReassembleSplitString(splitQuery, true);
                      _ = SearchAsync(search, rawQuery, version);
                   }
