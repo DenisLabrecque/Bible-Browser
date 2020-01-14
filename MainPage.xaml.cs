@@ -290,7 +290,7 @@ namespace BibleBrowserUWP
                m_SearchResults.Clear();
 
                // Search was already done
-               if (reference.Search.IsComplete)
+               if (reference.Search.IsComplete && reference.Search.SearchProgressInfo != null)
                {
                   ReportSearchProgress(reference.Search.SearchProgressInfo);
                   SetCurrentView(CurrentView.Search);
@@ -1122,7 +1122,6 @@ namespace BibleBrowserUWP
             Debug.WriteLine("Original query is the same as this one: " + originalReference.Search.RawQuery + rawQuery);
             SetCurrentView(CurrentView.Search);
             ReportSearchProgress(originalReference.Search.SearchProgressInfo);
-            //lvSearchResults.ItemsSource = m_SearchResults;
             return;
          }
 
@@ -1254,6 +1253,12 @@ namespace BibleBrowserUWP
       /// </summary>
       private void ReportSearchProgress(SearchProgressInfo progress)
       {
+         if(progress == null)
+         {
+            Debug.WriteLine("<ReportSearchProgress> NULL progress object.");
+            return;
+         }
+
          // Update the UI to reflect the progress value that is passed back.
          Debug.WriteLine("<ReportSearchProgress> " + " task: " + progress.Status + ", percent: " + progress.Completion * 100);
          progSearchProgress.Value = progress.Completion;
@@ -1474,7 +1479,7 @@ namespace BibleBrowserUWP
             string name = cbSelectVoice.SelectedValue as string;
             
             m_synth = new SpeechSynthesizer();
-            m_synth.Voice = SpeechSynthesizer.AllVoices.Where(voice => voice.DisplayName.Contains(name)).First();
+            //m_synth.Voice = SpeechSynthesizer.AllVoices.Where(voice => voice.DisplayName.Contains(name)).First();
          }
          catch {
             cbSelectVoice.Visibility = Visibility.Collapsed;
