@@ -117,7 +117,6 @@
     <Compile Include="Classes\Text.cs" />
     <Compile Include="Classes\TrulyObservableCollection.cs" />
     <Compile Include="Classes\Verse.cs" />
-    <Compile Include="OldClasses\ChapterAndVerse.cs" />
     <Compile Include="Classes\Constants.cs" />
     <Compile Include="Classes\BibleLoader.cs" />
     <Compile Include="Classes\BibleSearch.cs" />

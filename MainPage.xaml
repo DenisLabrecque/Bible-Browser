@@ -1035,7 +1035,8 @@
                         Grid.Row="1"
                         Background="{ThemeResource ReceptusGrey}"
                         HorizontalAlignment="Right"
-                        Orientation="Horizontal">
+                        Orientation="Horizontal"
+                        Visibility="Collapsed">
 
                <Button x:Name="btnPlay"
                        Click="BtnPlay_Click"

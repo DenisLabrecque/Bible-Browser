@@ -1200,6 +1200,8 @@ namespace BibleBrowserUWP
                // This is a search
                else
                {
+                  BibleReference newReference = new BibleReference(version, comparison, book, chapter);
+                  BrowserTab.Selected.AddToHistory(ref newReference, BrowserTab.NavigationMode.Add);
                   _ = SearchAsync(searchQuery, rawQuery, version);
                }
             }
