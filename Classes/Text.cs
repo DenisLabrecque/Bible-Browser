@@ -23,16 +23,16 @@ namespace BibleBrowserUWP
       /// How do I remove diacritics (accents) from a string in .NET?
       /// Blair Conrad's answer
       /// </summary>
-      /// <param name="text"></param>
-      /// <returns></returns>
+      /// <param name="text">Text with diacritics</param>
+      /// <returns>Text of letters without the diacritical markings</returns>
       public static string RemoveDiacritics(this string text)
       {
-         var normalizedString = text.Normalize(NormalizationForm.FormD);
-         var stringBuilder = new StringBuilder();
+         string normalizedString = text.Normalize(NormalizationForm.FormD);
+         StringBuilder stringBuilder = new StringBuilder();
 
-         foreach (var c in normalizedString)
+         foreach (char c in normalizedString)
          {
-            var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+            UnicodeCategory unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
             if (unicodeCategory != UnicodeCategory.NonSpacingMark)
             {
                stringBuilder.Append(c);
@@ -40,6 +40,30 @@ namespace BibleBrowserUWP
          }
 
          return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
+      }
+
+      /// <summary>
+      /// Extension method that replaces punctuation marks with spaces.
+      /// </summary>
+      /// <param name="text">Text with close punctuation</param>
+      /// <returns>Text with spaces replacing punctuation marks</returns>
+      public static string RemovePunctuation(this string text)
+      {
+         var stringBuilder = new StringBuilder();
+
+         foreach(char letter in text)
+         {
+            if(char.IsPunctuation(letter))
+            {
+               stringBuilder.Append(" ");
+            }
+            else
+            {
+               stringBuilder.Append(letter);
+            }
+         }
+
+         return stringBuilder.ToString();
       }
 
       /// <summary>
@@ -70,13 +94,13 @@ namespace BibleBrowserUWP
                   // --
                   else if (i + 1 < text.Length && text[i] == '-' && (text[i + 1] == '-' || char.IsWhiteSpace(text[i + 1])))
                   {
-                     builder.Append('—');
+                     builder.Append(MDASH);
                      continue;
                   }
                   // End of line -
                   else if (i + 1 == text.Length)
                   {
-                     builder.Append('—');
+                     builder.Append(MDASH);
                      continue;
                   }
                }

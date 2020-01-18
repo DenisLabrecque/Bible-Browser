@@ -722,33 +722,33 @@
             </ScrollViewer>
          </Border>
 
-         <Button Name="btnLeftPage"
-                 Style="{ThemeResource CommandButton}"
-                 Height="50"
-                 Click="BtnLeftPage_Click"
-                 HorizontalAlignment="Left"
-                 VerticalAlignment="Center"
-                 x:Uid="btnLeftPage"
-                 ToolTipService.ToolTip="Previous chapter (Left arrow)">
+         <RepeatButton Name="btnLeftPage"
+                       Height="50"
+                       Click="BtnLeftPage_Click"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"
+                       x:Uid="btnLeftPage"
+                       Background="Transparent"
+                       ToolTipService.ToolTip="Previous chapter (Left arrow)">
             <FontIcon Glyph="&#xE76B;" Foreground="{ThemeResource ReceptusGrey}" /><!-- Chevron left -->
-            <Button.KeyboardAccelerators>
+            <RepeatButton.KeyboardAccelerators>
                <KeyboardAccelerator Modifiers="None" Key="Left"/>
-            </Button.KeyboardAccelerators>
-         </Button>
+            </RepeatButton.KeyboardAccelerators>
+         </RepeatButton>
 
-         <Button Name="btnRightPage"
-                 Style="{ThemeResource CommandButton}"
-                 Height="50"
-                 Click="BtnRightPage_Click"
-                 HorizontalAlignment="Right"
-                 VerticalAlignment="Center"
-                 x:Uid="btnRightPage"
-                 ToolTipService.ToolTip="Next chapter (Right arrow)">
+         <RepeatButton Name="btnRightPage"
+                       Height="50"
+                       Click="BtnRightPage_Click"
+                       HorizontalAlignment="Right"
+                       VerticalAlignment="Center"
+                       x:Uid="btnRightPage"
+                       Background="Transparent"
+                       ToolTipService.ToolTip="Next chapter (Right arrow)">
             <FontIcon Glyph="&#xE76C;" Foreground="{ThemeResource ReceptusGrey}" /><!-- Chevron right -->
-            <Button.KeyboardAccelerators>
+            <RepeatButton.KeyboardAccelerators>
                <KeyboardAccelerator Modifiers="None" Key="Right"/>
-            </Button.KeyboardAccelerators>
-         </Button>
+            </RepeatButton.KeyboardAccelerators>
+         </RepeatButton>
 
          <!-- Command Bar -->
          <Grid VerticalAlignment="Top"
@@ -1036,7 +1036,7 @@
                         Background="{ThemeResource ReceptusGrey}"
                         HorizontalAlignment="Right"
                         Orientation="Horizontal"
-                        Visibility="Collapsed">
+                        Visibility="Visible">
 
                <Button x:Name="btnPlay"
                        Click="BtnPlay_Click"

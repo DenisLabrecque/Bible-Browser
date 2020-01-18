@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -93,7 +94,7 @@ namespace BibleBrowserUWP
       public static async Task<SearchProgressInfo> SearchAsync(BibleVersion version, string query, IProgress<SearchProgressInfo> progress, CancellationTokenSource cancellation)
       {
          SearchProgressInfo progressInfo = new SearchProgressInfo(query);
-         query = query.ToLower().RemoveDiacritics();
+         query = query.ToLower(CultureInfo.InvariantCulture).RemoveDiacritics().RemovePunctuation();
 
          progressInfo = await Task.Run<SearchProgressInfo>(() =>
          {
@@ -133,7 +134,7 @@ namespace BibleBrowserUWP
                         int verseNumber = 1;
                         foreach (string verse in version.GetChapterVerses(chapterReference))
                         {
-                           if (verse.ToLower().RemoveDiacritics().Contains(query))
+                           if (verse.ToLower().RemoveDiacritics().RemovePunctuation().Contains(query))
                            {
                               BibleReference hit = new BibleReference(version, null, (BibleBook)book, chapter, verseNumber);
                               Debug.WriteLine(hit + ":" + verseNumber + " -- " + verse);

@@ -1361,7 +1361,6 @@ namespace BibleBrowserUWP
       {
          GoToPreviousReference();
          //CancelSearch();
-         //SetCurrentView(CurrentView.Chapter);
       }
 
 

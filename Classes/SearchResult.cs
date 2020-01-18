@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,9 +38,9 @@ namespace BibleBrowserUWP
                throw new ArgumentException("Highlight text cannot be set before the verse text is known");
             else
             {
-               string highlight = value.ToLower().RemoveDiacritics();
-               string verse = VerseText.ToLower().RemoveDiacritics();
-               int startIndex = verse.IndexOf(highlight);
+               string highlight = value.ToLower(CultureInfo.InvariantCulture).RemoveDiacritics();
+               string verse = VerseText.ToLower(CultureInfo.InvariantCulture).RemoveDiacritics();
+               int startIndex = Math.Clamp(verse.IndexOf(highlight), 0, int.MaxValue);
                string substring = VerseText.Substring(startIndex, highlight.Length);
 
                if (string.IsNullOrWhiteSpace(substring))
