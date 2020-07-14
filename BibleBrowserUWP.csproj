@@ -133,6 +133,8 @@
       <SubType>Designer</SubType>
     </AppxManifest>
     <Content Include="Assets\Fonts\PalanquinDark-Regular.ttf" />
+    <Content Include="JavaScript\vue.js" />
+    <Content Include="Reader.html" />
     <None Include="BibleBrowserUWP_StoreKey.pfx" />
     <None Include="BibleBrowserUWP_TemporaryKey.pfx" />
     <Content Include="Assets\BadgeLogo.scale-400.png" />

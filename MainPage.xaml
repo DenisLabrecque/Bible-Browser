@@ -669,14 +669,10 @@
                             SelectionMode="None"
                             IsItemClickEnabled="True"
                             ItemClick="LvSearchResults_ItemClick">
-                     <ListView.ItemTemplate>
-                        <DataTemplate x:DataType="local1:SearchResult">
-                           <local1:SearchResultBlock Result="{Binding}"/>
-                        </DataTemplate>
-                     </ListView.ItemTemplate>
                   </ListView>
+                  <WebView Height="888" Source="ms-appx-web:///Reader.html" />
 
-                  <!-- Compare view (main content) -->
+                  <!-- Compare view (main content) --><!--
                   <muxc:ItemsRepeater Name="gvCompareVerses">
                      <muxc:ItemsRepeater.ItemTemplate>
                         <DataTemplate x:DataType="local1:Verse">
@@ -688,7 +684,7 @@
                                  <ColumnDefinition Width="{x:Bind CompareWidth}"/>
                               </Grid.ColumnDefinitions>
 
-                              <!-- Verse number -->
+                              --><!-- Verse number --><!--
                               <TextBlock Text="{x:Bind Number}"
                                       Padding="0,3,5,0"
                                       FontSize="12"
@@ -699,7 +695,7 @@
                                       Foreground="Gray"
                                       FontFamily="/Assets/Fonts/PalanquinDark.ttf#Palanquin Dark Regular"/>
 
-                              <!-- Verse text -->
+                              --><!-- Verse text --><!--
                               <RichTextBlock Style="{ThemeResource ReadableText}"
                                           Grid.Column="1">
                                  <Paragraph>
@@ -707,7 +703,7 @@
                                  </Paragraph>
                               </RichTextBlock>
 
-                              <!-- Compare verse text -->
+                              --><!-- Compare verse text --><!--
                               <RichTextBlock Style="{ThemeResource ReadableText}"
                                              Grid.Column="3">
                                  <Paragraph>
@@ -717,7 +713,9 @@
                            </Grid>
                         </DataTemplate>
                      </muxc:ItemsRepeater.ItemTemplate>
-                  </muxc:ItemsRepeater>
+                  </muxc:ItemsRepeater>-->
+                  
+                  
                </StackPanel>
             </ScrollViewer>
          </Border>

@@ -202,14 +202,14 @@ namespace BibleBrowserUWP
          {
             contentWidth = pageWidth - (2 * MINMARGIN) - VERSECOLUMN - MIDDLCOLUMN;
             ChapterWidth = contentWidth;
-            gvCompareVerses.Width = contentWidth;
+            //gvCompareVerses.Width = contentWidth;
             lvSearchResults.Width = contentWidth;
          }
          else
          {
             contentWidth = (MAXTEXTWIDTH * 2) - VERSECOLUMN - MIDDLCOLUMN;
             ChapterWidth = contentWidth;
-            gvCompareVerses.Width = contentWidth;
+            //gvCompareVerses.Width = contentWidth;
             lvSearchResults.Width = contentWidth;
          }
 
@@ -635,19 +635,19 @@ namespace BibleBrowserUWP
          // New tab, leave blank
          if (BrowserTab.Selected.Reference == null)
          {
-            gvCompareVerses.ItemsSource = null;
+            //gvCompareVerses.ItemsSource = null;
          }
          // Single version
          else if (reference.ComparisonVersion == null)
          {
-            gvCompareVerses.ItemsSource = null;
-            gvCompareVerses.ItemsSource = reference.Verses;
+            //gvCompareVerses.ItemsSource = null;
+            //gvCompareVerses.ItemsSource = reference.Verses;
          }
          // With comparison version
          else
          {
-            gvCompareVerses.ItemsSource = null;
-            gvCompareVerses.ItemsSource = reference.Verses;
+            //gvCompareVerses.ItemsSource = null;
+            //gvCompareVerses.ItemsSource = reference.Verses;
          }
       }
 
@@ -706,13 +706,13 @@ namespace BibleBrowserUWP
       {
          if (show)
          {
-            gvCompareVerses.Visibility = Visibility.Visible;
+            //gvCompareVerses.Visibility = Visibility.Visible;
             btnLeftPage.Visibility = Visibility.Visible;
             btnRightPage.Visibility = Visibility.Visible;
          }
          else
          {
-            gvCompareVerses.Visibility = Visibility.Collapsed;
+            //gvCompareVerses.Visibility = Visibility.Collapsed;
             btnLeftPage.Visibility = Visibility.Collapsed;
             btnRightPage.Visibility = Visibility.Collapsed;
          }

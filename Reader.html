@@ -1,0 +1,258 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+   <style>
+      /* Variables */
+      body {
+         --system-accent-colour: #E23F47;
+         --app-bar-background: #FF749099;
+         --receptus-red: #E23F47;
+         --receptus-light: #F2F2F2;
+         --receptus-text: black;
+         --receptus-light-grey: #D3DBDE;
+         --receptus-grey: #7FA1AB;
+         --button-colour: white;
+         --disabled-button-colour: #FF99BCC7;
+         --padding: 15px;
+      }
+
+         body.dark-mode {
+            --system-accent-colour: #F2F2F2;
+            --app-bar-background: #587077;
+            --receptus-red: #E23F47;
+            --receptus-grey: #F2F2F2;
+            --receptus-light: black;
+            --receptus-text: #F2F2F2;
+            --receptus-light-grey: #D3DBDE;
+            --button-colour: whitesmoke;
+            --disabled-button-colour: #FF99BCC7;
+         }
+
+      /* Basic styling */
+      body {
+         font-family: 'Roboto Slab';
+         color: var(--receptus-text);
+         background: var(--receptus-light);
+         line-height: 200%;
+         font-size: 18px;
+      }
+
+      p {
+         margin: 0 0 0 0;
+      }
+
+      ::selection {
+         background: var(--receptus-grey);
+      }
+
+      /* Positioning */
+      ol.main {
+         margin: 0 0 0 0;
+         padding: 0 0 0 0;
+         min-width: 400px;
+         margin-left: auto;
+         margin-right: auto;
+         counter-reset: verse-count;
+      }
+
+         ol.main.double {
+            max-width: 900px;
+         }
+
+         ol.main.single {
+            max-width: 450px;
+         }
+
+         ol.main li {
+            display: flex;
+            list-style-type: none;
+            counter-increment: verse-count;
+         }
+
+         ol.main.verse-numbers li:before { /* Verse numbers */
+            content: counter(verse-count);
+            color: var(--receptus-grey);
+            font-weight: bold;
+            font-size: 80%;
+            line-height: 220%;
+         }
+
+      body.dark-mode ol.main li:before {
+         color: var(--receptus-light-grey);
+      }
+      /* Two versions */
+      ol.double li p {
+         width: 50%;
+         padding-left: var(--padding);
+      }
+
+         ol.double li p:first-child {
+            padding-left: 5px;
+         }
+      /* One version */
+      ol.single li p:first-child {
+         display: inline;
+         width: 100%;
+      }
+
+      ol.single li:before {
+         padding-right: 5px;
+      }
+
+      ol.single li p:last-child {
+         display: none;
+      }
+
+      ol.single li {
+         display: inline;
+      }
+
+      .flex {
+         display: flex;
+      }
+   </style>
+   <script src="JavaScript/vue.js"></script>
+   <script>
+      const DARK_MODE_CLASS = 'dark-mode';
+      const FONT_SIZE = 18;
+      const MAX_SIZE = 35;
+      const MIN_SIZE = 10;
+      let currentFontSize = FONT_SIZE;
+
+      // Set the reader's colour mode (dark or light)
+      function mode(mode) {
+         if (mode === 'light') {
+            document.querySelector('body').classList.remove(DARK_MODE_CLASS);
+         }
+         else if (mode === 'dark') {
+            document.querySelector('body').classList.add(DARK_MODE_CLASS);
+         }
+      }
+
+      // Set the comparison view (true or false)
+      function compare(bool) {
+         if (bool) {
+            document.querySelector('ol.main').classList.remove('single');
+            document.querySelector('ol.main').classList.add('double');
+         }
+         else {
+            document.querySelector('ol.main').classList.remove('double');
+            document.querySelector('ol.main').classList.add('single');
+         }
+      }
+
+      function increaseFontSize() {
+         currentFontSize++;
+         currentFontSize = Math.clamp(currentFontSize, MIN_SIZE, MAX_SIZE);
+         fontSize(currentFontSize);
+      }
+
+      function decreaseFontSize() {
+         currentFontSize--;
+         currentFontSize = Math.clamp(currentFontSize, MIN_SIZE, MAX_SIZE);
+         fontSize(currentFontSize);
+      }
+
+      function resetFontSize() {
+         currentFontSize = FONT_SIZE;
+         fontSize(currentFontSize);
+      }
+
+      function verseNumbers(bool) {
+         if (bool) {
+            document.querySelector('ol.main').classList.add('verse-numbers');
+         }
+         else {
+            document.querySelector('ol.main').classList.remove('verse-numbers');
+         }
+      }
+
+      // Set the page's font size in pixels (integer input only)
+      // Will constrain the size to the minimum and maximum allowed
+      function fontSize(size) {
+         size = Math.clamp(size, MIN_SIZE, MAX_SIZE);
+         document.querySelector('body').style.fontSize = size + 'px';
+      }
+
+      // Replace the last space in a paragraph with a non-breaking space
+      function removeOrphans() {
+         let paragraphs = document.querySelectorAll('p');
+         paragraphs.forEach(paragraph => {
+            let verse = paragraph.textContent;
+            verse = verse.replace(/ ([^ ]*)$/, '&nbsp;$1');
+            paragraph.innerHTML = verse;
+         });
+      }
+
+      // Utility for clamping numbers to a minimum and maximum
+      Math.clamp = function (number, min, max) {
+         if (number < min) {
+            return min;
+         }
+         else if (number > max) {
+            return max;
+         }
+         else {
+            return number;
+         }
+      }
+
+      // Utility for changing a string character at an index
+      String.prototype.replaceAt = function (index, replacement) {
+         return this.substr(0, index) + replacement + this.substr(index + replacement.length);
+      }
+   </script>
+</head>
+<body>
+   <ol id="app" class="main double" :class="view">
+      <li v-for="verse in verses" :key="verse.main">
+         <p>{{ verse.main }}</p>
+         <p>{{ verse.comparison }}</p>
+      </li>
+   </ol>
+
+   <button onclick="verses()">Test</button>
+
+   <script>
+      let app = new Vue({
+         el: '#app',
+         data: {
+            view: 'double',
+            verses: [
+               {
+                  main: 'In the beginning God created the heaven and the earth.',
+                  comparison: 'Au commencement, Dieu créa les cieux et la terre.'
+               },
+               {
+                  main: 'And the earth was without form, and void; and darkness was upon the face of the deep. And the Spirit of God moved upon the face of the waters.',
+                  comparison: 'La terre était informe et vide: il y avait des ténèbres à la surface de l\'abîme, et l\'esprit de Dieu se mouvait au-dessus des eaux.'
+               },
+               {
+                  main: 'And God said, Let there be light: and there was light',
+                  comparison: 'Dieu dit: Que la lumière soit! Et la lumière fut.'
+               }
+            ]
+         }
+      });
+
+      function command() {
+         app.verses = []
+      }
+
+      function verses() {
+         array = [
+            {
+               main: 'test 1',
+               comparison: 'Au commencement, Dieu créa les cieux et la terre.'
+            },
+            {
+               main: 'test 2',
+               comparison: 'La terre était informe et vide: il y avait des ténèbres à la surface de l\'abîme, et l\'esprit de Dieu se mouvait au-dessus des eaux.'
+            }];
+         app.verses = array;
+         app.refresh();
+      }
+   </script>
+</body>
+</html>
