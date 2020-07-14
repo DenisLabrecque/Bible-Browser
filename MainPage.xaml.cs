@@ -22,7 +22,12 @@ using Windows.UI.Xaml.Media;
 using Microsoft.Toolkit.Uwp.Notifications; // Notifications library
 using Windows.UI.Notifications;
 using Windows.UI.Xaml.Input;
+<<<<<<< Updated upstream
 using Windows.UI.Xaml.Documents;
+=======
+using Windows.Data.Json;
+using Newtonsoft.Json;
+>>>>>>> Stashed changes
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -203,11 +208,28 @@ namespace BibleBrowserUWP
          {
             contentWidth = pageWidth - (2 * MINMARGIN) - VERSECOLUMN - MIDDLCOLUMN;
             ChapterWidth = contentWidth;
+<<<<<<< Updated upstream
+=======
+            //gvCompareVerses.Width = contentWidth;
+            try
+            {
+               lvSearchResults.Width = contentWidth;
+            }
+            catch
+            {
+               Debug.WriteLine("Doesn't fall within range width: " + contentWidth);
+            }
+>>>>>>> Stashed changes
          }
          else
          {
             contentWidth = (MAXTEXTWIDTH * 2) - VERSECOLUMN - MIDDLCOLUMN;
             ChapterWidth = contentWidth;
+<<<<<<< Updated upstream
+=======
+            //gvCompareVerses.Width = contentWidth;
+            lvSearchResults.Width = contentWidth;
+>>>>>>> Stashed changes
          }
 
          gvCompareVerses.Width = contentWidth;
@@ -608,6 +630,9 @@ namespace BibleBrowserUWP
       {
          SetCurrentView(CurrentView.Chapter);
 
+         Debug.WriteLine(reference);
+         Debug.WriteLine(JsonConvert.SerializeObject(reference));
+
          lvSearchResults.ItemsSource = null;
          if(m_cancelSearch != null)
             m_cancelSearch.Dispose();
@@ -615,24 +640,57 @@ namespace BibleBrowserUWP
          // New tab, leave blank
          if (BrowserTab.Selected.Reference == null)
          {
+<<<<<<< Updated upstream
             gvCompareVerses.ItemsSource = null;
             EraseVerseText();
+=======
+            //gvCompareVerses.ItemsSource = null;
+>>>>>>> Stashed changes
          }
          // Single version
          else if (reference.ComparisonVersion == null)
          {
+<<<<<<< Updated upstream
             gvCompareVerses.ItemsSource = null;
             gvCompareVerses.ItemsSource = reference.Verses;
             EraseVerseText();
             FillVerseText(reference);
+=======
+            //gvCompareVerses.ItemsSource = null;
+            //gvCompareVerses.ItemsSource = reference.Verses;
+>>>>>>> Stashed changes
          }
          // With comparison version
          else
          {
+<<<<<<< Updated upstream
             gvCompareVerses.ItemsSource = null;
             gvCompareVerses.ItemsSource = reference.Verses;
             EraseVerseText();
             FillVerseText(reference);
+=======
+            //gvCompareVerses.ItemsSource = null;
+            //gvCompareVerses.ItemsSource = reference.Verses;
+         }
+      }
+
+      private void BindReadingVoices(BibleReference reference)
+      {
+         try
+         {
+            string code = BrowserTab.Selected.LanguageCode;
+            IEnumerable<VoiceInformation> voices = SpeechSynthesizer.AllVoices.Where(voice => voice.Language.Contains(code));
+            List<string> voiceNames = new List<string>();
+            foreach (VoiceInformation voice in voices)
+            {
+               voiceNames.Add(voice.DisplayName);
+            }
+            cbSelectVoice.ItemsSource = voiceNames;
+            cbSelectVoice.SelectedItem = voiceNames.FirstOrDefault();
+         }
+         catch {
+            cbSelectVoice.Visibility = Visibility.Collapsed;
+>>>>>>> Stashed changes
          }
       }
 
@@ -672,13 +730,13 @@ namespace BibleBrowserUWP
       {
          if (show)
          {
-            gvCompareVerses.Visibility = Visibility.Visible;
+            //gvCompareVerses.Visibility = Visibility.Visible;
             btnLeftPage.Visibility = Visibility.Visible;
             btnRightPage.Visibility = Visibility.Visible;
          }
          else
          {
-            gvCompareVerses.Visibility = Visibility.Collapsed;
+            //gvCompareVerses.Visibility = Visibility.Collapsed;
             btnLeftPage.Visibility = Visibility.Collapsed;
             btnRightPage.Visibility = Visibility.Collapsed;
          }
@@ -1502,6 +1560,11 @@ namespace BibleBrowserUWP
          //{
          //   if((DependencyObject)rtbLeftCompare.Blocks.ElementAt(i). )
          //}
+      }
+
+      private void Button_Click(object sender, RoutedEventArgs e)
+      {
+         _ = wvReaderView.InvokeScriptAsync("test", null);
       }
    }
 }

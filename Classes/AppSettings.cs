@@ -37,7 +37,7 @@ namespace BibleBrowserUWP
          set {
             // Error check
             if (value == ElementTheme.Default)
-               throw new System.Exception("Only set the theme to light or dark mode!");
+               throw new Exception("Only set the theme to light or dark mode!");
             // Never set
             else if (LOCALSETTINGS.Values[KEY_THEME] == null)
                LOCALSETTINGS.Values[KEY_THEME] = (int)value;

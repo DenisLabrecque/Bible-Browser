@@ -20,7 +20,7 @@ namespace BibleBrowserUWP
    {
       #region Members
 
-      public static char[] s_wordSeparators = {
+      public static readonly char[] WordSeparators = {
          ' ',
          '*'
       };

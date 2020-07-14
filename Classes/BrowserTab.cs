@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using Windows.Storage;
 using BibleBrowserUWP;
+using System.Globalization;
 
 namespace BibleBrowserUWP
 {
@@ -175,6 +176,18 @@ namespace BibleBrowserUWP
          }
       }
 
+<<<<<<< Updated upstream
+=======
+      /// <summary>
+      /// Get the language code of the current version, like "en" or "fr"
+      /// </summary>
+      public string LanguageCode {
+         get {
+            return Reference.Version.Language.ToUpperInvariant();
+         }
+      }
+
+>>>>>>> Stashed changes
 
       /// <summary>
       /// Add a reference to history as necessary.

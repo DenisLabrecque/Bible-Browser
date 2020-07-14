@@ -748,7 +748,7 @@
                   </Grid>
 
                   <!-- Compare view (main content) -->
-                  <muxc:ItemsRepeater Name="gvCompareVerses">
+                  <!--<muxc:ItemsRepeater Name="gvCompareVerses">
                      <muxc:ItemsRepeater.ItemTemplate>
                         <DataTemplate x:DataType="local1:Verse">
                            <Grid>
@@ -759,7 +759,7 @@
                                  <ColumnDefinition Width="{x:Bind CompareWidth}"/>
                               </Grid.ColumnDefinitions>
 
-                              <!-- Verse number -->
+                              --><!-- Verse number --><!--
                               <TextBlock Text="{x:Bind Number}"
                                       Padding="0,3,5,0"
                                       FontSize="12"
@@ -770,7 +770,7 @@
                                       Foreground="Gray"
                                       FontFamily="/Assets/Fonts/PalanquinDark.ttf#Palanquin Dark Regular"/>
 
-                              <!-- Verse text -->
+                              --><!-- Verse text --><!--
                               <RichTextBlock Style="{ThemeResource ReadableText}"
                                           Grid.Column="1">
                                  <Paragraph>
@@ -778,7 +778,7 @@
                                  </Paragraph>
                               </RichTextBlock>
 
-                              <!-- Compare verse text -->
+                              --><!-- Compare verse text --><!--
                               <RichTextBlock Style="{ThemeResource ReadableText}"
                                              Grid.Column="3">
                                  <Paragraph>
@@ -788,7 +788,12 @@
                            </Grid>
                         </DataTemplate>
                      </muxc:ItemsRepeater.ItemTemplate>
-                  </muxc:ItemsRepeater>
+                  </muxc:ItemsRepeater>-->
+                  
+                     <WebView x:Name="wvReaderView" Source="ms-appx-web:///Assets/ReaderView.html" Height="500" />
+                  <Button Content="Button" Click="Button_Click" />
+
+
                </StackPanel>
             </ScrollViewer>
          </Border>
