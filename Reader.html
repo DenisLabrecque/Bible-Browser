@@ -236,22 +236,16 @@
          }
       });
 
-      function command() {
-         app.verses = []
+      function test(value) {
+         document.querySelector('body').innerHTML = 'test <b>' +value+ '</b>'
       }
 
-      function verses() {
-         array = [
-            {
-               main: 'test 1',
-               comparison: 'Au commencement, Dieu créa les cieux et la terre.'
-            },
-            {
-               main: 'test 2',
-               comparison: 'La terre était informe et vide: il y avait des ténèbres à la surface de l\'abîme, et l\'esprit de Dieu se mouvait au-dessus des eaux.'
-            }];
-         app.verses = array;
-         app.refresh();
+      function print(versesArray) {
+         app.verses = versesArray;
+      }
+
+      function clear() {
+         app.verses = [];
       }
    </script>
 </body>

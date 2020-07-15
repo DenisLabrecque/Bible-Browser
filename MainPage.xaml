@@ -670,7 +670,7 @@
                             IsItemClickEnabled="True"
                             ItemClick="LvSearchResults_ItemClick">
                   </ListView>
-                  <WebView Height="888" Source="ms-appx-web:///Reader.html" />
+                  <WebView Name="wvReader" Height="888" Source="ms-appx-web:///Reader.html" />
 
                   <!-- Compare view (main content) --><!--
                   <muxc:ItemsRepeater Name="gvCompareVerses">

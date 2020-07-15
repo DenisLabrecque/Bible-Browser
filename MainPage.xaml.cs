@@ -22,6 +22,9 @@ using Windows.UI.Xaml.Media;
 using Microsoft.Toolkit.Uwp.Notifications; // Notifications library
 using Windows.UI.Notifications;
 using Windows.UI.Xaml.Input;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using System.Text;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -101,7 +104,7 @@ namespace BibleBrowserUWP
       public static bool IsKeyboardAttached {
          get {
             KeyboardCapabilities keyboardCapabilities = new KeyboardCapabilities();
-            if(keyboardCapabilities.KeyboardPresent == 0)
+            if (keyboardCapabilities.KeyboardPresent == 0)
             {
                Debug.WriteLine("Keyboard not found.");
                return false;
@@ -126,10 +129,11 @@ namespace BibleBrowserUWP
 
          // Create the UI
          this.InitializeComponent();
-         
+
          // Set theme for window root.
          FrameworkElement root = (FrameworkElement)Window.Current.Content;
          root.RequestedTheme = AppSettings.Theme;
+         Mode(AppSettings.Theme.ToString().ToLowerInvariant());
          SetThemeToggle(AppSettings.Theme);
          SetNotificationToggle(AppSettings.ReadingNotifications);
          SetNotificationTime(AppSettings.NotifyTime);
@@ -169,7 +173,7 @@ namespace BibleBrowserUWP
       /// </summary>
       private void SetNotificationToggle(bool notificationsAllowed)
       {
-         if(notificationsAllowed)
+         if (notificationsAllowed)
          {
             //tglNotifications.IsOn = true;
             //tpNotificationTime.IsEnabled = true;
@@ -278,7 +282,7 @@ namespace BibleBrowserUWP
             BibleReference reference = BrowserTab.Selected.Reference;
             reference.VerticalScrollOffset = svPageScroller.VerticalOffset;
             BrowserTab.Selected.AddToHistory(ref reference, BrowserTab.NavigationMode.Previous);
-            if(reference.IsSearch)
+            if (reference.IsSearch)
             {
                Debug.WriteLine("```````````````````````````````````");
                Debug.WriteLine("Is search: " + BrowserTab.Selected.Reference.IsSearch);
@@ -318,7 +322,7 @@ namespace BibleBrowserUWP
             BibleReference reference = BrowserTab.Selected.Reference;
             reference.VerticalScrollOffset = svPageScroller.VerticalOffset;
             BrowserTab.Selected.AddToHistory(ref reference, BrowserTab.NavigationMode.Next);
-            if(BrowserTab.Selected.Reference.IsSearch)
+            if (BrowserTab.Selected.Reference.IsSearch)
             {
                Debug.WriteLine("-------------------------------------");
                Debug.WriteLine("Is search: " + BrowserTab.Selected.Reference.IsSearch);
@@ -329,7 +333,7 @@ namespace BibleBrowserUWP
 
                m_SearchResults.Clear();
 
-               if(reference.Search.IsComplete)
+               if (reference.Search.IsComplete)
                {
                   ReportSearchProgress(reference.Search.SearchProgressInfo);
                   SetCurrentView(CurrentView.Search);
@@ -354,7 +358,7 @@ namespace BibleBrowserUWP
       {
          BibleReference oldReference = BrowserTab.Selected.Reference;
 
-         if(oldReference != null) // Not a new tab
+         if (oldReference != null) // Not a new tab
          {
             int chapter = oldReference.Chapter;
             BibleBook book = oldReference.Book;
@@ -363,7 +367,7 @@ namespace BibleBrowserUWP
             if (chapter < 1)
             {
                int bookIndex = (int)book - 1; // Go to the previous book
-               if(bookIndex < 0) // First book wraps to last
+               if (bookIndex < 0) // First book wraps to last
                {
                   bookIndex = Enum.GetNames(typeof(BibleBook)).Length - 1;
                }
@@ -392,7 +396,7 @@ namespace BibleBrowserUWP
             if (chapter > oldReference.Chapters.Count)
             {
                int bookIndex = (int)book + 1; // Go to the next book
-               if(bookIndex > Enum.GetNames(typeof(BibleBook)).Length - 1) // Last book loops back to first
+               if (bookIndex > Enum.GetNames(typeof(BibleBook)).Length - 1) // Last book loops back to first
                {
                   bookIndex = 0;
                }
@@ -499,7 +503,7 @@ namespace BibleBrowserUWP
       /// </summary>
       async private void ReadChapterText()
       {
-         if(m_isPlaybackStarted)
+         if (m_isPlaybackStarted)
          {
             m_mediaElement.Play();
          }
@@ -511,10 +515,10 @@ namespace BibleBrowserUWP
             try
             {
                m_synth.Voice = SpeechSynthesizer.AllVoices.Where(p => p.Language.Contains(tab.LanguageCode)).First();
-               
+
                // Generate the audio stream from plain text.
                m_speechStream = await m_synth.SynthesizeTextToStreamAsync(tab.Reference.GetChapterPlainText());
-               
+
                // Send the stream to the media object
                m_mediaElement.SetSource(m_speechStream, m_speechStream.ContentType);
                m_mediaElement.Play();
@@ -524,7 +528,7 @@ namespace BibleBrowserUWP
             catch (InvalidOperationException)
             {
                // Show an error message
-               var messageDialog = new MessageDialog("Please install the language pack for this language (" + new CultureInfo(tab.LanguageCode)  + ").");
+               var messageDialog = new MessageDialog("Please install the language pack for this language (" + new CultureInfo(tab.LanguageCode) + ").");
                messageDialog.Commands.Add(new UICommand("Close"));
                messageDialog.DefaultCommandIndex = 0;
                messageDialog.CancelCommandIndex = 0;
@@ -629,26 +633,79 @@ namespace BibleBrowserUWP
          BindReadingVoices(reference);
 
          lvSearchResults.ItemsSource = null;
-         if(reference.IsSearch && reference.Search.Cancellation != null)
+         if (reference.IsSearch && reference.Search.Cancellation != null)
             reference.Search.Cancellation.Dispose();
+
+         VerseNumbers(true);
 
          // New tab, leave blank
          if (BrowserTab.Selected.Reference == null)
          {
-            //gvCompareVerses.ItemsSource = null;
+            Print(null);
          }
          // Single version
          else if (reference.ComparisonVersion == null)
          {
-            //gvCompareVerses.ItemsSource = null;
-            //gvCompareVerses.ItemsSource = reference.Verses;
+            Compare(false);
+            Print(reference.Verses);
          }
          // With comparison version
          else
          {
-            //gvCompareVerses.ItemsSource = null;
-            //gvCompareVerses.ItemsSource = reference.Verses;
+            Compare(true);
+            Print(reference.Verses);
          }
+      }
+
+      #region JavaScript Commands
+
+      internal void Print(List<Verse> verses)
+      {
+         if (verses.Count == 0 || verses == null)
+         {
+            _ = wvReader.InvokeScriptAsync("clear", null);
+            return;
+         }
+
+         List<Classes.JsonObjects.Verse> chapter = new List<Classes.JsonObjects.Verse>();
+         foreach (Verse verse in verses)
+         {
+            chapter.Add(new Classes.JsonObjects.Verse { Main = verse.MainText, Comparison = verse.SecondText });
+         }
+
+         var settings = new JsonSerializerSettings();
+         settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+         string json = JsonConvert.SerializeObject(chapter, settings);
+         Debug.WriteLine(json);
+
+         _ = wvReader.InvokeScriptAsync("eval", new string[] { "print(JSON.parse('" + json + "'))" });
+      }
+
+      internal void Compare(bool compare) =>
+         _ = wvReader.InvokeScriptAsync("compare", new string[] { compare.ToString().ToLowerInvariant() });
+
+      internal void IncreaseFontSize() =>
+         _ = wvReader.InvokeScriptAsync("increaseFontSize", null);
+
+      internal void DecreaseFontSize() =>
+         _ = wvReader.InvokeScriptAsync("decreaseFontSize", null);
+
+      internal void VerseNumbers(bool show) =>
+         _ = wvReader.InvokeScriptAsync("verseNumbers", new string[] { show.ToString().ToLowerInvariant() });
+
+      internal void Mode(string color) =>
+         _ = wvReader.InvokeScriptAsync("mode", new string[] { color });
+
+      #endregion
+
+      internal string VerseToJson(List<Verse> verses)
+      {
+         var array = verses.ToArray();
+         var settings = new JsonSerializerSettings();
+         settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+         string json = JsonConvert.SerializeObject(array, settings);
+         Debug.WriteLine(json);
+         return json;
       }
 
       private void BindReadingVoices(BibleReference reference)
@@ -789,11 +846,6 @@ namespace BibleBrowserUWP
 
 
       #region Events
-
-      private async void Home_Click(object sender, RoutedEventArgs e)
-      {
-         await BrowserTab.SaveOpenTabs();
-      }
 
       private void BtnPlay_Click(object sender, RoutedEventArgs e)
       {
@@ -1307,9 +1359,11 @@ namespace BibleBrowserUWP
       }
 
 
+
       /// <summary>
       /// Switch the app's theme between light mode and dark mode, and save that setting.
       /// </summary>
+      [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "They are in lower case to match JavaScript")]
       private void ToggleSwitch_Toggled(object sender, RoutedEventArgs e)
       {
          FrameworkElement window = (FrameworkElement)Window.Current.Content;
@@ -1318,11 +1372,13 @@ namespace BibleBrowserUWP
          {
             AppSettings.Theme = AppSettings.NONDEFLTHEME;
             window.RequestedTheme = AppSettings.NONDEFLTHEME;
+            Mode(AppSettings.NONDEFLTHEME.ToString().ToLowerInvariant());
          }
          else
          {
             AppSettings.Theme = AppSettings.DEFAULTTHEME;
             window.RequestedTheme = AppSettings.DEFAULTTHEME;
+            Mode(AppSettings.DEFAULTTHEME.ToString().ToLowerInvariant());
          }
       }
 

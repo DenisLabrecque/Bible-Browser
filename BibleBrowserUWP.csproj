@@ -111,6 +111,7 @@
     <Compile Include="Classes\BibleVersion.cs" />
     <Compile Include="Classes\BrowserTab.cs" />
     <Compile Include="Classes\DGLUtility.cs" />
+    <Compile Include="Classes\JsonObjects\Verse.cs" />
     <Compile Include="Classes\SearchItem.cs" />
     <Compile Include="Classes\SearchProgressInfo.cs" />
     <Compile Include="Classes\SearchResult.cs" />
@@ -229,6 +230,9 @@
     </PackageReference>
     <PackageReference Include="Microsoft.UI.Xaml">
       <Version>2.4.0-prerelease.191217001</Version>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>12.0.3</Version>
     </PackageReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
